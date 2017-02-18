@@ -16,17 +16,37 @@ var Editor = (function () {
         Editor._rot = Editor._rot % 4;
         Editor._preview.Dispose();
         Editor.setPreview();
+        Editor._cursor.Dispose();
     };
     Editor.setPreview = function () {
         Editor._preview = new GameObject(new BABYLON.Vector3(0, 0, 0), Editor._rot, Editor._ref, Editor._color, true, true);
     };
-    Editor.OnClick = function (evt) {
-        var coordinates = Editor.GetRelativeMousePos(evt);
-        if (Editor._ref !== "delete") {
-            Editor.CreateGameObjectAtPos(coordinates);
+    Editor.setCursor = function () {
+        if (Editor._cursor) {
+            Editor._cursor.Dispose();
         }
-        else {
-            Editor.DisposeGameObjectAtPos(coordinates);
+        Editor._cursor = new GameObject(Editor._cursorPos, Editor._rot, Editor._ref, Editor._color, true, false, true);
+    };
+    Editor.disposeCursor = function () {
+        if (Editor._cursor) {
+            Editor._cursor.Dispose();
+        }
+    };
+    Editor.OnKeyDown = function (evt) {
+        if (evt.code === "KeyR") {
+            Editor.rotate();
+        }
+    };
+    Editor.OnClick = function (evt) {
+        Editor.disposeCursor();
+        if (evt.button === 0) {
+            var coordinates = Editor.GetRelativeMousePos(evt);
+            if (Editor._ref !== "delete") {
+                Editor.CreateGameObjectAtPos(coordinates);
+            }
+            else {
+                Editor.DisposeGameObjectAtPos(coordinates);
+            }
         }
     };
     Editor.GetRelativeMousePos = function (evt) {
@@ -45,8 +65,7 @@ var Editor = (function () {
                 if (mesh.name.indexOf("GameObject_") === 0) {
                     var gameObject = GameObject.FindByMesh(mesh);
                     if (gameObject) {
-                        var newPos = Editor.GetCoordinates(pickResult.pickedPoint);
-                        new GameObject(newPos, Editor._rot, Editor._ref, Editor._color);
+                        new GameObject(Editor._cursorPos, Editor._rot, Editor._ref, Editor._color);
                     }
                 }
             }
@@ -66,6 +85,33 @@ var Editor = (function () {
         }
     };
     ;
+    Editor.OnMouseOver = function (evt) {
+        var coordinates = Editor.GetRelativeMousePos(evt);
+        if (Editor._ref !== "delete") {
+            Editor.CreateCursorAtPos(coordinates);
+        }
+    };
+    Editor.CreateCursorAtPos = function (coordinates) {
+        var pickResult = Game.Instance.getScene().pick(coordinates.x, coordinates.y);
+        if (pickResult.hit) {
+            var mesh = pickResult.pickedMesh;
+            if (mesh) {
+                if (mesh.name.indexOf("GameObject_") === 0) {
+                    var gameObject = GameObject.FindByMesh(mesh);
+                    if (gameObject) {
+                        if (gameObject.getId() !== -1) {
+                            Editor._cursorPos = Editor.GetCoordinates(pickResult.pickedPoint);
+                            Editor.setCursor();
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            Editor.disposeCursor();
+        }
+    };
+    ;
     Editor.GetCoordinates = function (hitPos) {
         hitPos = hitPos.divide(Data.XYZSize());
         var epsilon = BABYLON.Vector3.Normalize(hitPos.subtract(Game.Instance.getCamera().position));
@@ -80,22 +126,24 @@ var Editor = (function () {
     return Editor;
 }());
 Editor._ref = "cube";
-Editor._color = "red";
+Editor._color = "Red";
 Editor._rot = 0;
-window.addEventListener("click", Editor.OnClick);
+Editor._cursorPos = new BABYLON.Vector3(0, 0, 0);
 window.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("red").addEventListener("click", function () {
-        Editor.setColor("red");
-    });
-    document.getElementById("green").addEventListener("click", function () {
-        Editor.setColor("green");
-    });
-    document.getElementById("blue").addEventListener("click", function () {
-        Editor.setColor("blue");
-    });
-    document.getElementById("yellow").addEventListener("click", function () {
-        Editor.setColor("yellow");
-    });
+    window.addEventListener("keydown", Editor.OnKeyDown);
+    document.getElementById("renderCanvas").addEventListener("click", Editor.OnClick);
+    document.getElementById("renderCanvas").addEventListener("mousemove", Editor.OnMouseOver);
+    var colors = document.getElementsByClassName("colorpicker");
+    var _loop_1 = function (i) {
+        var htmlColor = colors[i];
+        htmlColor.style.backgroundColor = htmlColor.id;
+        htmlColor.addEventListener("click", function () {
+            Editor.setColor(htmlColor.id);
+        });
+    };
+    for (var i = 0; i < colors.length; i++) {
+        _loop_1(i);
+    }
     document.getElementById("rotate").addEventListener("click", function () {
         Editor.rotate();
     });
@@ -113,5 +161,14 @@ window.addEventListener("DOMContentLoaded", function () {
     });
     document.getElementById("l-bar").addEventListener("click", function () {
         Editor.setRef("l-bar");
+    });
+    document.getElementById("s-brick").addEventListener("click", function () {
+        Editor.setRef("s-brick");
+    });
+    document.getElementById("m-brick").addEventListener("click", function () {
+        Editor.setRef("m-brick");
+    });
+    document.getElementById("l-brick").addEventListener("click", function () {
+        Editor.setRef("l-brick");
     });
 });
