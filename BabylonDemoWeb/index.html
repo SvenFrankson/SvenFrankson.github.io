@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>BabylonDemo</title>
+    <script src="./lib/babylon.2.4.js"></script>
+    <script src="./scripts/game.js"></script>
+    <script src="./scripts/EditorPreview.js"></script>
+    <script src="./scripts/Data.js"></script>
+    <script src="./scripts/LocalLocks.js"></script>
+    <script src="./scripts/Materials.js"></script>
+    <script src="./scripts/Meshes.js"></script>
+    <script src="./scripts/GameObject.js"></script>
+    <script src="./scripts/Editor.js"></script>
+    <link rel="stylesheet" type="text/css" href="./styles/app.css">
+    <link rel="stylesheet" type="text/css" href="./styles/bootstrap.css">
+</head>
+<body>
+  <div class="page-header text-center">
+    <h1>BabylonJS Demo</h1>
+  </div>
+  <div class="row">
+    <div class="col-xs-1">
+
+    </div>
+    <div class="col-xs-8">
+      <canvas id="renderCanvas"></canvas>
+    </div>
+    <div class="col-xs-2">
+      <div class="row">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Preview Editor</h3>
+          </div>
+          <div class="panel-body">
+            <canvas id="renderCanvasEditorPreview"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-6">
+          <div class="row">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Colors</h3>
+              </div>
+              <div class="panel-body">
+                <div class="btn-group-vertical" role="group">
+                  <button id="red" type="button" class="btn btn-default">Red</button>
+                  <button id="green" type="button" class="btn btn-default">Green</button>
+                  <button id="blue" type="button" class="btn btn-default">Blue</button>
+                  <button id="yellow" type="button" class="btn btn-default">Yellow</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Commands</h3>
+              </div>
+              <div class="panel-body">
+                <div class="btn-group-vertical" role="group">
+                  <button id="rotate" type="button" class="btn btn-default">Rotate</button>
+                  <button id="delete" type="button" class="btn btn-default">Delete</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xs-6">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Shapes</h3>
+            </div>
+            <div class="panel-body">
+              <div class="btn-group-vertical" role="group">
+                <button id="cube" type="button" class="btn btn-default">Cube</button>
+                <button id="s-bar" type="button" class="btn btn-default">S-Bar</button>
+                <button id="m-bar" type="button" class="btn btn-default">M-Bar</button>
+                <button id="l-bar" type="button" class="btn btn-default">L-Bar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
