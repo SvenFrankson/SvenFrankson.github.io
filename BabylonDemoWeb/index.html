@@ -7,6 +7,7 @@
     <script src="./scripts/game.js"></script>
     <script src="./scripts/EditorPreview.js"></script>
     <script src="./scripts/Data.js"></script>
+    <script src="./scripts/GameObjectData.js"></script>
     <script src="./scripts/LocalLocks.js"></script>
     <script src="./scripts/Materials.js"></script>
     <script src="./scripts/Meshes.js"></script>
@@ -22,7 +23,6 @@
   </div>
   <div class="row">
     <div class="col-xs-1">
-
     </div>
     <div class="col-xs-8">
       <canvas id="renderCanvas"></canvas>
@@ -34,6 +34,23 @@
           <a href="https://github.com/SvenFrankson/babylon-demo"><button type="button" class="btn btn-default">Source Code</button></a>
           <a href="https://github.com/SvenFrankson/babylon-demo/issues"><button type="button" class="btn btn-default">Found a bug ?</button></a>
           <a href="http://svenfrankson.com/"><button type="button" class="btn btn-default">About</button></a>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Load JSON description file</h3>
+        </div>
+        <div id="load-input" class="panel-body">
+          <input id="load-input-content" type="textarea"></input>
+          <button id="load-input-btn" type="button" class="btn btn-default">Load</button>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Scene JSON description</h3>
+        </div>
+        <div id="save-output" class="panel-body">
+
         </div>
       </div>
     </div>
@@ -101,18 +118,40 @@
             </div>
             <div class="panel-body text-center">
               <div class="btn-group-vertical" role="group">
-                <button id="cube" type="button" class="btn btn-default">Cube</button>
-                <button id="s-bar" type="button" class="btn btn-default">S-Bar</button>
-                <button id="m-bar" type="button" class="btn btn-default">M-Bar</button>
-                <button id="l-bar" type="button" class="btn btn-default">L-Bar</button>
-                <button id="s-brick" type="button" class="btn btn-default">S-Brick</button>
-                <button id="m-brick" type="button" class="btn btn-default">M-Brick</button>
-                <button id="l-brick" type="button" class="btn btn-default">L-Brick</button>
+                <button id="cube" type="button" class="btn btn-default shape-picker">Cube</button>
+                <button id="s-bar" type="button" class="btn btn-default shape-picker">S-Bar</button>
+                <button id="m-bar" type="button" class="btn btn-default shape-picker">M-Bar</button>
+                <button id="l-bar" type="button" class="btn btn-default shape-picker">L-Bar</button>
+                <button id="xl-bar" type="button" class="btn btn-default shape-picker">XL-Bar</button>
+
+                <button id="s-brick" type="button" class="btn btn-default shape-picker">S-Brick</button>
+                <button id="m-brick" type="button" class="btn btn-default shape-picker">M-Brick</button>
+                <button id="l-brick" type="button" class="btn btn-default shape-picker">L-Brick</button>
+                <button id="xl-brick" type="button" class="btn btn-default shape-picker">XL-Brick</button>
+
+                <button id="square" type="button" class="btn btn-default shape-picker">Square</button>
+                <button id="s-line" type="button" class="btn btn-default shape-picker">S-Line</button>
+                <button id="m-line" type="button" class="btn btn-default shape-picker">M-Line</button>
+                <button id="l-line" type="button" class="btn btn-default shape-picker">L-Line</button>
+                <button id="xl-line" type="button" class="btn btn-default shape-picker">XL-Line</button>
+
+                <button id="s-plate" type="button" class="btn btn-default shape-picker">S-Plate</button>
+                <button id="m-plate" type="button" class="btn btn-default shape-picker">M-Plate</button>
+                <button id="l-plate" type="button" class="btn btn-default shape-picker">L-Plate</button>
+                <button id="xl-plate" type="button" class="btn btn-default shape-picker">XL-Plate</button>
+
+                <button id="xs-slide" type="button" class="btn btn-default shape-picker">XS-Slide</button>
+                <button id="s-slide" type="button" class="btn btn-default shape-picker">S-Slide</button>
+                <button id="m-slide" type="button" class="btn btn-default shape-picker">M-Slide</button>
+                <button id="l-slide" type="button" class="btn btn-default shape-picker">L-Slide</button>
+                <button id="xl-slide" type="button" class="btn btn-default shape-picker">XL-Slide</button>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
+    <div class="col-xs-1">
     </div>
   </div>
 </body>

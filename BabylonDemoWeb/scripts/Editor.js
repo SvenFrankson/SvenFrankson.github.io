@@ -65,6 +65,7 @@ var Editor = (function () {
                 if (mesh.name.indexOf("GameObject_") === 0) {
                     var gameObject = GameObject.FindByMesh(mesh);
                     if (gameObject) {
+                        console.log("Create GameObject");
                         new GameObject(Editor._cursorPos, Editor._rot, Editor._ref, Editor._color);
                     }
                 }
@@ -77,10 +78,8 @@ var Editor = (function () {
         if (pickResult.hit) {
             var mesh = pickResult.pickedMesh;
             if (mesh) {
-                if (mesh.name.indexOf("GameObject_") === 0) {
-                    var gameObject = GameObject.FindByMesh(mesh);
-                    gameObject.Dispose();
-                }
+                var gameObject = GameObject.FindByMesh(mesh);
+                gameObject.Dispose();
             }
         }
     };
@@ -92,14 +91,17 @@ var Editor = (function () {
         }
     };
     Editor.CreateCursorAtPos = function (coordinates) {
-        var pickResult = Game.Instance.getScene().pick(coordinates.x, coordinates.y);
+        var pickResult = Game.Instance.getScene()
+            .pick(coordinates.x, coordinates.y, function (mesh) {
+            return mesh.id !== "Cursor";
+        });
         if (pickResult.hit) {
             var mesh = pickResult.pickedMesh;
             if (mesh) {
                 if (mesh.name.indexOf("GameObject_") === 0) {
                     var gameObject = GameObject.FindByMesh(mesh);
                     if (gameObject) {
-                        if (gameObject.getId() !== -1) {
+                        if (gameObject.GetId() !== -1) {
                             Editor._cursorPos = Editor.GetCoordinates(pickResult.pickedPoint);
                             Editor.setCursor();
                         }
@@ -123,8 +125,29 @@ var Editor = (function () {
         pos.z = Math.round(pos.z);
         return pos;
     };
+    Editor.LoadJSONDescription = function () {
+        var jsonDescription = document.getElementById("load-input-content").value;
+        var datas = JSON.parse(jsonDescription);
+        for (var i = 0; i < datas.length; i++) {
+            Editor.pendingGameObject.push(datas[i]);
+        }
+    };
+    Editor.InstantiatePending = function () {
+        if (Editor.frameCountSinceLastInstantiation < Editor.frameDelay) {
+            Editor.frameCountSinceLastInstantiation++;
+            return;
+        }
+        if (Editor.pendingGameObject.length > 0) {
+            var gameObjectData = Editor.pendingGameObject.splice(0, 1)[0];
+            GameObject.GameObjectFromData(gameObjectData);
+        }
+        Editor.frameCountSinceLastInstantiation = 0;
+    };
     return Editor;
 }());
+Editor.frameDelay = 3;
+Editor.frameCountSinceLastInstantiation = 0;
+Editor.pendingGameObject = new Array();
 Editor._ref = "cube";
 Editor._color = "Red";
 Editor._rot = 0;
@@ -132,7 +155,11 @@ Editor._cursorPos = new BABYLON.Vector3(0, 0, 0);
 window.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("keydown", Editor.OnKeyDown);
     document.getElementById("renderCanvas").addEventListener("click", Editor.OnClick);
+    document.getElementById("load-input-btn").addEventListener("click", Editor.LoadJSONDescription);
     document.getElementById("renderCanvas").addEventListener("mousemove", Editor.OnMouseOver);
+    document.getElementById("renderCanvas").addEventListener("mouseout", function () {
+        Editor.disposeCursor();
+    });
     var colors = document.getElementsByClassName("colorpicker");
     var _loop_1 = function (i) {
         var htmlColor = colors[i];
@@ -144,31 +171,20 @@ window.addEventListener("DOMContentLoaded", function () {
     for (var i = 0; i < colors.length; i++) {
         _loop_1(i);
     }
+    var shapes = document.getElementsByClassName("shape-picker");
+    var _loop_2 = function (i) {
+        var htmlShape = shapes[i];
+        htmlShape.addEventListener("click", function () {
+            Editor.setRef(htmlShape.id);
+        });
+    };
+    for (var i = 0; i < shapes.length; i++) {
+        _loop_2(i);
+    }
     document.getElementById("rotate").addEventListener("click", function () {
         Editor.rotate();
     });
     document.getElementById("delete").addEventListener("click", function () {
         Editor.setRef("delete");
-    });
-    document.getElementById("cube").addEventListener("click", function () {
-        Editor.setRef("cube");
-    });
-    document.getElementById("s-bar").addEventListener("click", function () {
-        Editor.setRef("s-bar");
-    });
-    document.getElementById("m-bar").addEventListener("click", function () {
-        Editor.setRef("m-bar");
-    });
-    document.getElementById("l-bar").addEventListener("click", function () {
-        Editor.setRef("l-bar");
-    });
-    document.getElementById("s-brick").addEventListener("click", function () {
-        Editor.setRef("s-brick");
-    });
-    document.getElementById("m-brick").addEventListener("click", function () {
-        Editor.setRef("m-brick");
-    });
-    document.getElementById("l-brick").addEventListener("click", function () {
-        Editor.setRef("l-brick");
     });
 });
