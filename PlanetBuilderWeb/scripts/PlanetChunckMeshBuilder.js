@@ -52,6 +52,7 @@ var PlanetChunckMeshBuilder = (function () {
         vertexData.positions = positions;
         vertexData.indices = indices;
         vertexData.normals = normals;
+        vertexData.uvs = uvs;
         return vertexData;
     };
     return PlanetChunckMeshBuilder;
