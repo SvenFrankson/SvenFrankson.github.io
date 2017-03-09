@@ -5,11 +5,11 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var PlanetChunck = (function (_super) {
     __extends(PlanetChunck, _super);
-    function PlanetChunck(size, iPos, jPos, kPos) {
+    function PlanetChunck(iPos, jPos, kPos, planetSide) {
         var _this = this;
         var name = "chunck-" + iPos + "-" + jPos + "-" + kPos;
         _this = _super.call(this, name, Game.Instance.getScene()) || this;
-        _this.size = size;
+        _this.planetSide = planetSide;
         _this.iPos = iPos;
         _this.jPos = jPos;
         _this.kPos = kPos;
@@ -24,15 +24,18 @@ var PlanetChunck = (function (_super) {
                 _this.data[i][j][0] = 1;
                 var h = Math.floor(Math.random() * 4);
                 for (var k = 0; k < h; k++) {
-                    _this.data[i][j][k] = 1;
+                    _this.data[i][j][k] = Math.floor(Math.random() * 4) + 1;
                 }
             }
         }
         return _this;
     }
+    PlanetChunck.prototype.GetSize = function () {
+        return this.planetSide.GetSize();
+    };
     PlanetChunck.prototype.Initialize = function () {
         var data = PlanetChunckMeshBuilder
-            .BuildVertexData(this.size, this.iPos, this.jPos, this.kPos, 5, this.data);
+            .BuildVertexData(this.GetSize(), this.iPos, this.jPos, this.kPos, 5, this.data);
         data.applyToMesh(this);
         this.material = SharedMaterials.MainMaterial();
     };
