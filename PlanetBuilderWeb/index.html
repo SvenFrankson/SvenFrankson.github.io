@@ -6,33 +6,105 @@
     <script src="./lib/jquery-3.1.1.min.js"></script>
     <script src="./lib/bootstrap.min.js"></script>
     <script src="./lib/babylon.2.4.js"></script>
-    <script src="./scripts/game.js"></script>
+    <script src="./scripts/Game.js"></script>
+    <script src="./scripts/PlanetEditor.js"></script>
+    <script src="./scripts/Player.js"></script>
     <script src="./scripts/MeshTools.js"></script>
     <script src="./scripts/PlanetTools.js"></script>
     <script src="./scripts/SharedMaterials.js"></script>
+    <script src="./scripts/Water.js"></script>
     <script src="./scripts/PlanetChunckMeshBuilder.js"></script>
     <script src="./scripts/PlanetChunck.js"></script>
     <script src="./scripts/PlanetSide.js"></script>
     <script src="./scripts/Planet.js"></script>
-    <script src="./scripts/PlanetToolsTest.js"></script>
     <link rel="stylesheet" type="text/css" href="./styles/app.css">
     <link rel="stylesheet" type="text/css" href="./styles/bootstrap.css">
 </head>
 <body>
   <div class="page-header text-center">
-    <h1>Planet Builder Web</h1>
+    <h1>Planet Builder - Web Version</h1>
     requires modern webGL compatible web-browser with javascript enabled. Not mobile responsive (yet...)
   </div>
   <div class="row">
-    <div class="col-xs-1">
 
+    <div class="col-xs-9">
+      <div id="canvas-container" >
+        <canvas id="renderCanvas"></canvas>
+        <img id="cursor" src="./img/cursor.png">
+        <div id="inventory">
+          <intput id="remove" class="btn btn-primary inventory-item">
+            <img class="inventory-picture" src="./img/remove.png">
+            <div>[0] [X]</div>
+          </intput>
+          <intput id="grass" class="btn btn-primary inventory-item" disabled>
+            <img class="inventory-picture" src="./img/grass.png">
+            <div>[1]</div>
+          </intput>
+          <intput id="dirt" class="btn btn-primary inventory-item" disabled>
+            <img class="inventory-picture" src="./img/dirt.png">
+            <div>[2]</div>
+          </intput>
+          <intput id="sand" class="btn btn-primary inventory-item" disabled>
+            <img class="inventory-picture" src="./img/sand.png">
+            <div>[3]</div>
+          </intput>
+          <intput id="rock" class="btn btn-primary inventory-item" disabled>
+            <img class="inventory-picture" src="./img/rock.png">
+            <div>[4]</div>
+          </intput>
+        </div>
+      </div>
     </div>
-    <div class="col-xs-10">
-      <canvas id="renderCanvas"></canvas>
-    </div>
-    <div class="col-xs-1">
 
+    <div class="col-xs-3">
+      <div class="panel panel-default info-menu">
+        <div class="panel-heading">
+          FPS
+        </div>
+        <div class="panel-body">
+          <span id="fps-count"></span>
+        </div>
+      </div>
+      <div class="panel panel-default info-menu">
+        <div class="panel-heading">
+          Controls
+        </div>
+        <div class="panel-body">
+          <b>[Click Canvas]</b> Take control.
+        </div>
+        <div class="panel-body">
+          <b>[Escape]</b> Drop control.
+        </div>
+        <div class="panel-body">
+          <b>[Mouse]</b> Look around.
+        </div>
+        <div class="panel-body">
+          <b>[WASD]</b> Move.</br>
+          <b>[QZSD]</b> Move.
+        </div>
+        <div class="panel-body">
+          <b>[Space]</b> Fly.</br>
+        </div>
+        <div class="panel-body">
+          <b>[0,1,2,3,4]</b> Set selected Item.
+        </div>
+        <div class="panel-body">
+          <b>[Click]</b> Use selected Item.
+        </div>
+      </div>
+      <div class="panel panel-default info-menu">
+        <div class="panel-heading">
+          Contact
+        </div>
+        <div class="panel-body">
+          <a href="https://github.com/SvenFrankson/babylon-demo"><button type="button" class="btn btn-default">Source Code</button></a>
+          <a href="https://github.com/SvenFrankson/babylon-demo/issues"><button type="button" class="btn btn-default">Found a bug ?</button></a>
+          <a href="http://svenfrankson.com/"><button type="button" class="btn btn-default">WebSite</button></a>
+          <a href="https://www.linkedin.com/in/sventaton/?locale=en_US"><button type="button" class="btn btn-default">LinkedIn</button></a>
+        </div>
+      </div>
     </div>
+
   </div>
 </body>
 </html>

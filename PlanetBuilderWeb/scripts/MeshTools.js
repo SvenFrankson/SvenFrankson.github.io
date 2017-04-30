@@ -1,6 +1,9 @@
 var MeshTools = (function () {
     function MeshTools() {
     }
+    MeshTools.Angle = function (v1, v2) {
+        return Math.acos(BABYLON.Vector3.Dot(BABYLON.Vector3.Normalize(v1), BABYLON.Vector3.Normalize(v2)));
+    };
     MeshTools.FloatVector = function (size) {
         return new BABYLON.Vector3(size, size, size);
     };
@@ -65,6 +68,26 @@ var MeshTools = (function () {
         uvs.push(0.5);
         uvs.push(0.25 + (block - 1) * 0.25);
         uvs.push(0.25);
+    };
+    MeshTools.PushWaterUvs = function (uvs) {
+        uvs.push(0);
+        uvs.push(0);
+        uvs.push(0);
+        uvs.push(1);
+        uvs.push(1);
+        uvs.push(1);
+        uvs.push(1);
+        uvs.push(0);
+    };
+    MeshTools.VertexDataFromJSON = function (jsonData) {
+        var tmp = JSON.parse(jsonData);
+        var vertexData = new BABYLON.VertexData();
+        vertexData.positions = tmp.positions;
+        vertexData.normals = tmp.normals;
+        vertexData.matricesIndices = tmp.matricesIndices;
+        vertexData.matricesWeights = tmp.matricesWeights;
+        vertexData.indices = tmp.indices;
+        return vertexData;
     };
     return MeshTools;
 }());
