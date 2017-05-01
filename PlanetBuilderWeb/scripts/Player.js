@@ -15,7 +15,6 @@ var Player = (function (_super) {
         _this.camPos = new BABYLON.Mesh("Dummy", Game.Scene);
         _this.camPos.parent = _this;
         _this.camPos.position = new BABYLON.Vector3(0, 0, 0);
-        _this.camPos.rotationQuaternion = BABYLON.Quaternion.Identity();
         Game.Camera.parent = _this.camPos;
         _this.RegisterControl();
         Player.Instance = _this;
@@ -89,7 +88,9 @@ var Player = (function (_super) {
                 var rotation = BABYLON.Quaternion.RotationAxis(localY, rotationPower);
                 Player.Instance.rotationQuaternion = rotation.multiply(Player.Instance.rotationQuaternion);
                 var rotationCamPower = movementY / 500;
-                Player.Instance.camPos.rotate(BABYLON.Axis.X, rotationCamPower, BABYLON.Space.LOCAL);
+                Player.Instance.camPos.rotation.x += rotationCamPower;
+                Player.Instance.camPos.rotation.x = Math.max(Player.Instance.camPos.rotation.x, -Math.PI / 2);
+                Player.Instance.camPos.rotation.x = Math.min(Player.Instance.camPos.rotation.x, Math.PI / 2);
             }
         });
     };
