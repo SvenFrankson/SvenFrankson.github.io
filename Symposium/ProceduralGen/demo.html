@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
-    <title>SpaceSphere</title>
+    <title>Symposium Demo</title>
     <script src="./lib/jquery.min.js"></script>
     <script src="./lib/bootstrap.min.js"></script>
     <script src="./lib/babylon.js"></script>
@@ -12,7 +12,7 @@
 </head>
 <body>
   <div class="page-header text-center">
-    <h1>Procedural Generation</h1>
+    <h1>Demo Scene</h1>
     requires modern webGL compatible web-browser with javascript enabled.
   </div>
   <div class="row">
@@ -22,11 +22,11 @@
     <div class="col-xs-8 canvas-zone">
       <canvas id="render-canvas"></canvas>
       <canvas id="debug-output" width="257" height="257"></canvas>
-      <img id="height-map" src="./datas/heightMap256.png"/>
+      <img id="height-map" src="./datas/heightMap256.png"/ hidden>
     </div>
     <div class="col-xs-3">
       <div>Loading Time <span id="loading-time">?</span> ms</div>
-      <div id="png-height-map"></div>
+      <div id="demo-scene"></div>
     </div>
   </div>
 </body>
