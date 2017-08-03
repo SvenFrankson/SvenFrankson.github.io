@@ -264,6 +264,9 @@ var Level0 = (function () {
                             if (BABYLON.Vector3.DistanceSquared(spaceShip.position, b.position) < 400) {
                                 emit.activate();
                                 Comlink.Display("MotherShip", _this.dialogs[BeaconEmiter.activatedCount - 1], "aff9ff");
+                                if (BeaconEmiter.activatedCount === 4) {
+                                    _this.Win();
+                                }
                             }
                         }
                     }
@@ -297,19 +300,18 @@ var Level0 = (function () {
             _loop_3(i);
         }
     };
+    Level0.prototype.Win = function () {
+        var _this = this;
+        var time = (new Date()).getTime() - Main.playStart;
+        setTimeout(function () {
+            Comlink.Display("MotherShip", _this.dialogs[4], "aff9ff");
+            setTimeout(function () {
+                $("#game-over-time-value").text((time / 1000).toFixed(0) + " sec");
+                Main.GameOver();
+            }, 5000);
+        }, 5000);
+    };
     return Level0;
-}());
-var Menu = (function () {
-    function Menu() {
-    }
-    Menu.RunLevel1 = function () {
-        Loader.LoadScene("level-0", Main.Scene);
-    };
-    Menu.ShowMenu = function () {
-    };
-    Menu.HideMenu = function () {
-    };
-    return Menu;
 }());
 var Loader = (function () {
     function Loader() {
@@ -461,11 +463,76 @@ var Loader = (function () {
 Loader.LoadedStatics = [];
 Loader.index = 0;
 Loader._timeoutHandle = 0;
+var Menu = (function () {
+    function Menu() {
+    }
+    Menu.RunLevel1 = function () {
+        Loader.LoadScene("level-0", Main.Scene);
+    };
+    Menu.ShowMenu = function () {
+    };
+    Menu.HideMenu = function () {
+    };
+    return Menu;
+}());
+var RandomGenerator = (function () {
+    function RandomGenerator() {
+    }
+    RandomGenerator.Level1 = function () {
+        console.log(".");
+        var data = [];
+        var arcR = 1000;
+        var d = 100;
+        var r = 300;
+        var count = 1000;
+        var l = arcR + d + r;
+        var cX = -arcR / Math.sqrt(2);
+        var cZ = cX;
+        var minSqrRadius = (d + arcR) * (d + arcR);
+        var maxSqrRadius = l * l;
+        var position = BABYLON.Vector3.Zero();
+        while (data.length < 4) {
+            position.copyFromFloats(Math.random() * l, Math.random() * r - r / 2, Math.random() * l);
+            var sqrRadius = (position.x) * (position.x) + (position.z) * (position.z);
+            if ((sqrRadius > minSqrRadius) && (sqrRadius < maxSqrRadius)) {
+                data.push({
+                    name: "beacon",
+                    x: parseFloat((position.x + cX).toFixed(2)),
+                    y: parseFloat((position.y).toFixed(2)),
+                    z: parseFloat((position.z + cZ).toFixed(2)),
+                    s: 1,
+                    rX: parseFloat((Math.random() * Math.PI * 2).toFixed(2)),
+                    rY: parseFloat((Math.random() * Math.PI * 2).toFixed(2)),
+                    rZ: parseFloat((Math.random() * Math.PI * 2).toFixed(2))
+                });
+            }
+        }
+        while (data.length < count) {
+            position.copyFromFloats(Math.random() * l, Math.random() * r - r / 2, Math.random() * l);
+            var sqrRadius = (position.x) * (position.x) + (position.z) * (position.z);
+            if ((sqrRadius > minSqrRadius) && (sqrRadius < maxSqrRadius)) {
+                data.push({
+                    name: "asteroid-2",
+                    x: parseFloat((position.x + cX).toFixed(2)),
+                    y: parseFloat((position.y).toFixed(2)),
+                    z: parseFloat((position.z + cZ).toFixed(2)),
+                    s: parseFloat((Math.random() * 7 + 0.5).toFixed(2)),
+                    rX: parseFloat((Math.random() * Math.PI * 2).toFixed(2)),
+                    rY: parseFloat((Math.random() * Math.PI * 2).toFixed(2)),
+                    rZ: parseFloat((Math.random() * Math.PI * 2).toFixed(2))
+                });
+            }
+        }
+        console.log(JSON.stringify(data));
+    };
+    return RandomGenerator;
+}());
 var State;
 (function (State) {
     State[State["Menu"] = 0] = "Menu";
     State[State["Ready"] = 1] = "Ready";
     State[State["Game"] = 2] = "Game";
+    State[State["GameOver"] = 3] = "GameOver";
 })(State || (State = {}));
 ;
 var Main = (function () {
@@ -490,16 +557,17 @@ var Main = (function () {
     Main.prototype.createScene = function () {
         Main.Scene = new BABYLON.Scene(Main.Engine);
         this.resize();
-        var sun = new BABYLON.DirectionalLight("Sun", new BABYLON.Vector3(0.93, 0.06, 0.36), Main.Scene);
+        var sun = new BABYLON.DirectionalLight("Sun", new BABYLON.Vector3(0.36, 0.06, -0.96), Main.Scene);
         sun.intensity = 0.8;
-        var cloud = new BABYLON.HemisphericLight("Green", new BABYLON.Vector3(-0.75, 0.66, 0.07), Main.Scene);
+        var cloud = new BABYLON.HemisphericLight("Green", new BABYLON.Vector3(0.07, 0.66, 0.75), Main.Scene);
         cloud.intensity = 0.3;
         cloud.diffuse.copyFromFloats(86 / 255, 255 / 255, 229 / 255);
         cloud.groundColor.copyFromFloats(255 / 255, 202 / 255, 45 / 255);
         Main.MenuCamera = new BABYLON.ArcRotateCamera("MenuCamera", 0, 0, 1, BABYLON.Vector3.Zero(), Main.Scene);
         Main.Scene.activeCamera = Main.MenuCamera;
-        Main.MenuCamera.setPosition(new BABYLON.Vector3(160, 80, -160));
-        var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, Main.Scene);
+        Main.MenuCamera.setPosition(new BABYLON.Vector3(-160, 80, -160));
+        var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 2000.0 }, Main.Scene);
+        skybox.rotation.y = Math.PI / 2;
         skybox.infiniteDistance = true;
         var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", Main.Scene);
         skyboxMaterial.backFaceCulling = false;
@@ -523,10 +591,10 @@ var Main = (function () {
         var w = Main.Canvas.width;
         var h = Main.Canvas.height;
         var size = Math.min(w, h);
-        $("#cinematic-frame").css("width", size * 0.8);
-        $("#cinematic-frame").css("height", size * 0.8);
-        $("#cinematic-frame").css("bottom", h / 2 - size * 0.8 / 2);
-        $("#cinematic-frame").css("left", w / 2 - size * 0.8 / 2);
+        $(".frame").css("width", size * 0.8);
+        $(".frame").css("height", size * 0.8);
+        $(".frame").css("bottom", h / 2 - size * 0.8 / 2);
+        $(".frame").css("left", w / 2 - size * 0.8 / 2);
         $("#target1").css("width", size * 0.9 + "px");
         $("#target1").css("height", size * 0.9 + "px");
         $("#target1").css("top", Main.Canvas.height / 2 - size * 0.9 / 2);
@@ -563,10 +631,26 @@ var Main = (function () {
         $("#play-frame").hide();
         Main.Scene.activeCamera = Main.GameCamera;
         Main.Level.OnGameStart();
+        Main.playStart = (new Date()).getTime();
+    };
+    Main.GameOver = function () {
+        Main.State = State.GameOver;
+        $("#focal-length").hide();
+        $("#target1").hide();
+        $("#target2").hide();
+        $("#target3").hide();
+        $("#panel-right").hide();
+        $("#team-panel").hide();
+        $("#speed-display").hide();
+        $("#objective-radar").hide();
+        $(".map-icon").hide();
+        $("#play-frame").hide();
+        $("#game-over-frame").show();
     };
     return Main;
 }());
 Main._state = State.Menu;
+Main.playStart = 0;
 window.addEventListener("DOMContentLoaded", function () {
     var game = new Main("render-canvas");
     game.createScene();
@@ -1321,7 +1405,7 @@ var SpaceShipInputs = (function (_super) {
         var _this = this;
         this._canvas = canvas;
         canvas.addEventListener("keydown", function (e) {
-            if (e.keyCode === 90) {
+            if (e.keyCode === 87) {
                 _this._forward = true;
             }
             if (e.keyCode === 83) {
@@ -1330,12 +1414,12 @@ var SpaceShipInputs = (function (_super) {
             if (e.keyCode === 68) {
                 _this._right = true;
             }
-            if (e.keyCode === 81) {
+            if (e.keyCode === 65) {
                 _this._left = true;
             }
         });
         canvas.addEventListener("keyup", function (e) {
-            if (e.keyCode === 90) {
+            if (e.keyCode === 87) {
                 _this._forward = false;
             }
             if (e.keyCode === 83) {
@@ -1344,7 +1428,7 @@ var SpaceShipInputs = (function (_super) {
             if (e.keyCode === 68) {
                 _this._right = false;
             }
-            if (e.keyCode === 81) {
+            if (e.keyCode === 65) {
                 _this._left = false;
             }
             if (e.keyCode === 69) {
@@ -1465,7 +1549,7 @@ var SpaceShipCamera = (function (_super) {
         _this.rotation.copyFromFloats(0, 0, 0);
         _this.rotationQuaternion = BABYLON.Quaternion.Identity();
         _this._spaceShip = spaceShip;
-        _this.maxZ = 1000;
+        _this.maxZ = 2000;
         _this._spaceShip.focalPlane = BABYLON.MeshBuilder.CreatePlane("FocalPlane", { width: 1000, height: 1000 }, scene);
         _this._spaceShip.focalPlane.parent = _this._spaceShip;
         _this._spaceShip.focalPlane.isVisible = false;
