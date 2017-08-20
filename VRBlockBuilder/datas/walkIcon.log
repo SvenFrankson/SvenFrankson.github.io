@@ -1,0 +1,23 @@
+Exporter version: 5.2.0, Blender version: 2.78 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used:
+		selected layers only:  false
+		flat shading entire scene:  false
+		inline textures:  false
+		texture directory:  C:\Users\Sven\Documents\SvenFrankson\vr-demo\datas\
+	Python World class constructor completed
+	WARNING: No active camera has been assigned, or is not in a currently selected Blender layer
+	processing begun of mesh:  Arrow
+		processing begun of Standard material:  Blue
+		processing begun of Standard material:  White
+		processing begun of multimaterial:  walkIcon.Multimaterial#0
+		num positions      :  74
+		num normals        :  74
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  345
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========
+elapsed time:  0 min, 0.1121 secs

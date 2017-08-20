@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>VR Brick Builder</title>
+    <script src="./lib/jquery.min.js"></script>
+    <script src="./lib/bootstrap.min.js"></script>
+    <script src="./lib/babylon.js"></script>
+    <script src="./lib/babylon.gui.js"></script>
+    <script src="./scripts/app.js"></script>
+    <link rel="stylesheet" type="text/css" href="./styles/app.css">
+    <link rel="stylesheet" type="text/css" href="./styles/bootstrap.css">
+</head>
+<body>
+  <div class="page-header text-center">
+    <h1>VR Brick Builder</h1>
+  </div>
+  <div class="row">
+    <div class="col-xs-2">
+    </div>
+    <div class="col-xs-2">
+      <div id="cardboard-main-icon" class="panel panel-default">
+        <div class="panel-heading">
+          <h2 class="panel-title lg">Play CardBoard</h2>
+        </div>
+        <div class="panel-body">
+          <img class="main-icon" src="./img/cardboard-icon.png"/>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-1">
+    </div>
+    <div class="col-xs-2">
+      <div id="classic-main-icon" class="panel panel-default">
+        <div class="panel-heading">
+          <h2 class="panel-title lg">Play Desktop - Mobile</h2>
+        </div>
+        <div class="panel-body">
+          <img class="main-icon" src="./img/computer-phone-icon.png"/>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-1">
+    </div>
+    <div class="col-xs-2">
+      <div class="btn-group-vertical" style="width: 100%;">
+        <a href="https://github.com/SvenFrankson/" class="btn btn-default btn-lg">GitHub</a>
+        <a href="https://twitter.com/FranksonSven" class="btn btn-default btn-lg">Twitter</a>
+        <a href="http://svenfranksonhome-svenfrankson.rhcloud.com/" class="btn btn-default btn-lg">Website</a>
+        <a href="http://www.babylonjs.com/" class="btn btn-default btn-lg">BabylonsJS</a>
+      </div>
+    </div>
+    <div class="col-xs-2">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-1">
+    </div>
+    <div class="col-xs-2">
+      <div id="save1" class="panel panel-primary save">
+        <div class="panel-heading">
+          <h2 class="panel-title lg">Save 1</h2>
+        </div>
+        <div class="panel-body">
+          <img id="save1-pic" class="main-icon" src="./img/cardboard-icon.png"/>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-2">
+      <div id="save2" class="panel panel-default save">
+        <div class="panel-heading">
+          <h2 class="panel-title lg">Save 2</h2>
+        </div>
+        <div class="panel-body">
+          <img id="save2-pic" class="main-icon" src="./img/cardboard-icon.png"/>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-2">
+      <div id="save3" class="panel panel-default save">
+        <div class="panel-heading">
+          <h2 class="panel-title lg">Save 3</h2>
+        </div>
+        <div class="panel-body">
+          <img id="save3-pic" class="main-icon" src="./img/cardboard-icon.png"/>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-2">
+      <div id="save4" class="panel panel-default save">
+        <div class="panel-heading">
+          <h2 class="panel-title lg">Save 4</h2>
+        </div>
+        <div class="panel-body">
+          <img id="save4-pic" class="main-icon" src="./img/cardboard-icon.png"/>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-2">
+      <div id="save5" class="panel panel-default save">
+        <div class="panel-heading">
+          <h2 class="panel-title lg">Save 5</h2>
+        </div>
+        <div class="panel-body">
+          <img id="save5-pic" class="main-icon" src="./img/cardboard-icon.png"/>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-1">
+    </div>
+  </div>
+
+  <canvas id="render-canvas" hidden></canvas>
+</body>
+</html>
