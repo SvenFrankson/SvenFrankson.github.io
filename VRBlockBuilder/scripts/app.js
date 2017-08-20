@@ -934,6 +934,7 @@ class Main {
         $("canvas").show();
         Main.Scene = new BABYLON.Scene(Main.Engine);
         Main.Scene.registerBeforeRender(Control.Update);
+        Main.Scene.clearColor.copyFromFloats(0.2, 0.2, 0.2, 1);
         if (vrMode) {
             if (navigator.getVRDisplays) {
                 Main.Camera = new BABYLON.WebVRFreeCamera("WebVRFreeCamera", new BABYLON.Vector3(Config.XMax * Config.XSize / 2, 2, Config.ZMax * Config.ZSize / 2), Main.Scene);
