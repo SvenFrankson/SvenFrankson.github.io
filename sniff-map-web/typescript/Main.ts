@@ -9,8 +9,10 @@ class Main {
     public cameraManager: CameraManager;
     public ui: UI;
     public groundManager: GroundManager;
+    public buildingMaker: BuildingMaker;
 
     public static okMaterial: BABYLON.StandardMaterial;
+    public static nokMaterial: BABYLON.StandardMaterial;
     public static failureMaterial: BABYLON.StandardMaterial;
 
     public static minLon: number = 7.1665596;
@@ -42,6 +44,8 @@ class Main {
         this.scene.clearColor.copyFromFloats(0, 0, 0, 1);
         this.resize();
 
+        this.buildingMaker = new BuildingMaker();
+
         let hemisphericLight: BABYLON.HemisphericLight = new BABYLON.HemisphericLight("Light", BABYLON.Vector3.Up(), this.scene);
         this.light = hemisphericLight;
 
@@ -58,6 +62,10 @@ class Main {
         Main.okMaterial = new BABYLON.StandardMaterial("Random", this.scene);
         Main.okMaterial.diffuseColor = BABYLON.Color3.FromHexString("#42c8f4");
         Main.okMaterial.backFaceCulling = false;
+        
+        Main.nokMaterial = new BABYLON.StandardMaterial("Random", this.scene);
+        Main.nokMaterial.diffuseColor = BABYLON.Color3.FromHexString("#f48042");
+        Main.nokMaterial.backFaceCulling = false;
 
         Main.failureMaterial = new BABYLON.StandardMaterial("Random", this.scene);
         Main.failureMaterial.diffuseColor = BABYLON.Color3.FromHexString("#f48042");
@@ -168,8 +176,6 @@ class Main {
                             lon,
                             lat,
                             () => {
-                                poc.instantiateBuildings(this.scene);
-                                Failure.update();
                                 this.cameraManager.goToLocal(pickingInfo.pickedPoint);
                                 this.groundManager.toLocalGround(pickingInfo.pickedPoint);
                                 for (let i: number = -1; i <= 1; i++) {
@@ -179,8 +185,7 @@ class Main {
                                                 lon + i * poc.tileSize * 2,
                                                 lat + j * poc.tileSize * 2,
                                                 () => {
-                                                    poc.instantiateBuildings(this.scene);
-                                                    Failure.update();
+                                                    
                                                 }
                                             );
                                         }

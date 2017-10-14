@@ -9,17 +9,15 @@ class Failure {
         this.origin = origin.clone();
         this.sqrRange = range * range;
 
-        let debugSphere: BABYLON.Mesh = BABYLON.MeshBuilder.CreateDisc(
-            "Disc",
+        let debugSphere: BABYLON.Mesh = BABYLON.MeshBuilder.CreateSphere(
+            "Sphere",
             {
-                radius: range
+                diameter: 2 * range
             },
             Main.instance.scene
         );
         debugSphere.position.x = origin.x;
-        debugSphere.position.y = 0.05;
         debugSphere.position.z = origin.y;
-        debugSphere.rotation.x = Math.PI / 2;
         debugSphere.material = Main.failureMaterial;
     }
 
@@ -30,7 +28,7 @@ class Failure {
                 Failure.instances.forEach(
                     (f: Failure) => {
                         if (BABYLON.Vector2.DistanceSquared(b.coordinates, f.origin) < f.sqrRange) {
-                            b.material = Main.failureMaterial;
+                            b.material = Main.nokMaterial;
                         }
                     }
                 )

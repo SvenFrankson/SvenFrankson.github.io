@@ -72,6 +72,27 @@ class BuildingData {
         return data;
     }
 }
+class BuildingMaker {
+    constructor() {
+        this.stepInstantiate = () => {
+            let t0 = (new Date()).getTime();
+            let t1 = t0;
+            if (this.toDoList.length > 0) {
+                console.log(".");
+            }
+            while (this.toDoList.length > 0 && (t1 - t0) < 10) {
+                let data = this.toDoList.pop();
+                data.instantiate(Main.instance.scene);
+                t1 = (new Date()).getTime();
+            }
+            if (this.toDoList.length === 0) {
+                Failure.update();
+            }
+        };
+        this.toDoList = [];
+        Main.instance.scene.registerBeforeRender(this.stepInstantiate);
+    }
+}
 var CameraState;
 (function (CameraState) {
     CameraState[CameraState["global"] = 0] = "global";
@@ -83,7 +104,7 @@ class CameraManager {
     constructor() {
         this.state = CameraState.global;
         this.k = 0;
-        this.duration = 60;
+        this.duration = 120;
         this.fromPosition = BABYLON.Vector3.Zero();
         this.toPosition = BABYLON.Vector3.Zero();
         this.fromTarget = BABYLON.Vector3.Zero();
@@ -115,13 +136,17 @@ class CameraManager {
         this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(target);
-        this.toPosition.x -= 5;
-        this.toPosition.y += 2.5;
-        this.toPosition.z -= 3.75;
+        let direction = new BABYLON.Vector3(-3, 5, -4);
+        direction.normalize();
+        direction.scaleInPlace(20);
+        this.toPosition.addInPlace(direction);
         this.fromTarget.copyFrom(Main.instance.camera.target);
         this.toTarget.copyFrom(target);
         this.onTransitionDone = () => {
             this.state = CameraState.local;
+            Main.instance.camera.useAutoRotationBehavior = true;
+            Main.instance.camera.autoRotationBehavior.idleRotationWaitTime = 500;
+            Main.instance.camera.autoRotationBehavior.idleRotationSpinupTime = 2000;
         };
         this.k = 0;
         Main.instance.scene.registerBeforeRender(this.transitionStep);
@@ -137,6 +162,7 @@ class CameraManager {
         this.toTarget.copyFromFloats(0, 0, 0);
         this.onTransitionDone = () => {
             this.state = CameraState.global;
+            Main.instance.camera.useAutoRotationBehavior = false;
         };
         this.k = 0;
         Main.instance.scene.registerBeforeRender(this.transitionStep);
@@ -147,13 +173,11 @@ class Failure {
         Failure.instances.push(this);
         this.origin = origin.clone();
         this.sqrRange = range * range;
-        let debugSphere = BABYLON.MeshBuilder.CreateDisc("Disc", {
-            radius: range
+        let debugSphere = BABYLON.MeshBuilder.CreateSphere("Sphere", {
+            diameter: 2 * range
         }, Main.instance.scene);
         debugSphere.position.x = origin.x;
-        debugSphere.position.y = 0.05;
         debugSphere.position.z = origin.y;
-        debugSphere.rotation.x = Math.PI / 2;
         debugSphere.material = Main.failureMaterial;
     }
     static update() {
@@ -161,7 +185,7 @@ class Failure {
             b.material = Main.okMaterial;
             Failure.instances.forEach((f) => {
                 if (BABYLON.Vector2.DistanceSquared(b.coordinates, f.origin) < f.sqrRange) {
-                    b.material = Main.failureMaterial;
+                    b.material = Main.nokMaterial;
                 }
             });
         });
@@ -171,11 +195,12 @@ Failure.instances = [];
 class GroundManager {
     constructor(w, h) {
         this.k = 0;
-        this.duration = 60;
+        this.duration = 120;
         this.transitionStepToGlobal = () => {
             this.k++;
             this.localGround.visibility = (1 - this.k / this.duration);
             this.globalGround.visibility = this.k / this.duration;
+            Main.failureMaterial.alpha = this.k / this.duration;
             if (this.k >= this.duration) {
                 Main.instance.scene.unregisterBeforeRender(this.transitionStepToGlobal);
             }
@@ -184,6 +209,7 @@ class GroundManager {
             this.k++;
             this.localGround.visibility = this.k / this.duration;
             this.globalGround.visibility = 1 - this.k / this.duration;
+            Main.failureMaterial.alpha = 1 - this.k / this.duration;
             if (this.k >= this.duration) {
                 Main.instance.scene.unregisterBeforeRender(this.transitionStepToLocal);
             }
@@ -191,6 +217,7 @@ class GroundManager {
         this.globalGround = BABYLON.MeshBuilder.CreateGround("GlobalGround", { width: w, height: h }, Main.instance.scene);
         let groundMaterial = new BABYLON.StandardMaterial("GroundMaterial", Main.instance.scene);
         groundMaterial.diffuseTexture = new BABYLON.Texture("./data/map.png", Main.instance.scene);
+        groundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
         this.globalGround.material = groundMaterial;
         this.localGround = BABYLON.MeshBuilder.CreateDisc("LocalGround", { radius: 1 }, Main.instance.scene);
         this.localGround.rotation.x = Math.PI / 2;
@@ -199,6 +226,7 @@ class GroundManager {
         let localGroundMaterial = new BABYLON.StandardMaterial("LocalGroundMaterial", Main.instance.scene);
         localGroundMaterial.diffuseColor.copyFromFloats(0.6, 0.6, 0.6);
         localGroundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
+        this.localGround.material = localGroundMaterial;
     }
     toLocalGround(target) {
         this.k = 0;
@@ -228,6 +256,7 @@ class Main {
         this.scene = new BABYLON.Scene(this.engine);
         this.scene.clearColor.copyFromFloats(0, 0, 0, 1);
         this.resize();
+        this.buildingMaker = new BuildingMaker();
         let hemisphericLight = new BABYLON.HemisphericLight("Light", BABYLON.Vector3.Up(), this.scene);
         this.light = hemisphericLight;
         this.camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 1, BABYLON.Vector3.Zero(), this.scene);
@@ -237,6 +266,9 @@ class Main {
         Main.okMaterial = new BABYLON.StandardMaterial("Random", this.scene);
         Main.okMaterial.diffuseColor = BABYLON.Color3.FromHexString("#42c8f4");
         Main.okMaterial.backFaceCulling = false;
+        Main.nokMaterial = new BABYLON.StandardMaterial("Random", this.scene);
+        Main.nokMaterial.diffuseColor = BABYLON.Color3.FromHexString("#f48042");
+        Main.nokMaterial.backFaceCulling = false;
         Main.failureMaterial = new BABYLON.StandardMaterial("Random", this.scene);
         Main.failureMaterial.diffuseColor = BABYLON.Color3.FromHexString("#f48042");
         Main.failureMaterial.backFaceCulling = false;
@@ -279,16 +311,12 @@ class Main {
                     let lat = Tools.ZToLat(pickingInfo.pickedPoint.z);
                     Building.Clear();
                     poc.getDataAt(lon, lat, () => {
-                        poc.instantiateBuildings(this.scene);
-                        Failure.update();
                         this.cameraManager.goToLocal(pickingInfo.pickedPoint);
                         this.groundManager.toLocalGround(pickingInfo.pickedPoint);
                         for (let i = -1; i <= 1; i++) {
                             for (let j = -1; j <= 1; j++) {
                                 if (i !== j) {
                                     poc.getDataAt(lon + i * poc.tileSize * 2, lat + j * poc.tileSize * 2, () => {
-                                        poc.instantiateBuildings(this.scene);
-                                        Failure.update();
                                     });
                                 }
                             }
@@ -324,28 +352,16 @@ window.addEventListener("DOMContentLoaded", () => {
 class Poc {
     constructor() {
         this.tileSize = 0.002;
-        this.buildings = [];
-    }
-    instantiateBuildings(scene) {
-        this.buildings.forEach((data) => {
-            data.instantiate(scene);
-        });
     }
     getDataAt(long, lat, callback) {
-        this.buildings = [];
         let box = (long - this.tileSize).toFixed(7) + "," + (lat - this.tileSize).toFixed(7) + "," + (long + this.tileSize).toFixed(7) + "," + (lat + this.tileSize).toFixed(7);
         let url = "http://api.openstreetmap.org/api/0.6/map?bbox=" + box;
-        console.log(url);
         $.ajax({
             url: url,
             success: (data) => {
                 let mapNodes = new Map();
-                console.log("Success");
                 let root = data.firstElementChild;
-                console.log("Root");
-                console.log("Root has " + root.childElementCount + " children elements.");
                 let nodes = root.children;
-                console.log("Nodes");
                 for (let i = 0; i < nodes.length; i++) {
                     if (nodes[i].tagName === "node") {
                         let id = parseInt(nodes[i].id);
@@ -382,7 +398,7 @@ class Poc {
                                     newBuilding.pushNode(node);
                                 }
                             }
-                            this.buildings.push(newBuilding);
+                            Main.instance.buildingMaker.toDoList.push(newBuilding);
                         }
                     }
                 }

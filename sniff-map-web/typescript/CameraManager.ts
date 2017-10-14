@@ -16,13 +16,17 @@ class CameraManager {
         this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(target);
-        this.toPosition.x -= 5;
-        this.toPosition.y += 2.5;
-        this.toPosition.z -= 3.75;
+        let direction: BABYLON.Vector3 = new BABYLON.Vector3(-3, 5, -4);
+        direction.normalize();
+        direction.scaleInPlace(20);
+        this.toPosition.addInPlace(direction);
         this.fromTarget.copyFrom(Main.instance.camera.target);
         this.toTarget.copyFrom(target);
         this.onTransitionDone = () => {
             this.state = CameraState.local;
+            Main.instance.camera.useAutoRotationBehavior = true;
+            Main.instance.camera.autoRotationBehavior.idleRotationWaitTime = 500;
+            Main.instance.camera.autoRotationBehavior.idleRotationSpinupTime = 2000;
         }
 
         this.k = 0;
@@ -42,6 +46,7 @@ class CameraManager {
         this.toTarget.copyFromFloats(0, 0, 0);
         this.onTransitionDone = () => {
             this.state = CameraState.global;
+            Main.instance.camera.useAutoRotationBehavior = false;
         }
 
         this.k = 0;
@@ -49,7 +54,7 @@ class CameraManager {
     }
 
     public k: number = 0;
-    public duration: number = 60;
+    public duration: number = 120;
     public fromPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
     public toPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
     public fromTarget: BABYLON.Vector3 = BABYLON.Vector3.Zero();

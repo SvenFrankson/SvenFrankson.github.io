@@ -1,33 +1,17 @@
 class Poc {
 
     public tileSize: number = 0.002;
-    public buildings: BuildingData[] = [];
-
-    public instantiateBuildings(scene: BABYLON.Scene): void {
-        this.buildings.forEach(
-            (data) => {
-                data.instantiate(scene);
-            }
-        )
-    }
 
     public getDataAt(long: number, lat: number, callback: () => void): void {
-        this.buildings = [];
         let box: string = (long - this.tileSize).toFixed(7) + "," + (lat - this.tileSize).toFixed(7) + "," + (long + this.tileSize).toFixed(7) + "," + (lat + this.tileSize).toFixed(7);
         let url: string = "http://api.openstreetmap.org/api/0.6/map?bbox=" + box;
-        console.log(url);
         $.ajax(
             {
                 url: url,
                 success: (data: XMLDocument) => {
                     let mapNodes = new Map<number, BABYLON.Vector2>();
-                    console.log("Success");
                     let root = data.firstElementChild;
-                    console.log("Root");
-                    // console.log(root);
-                    console.log("Root has " + root.childElementCount + " children elements.");
                     let nodes = root.children;
-                    console.log("Nodes");
                     for (let i: number = 0; i < nodes.length; i++) {
                         if (nodes[i].tagName === "node") {
                             let id: number = parseInt(nodes[i].id);
@@ -64,7 +48,7 @@ class Poc {
                                         newBuilding.pushNode(node);
                                     }
                                 }
-                                this.buildings.push(newBuilding);
+                                Main.instance.buildingMaker.toDoList.push(newBuilding);
                             }
                         }
                     }
