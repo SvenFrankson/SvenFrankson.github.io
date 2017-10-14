@@ -24,9 +24,9 @@ class CameraManager {
         this.toTarget.copyFrom(target);
         this.onTransitionDone = () => {
             this.state = CameraState.local;
-            Main.instance.camera.useAutoRotationBehavior = true;
-            Main.instance.camera.autoRotationBehavior.idleRotationWaitTime = 500;
-            Main.instance.camera.autoRotationBehavior.idleRotationSpinupTime = 2000;
+            Main.instance.camera.useAutoRotationBehavior = false;
+            //Main.instance.camera.autoRotationBehavior.idleRotationWaitTime = 500;
+            //Main.instance.camera.autoRotationBehavior.idleRotationSpinupTime = 2000;
         }
 
         this.k = 0;

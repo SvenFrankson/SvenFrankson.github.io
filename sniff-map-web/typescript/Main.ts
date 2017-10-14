@@ -14,6 +14,7 @@ class Main {
     public static okMaterial: BABYLON.StandardMaterial;
     public static nokMaterial: BABYLON.StandardMaterial;
     public static failureMaterial: BABYLON.StandardMaterial;
+    public static greenMaterial: BABYLON.StandardMaterial;
 
     public static medLon: number = 7.7554;
     public static medLat: number = 48.5844;
@@ -53,16 +54,19 @@ class Main {
         this.cameraManager = new CameraManager();
 
         Main.okMaterial = new BABYLON.StandardMaterial("Random", this.scene);
-        Main.okMaterial.diffuseColor = BABYLON.Color3.FromHexString("#42c8f4");
+        Main.okMaterial.diffuseColor = BABYLON.Color3.FromHexString("#ffffff");
         Main.okMaterial.backFaceCulling = false;
         
         Main.nokMaterial = new BABYLON.StandardMaterial("Random", this.scene);
-        Main.nokMaterial.diffuseColor = BABYLON.Color3.FromHexString("#f48042");
+        Main.nokMaterial.diffuseColor = BABYLON.Color3.FromHexString("#E74D3B");
         Main.nokMaterial.backFaceCulling = false;
 
         Main.failureMaterial = new BABYLON.StandardMaterial("Random", this.scene);
-        Main.failureMaterial.diffuseColor = BABYLON.Color3.FromHexString("#f48042");
+        Main.failureMaterial.diffuseColor = BABYLON.Color3.FromHexString("#E74D3B");
         Main.failureMaterial.backFaceCulling = false;
+        
+        Main.greenMaterial = new BABYLON.StandardMaterial("Random", this.scene);
+        Main.greenMaterial.diffuseColor = BABYLON.Color3.FromHexString("#38c128");
 
         this.ui = new UI();
 
@@ -82,8 +86,20 @@ class Main {
                     );
                 }
             },
-            3000
-        )
+            5000
+        );
+
+        setInterval(
+            () => {
+                let position: BABYLON.Vector2 = BABYLON.Vector2.Zero();
+                position.x = Math.random() - 0.5;
+                position.y = Math.random() - 0.5;
+                position.scaleInPlace(64);
+                let range: number = Math.random() * 8 + 2;
+                new Failure(position, range);
+            },
+            10000
+        );
 
         // let long: number = 7.76539;
         // let lat: number = 48.581;
@@ -112,43 +128,9 @@ class Main {
 
         this.groundManager = new GroundManager(h, w);
 
-        new Failure(
-            new BABYLON.Vector2(
-                0, 0
-            ),
-            5
-        );
-
-        //setInterval(
-        //    () => {
-        //        new Failure(
-        //            new BABYLON.Vector2(
-        //                (Math.random() - 0.5) * w,
-        //                (Math.random() - 0.5) * h
-        //            ),
-        //            Math.random() * 20
-        //        );
-        //        Failure.update();
-        //    },
-        //    1500
-        //);
-
-        BABYLON.SceneLoader.ImportMesh(
-            "",
-            "http://svenfrankson.github.io/duck.babylon",
-            "",
-            this.scene,
-            (meshes) => {
-                meshes[0].position.x -= 1;
-                meshes[0].position.z += 1.5;
-                meshes[0].position.y = 0.3;
-                this.scene.registerBeforeRender(
-                    () => {
-                        meshes[0].rotation.y += 0.01;
-                    } 
-                )
-            }
-        );
+        this.canvas.addEventListener("keyup", () => {
+            PowerStation.instances[PowerStation.instances.length - 1].Dispose();
+        });
 
         this.scene.onPointerObservable.add(
             (eventData: BABYLON.PointerInfo, eventState: BABYLON.EventState) => {

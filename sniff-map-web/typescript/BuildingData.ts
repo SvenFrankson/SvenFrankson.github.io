@@ -16,6 +16,35 @@ class BuildingData {
         this.coordinates.scaleInPlace(1 / this.shape.length);
     }
 
+    public static instantiateBakeMany(data: BuildingData[], scene: BABYLON.Scene): Building {
+        if (data.length === 0) {
+            return undefined;
+        }
+        let rawData = BuildingData.extrudeToSolidRaw(data[0].shape, data[0].level * 0.2 + 0.1 * Math.random());
+        let vCount: number = rawData.positions.length / 3;
+        for (let i: number = 1; i < data.length; i++) {
+            let otherRawData = BuildingData.extrudeToSolidRaw(data[i].shape, data[i].level * 0.2 + 0.1 * Math.random());
+            for (let j: number = 0; j < otherRawData.indices.length; j++) {
+                otherRawData.indices[j] += vCount;
+            }
+            vCount += otherRawData.positions.length / 3;
+            rawData.positions.push(...otherRawData.positions);
+            rawData.indices.push(...otherRawData.indices);
+            rawData.colors.push(...otherRawData.colors);
+        }
+
+        let building: Building = new Building(scene);
+        building.coordinates = data[0].coordinates.clone();
+        let vertexData: BABYLON.VertexData = new BABYLON.VertexData();
+        vertexData.positions = rawData.positions;
+        vertexData.indices = rawData.indices;
+        vertexData.colors = rawData.colors;
+        vertexData.applyToMesh(building);
+        building.freezeWorldMatrix();
+
+        return building;
+    }
+
     public instantiate(scene: BABYLON.Scene): Building {
         let building: Building = new Building(scene);
         building.coordinates = this.coordinates.clone();
@@ -26,9 +55,9 @@ class BuildingData {
         return building;
     }
 
-    public static extrudeToSolid(points: BABYLON.Vector2[], height: number): BABYLON.VertexData {
-        let data: BABYLON.VertexData = new BABYLON.VertexData();
-
+    public static extrudeToSolidRaw(
+        points: BABYLON.Vector2[], height: number
+    ): {positions: number[], indices: number[], colors: number[]} {
         let positions: number[] = [];
         let indices: number[] = [];
         let colors: number[] = [];
@@ -64,9 +93,21 @@ class BuildingData {
         }
         indices.push(...Earcut.earcut(topPoints, [], 2));
 
-        data.positions = positions;
-        data.indices = indices;
-        data.colors = colors;
+        return {
+            positions: positions,
+            indices: indices,
+            colors: colors
+        };
+    }
+
+    public static extrudeToSolid(points: BABYLON.Vector2[], height: number): BABYLON.VertexData {
+        let data: BABYLON.VertexData = new BABYLON.VertexData();
+
+        let rawData = BuildingData.extrudeToSolidRaw(points, height);
+
+        data.positions = rawData.positions;
+        data.indices = rawData.indices;
+        data.colors = rawData.colors;
 
         return data;
     }

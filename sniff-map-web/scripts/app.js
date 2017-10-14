@@ -54,6 +54,32 @@ class BuildingData {
         this.coordinates.addInPlace(node);
         this.coordinates.scaleInPlace(1 / this.shape.length);
     }
+    static instantiateBakeMany(data, scene) {
+        if (data.length === 0) {
+            return undefined;
+        }
+        let rawData = BuildingData.extrudeToSolidRaw(data[0].shape, data[0].level * 0.2 + 0.1 * Math.random());
+        let vCount = rawData.positions.length / 3;
+        for (let i = 1; i < data.length; i++) {
+            let otherRawData = BuildingData.extrudeToSolidRaw(data[i].shape, data[i].level * 0.2 + 0.1 * Math.random());
+            for (let j = 0; j < otherRawData.indices.length; j++) {
+                otherRawData.indices[j] += vCount;
+            }
+            vCount += otherRawData.positions.length / 3;
+            rawData.positions.push(...otherRawData.positions);
+            rawData.indices.push(...otherRawData.indices);
+            rawData.colors.push(...otherRawData.colors);
+        }
+        let building = new Building(scene);
+        building.coordinates = data[0].coordinates.clone();
+        let vertexData = new BABYLON.VertexData();
+        vertexData.positions = rawData.positions;
+        vertexData.indices = rawData.indices;
+        vertexData.colors = rawData.colors;
+        vertexData.applyToMesh(building);
+        building.freezeWorldMatrix();
+        return building;
+    }
     instantiate(scene) {
         let building = new Building(scene);
         building.coordinates = this.coordinates.clone();
@@ -62,8 +88,7 @@ class BuildingData {
         building.freezeWorldMatrix();
         return building;
     }
-    static extrudeToSolid(points, height) {
-        let data = new BABYLON.VertexData();
+    static extrudeToSolidRaw(points, height) {
         let positions = [];
         let indices = [];
         let colors = [];
@@ -94,9 +119,18 @@ class BuildingData {
             topPoints.push(points[i].x, points[i].y);
         }
         indices.push(...Earcut.earcut(topPoints, [], 2));
-        data.positions = positions;
-        data.indices = indices;
-        data.colors = colors;
+        return {
+            positions: positions,
+            indices: indices,
+            colors: colors
+        };
+    }
+    static extrudeToSolid(points, height) {
+        let data = new BABYLON.VertexData();
+        let rawData = BuildingData.extrudeToSolidRaw(points, height);
+        data.positions = rawData.positions;
+        data.indices = rawData.indices;
+        data.colors = rawData.colors;
         return data;
     }
 }
@@ -110,9 +144,18 @@ class BuildingMaker {
                 work = true;
             }
             while (this.toDoList.length > 0 && (t1 - t0) < 10) {
-                let data = this.toDoList.pop();
-                data.instantiate(Main.instance.scene);
-                t1 = (new Date()).getTime();
+                if (this.toDoList.length > 2) {
+                    let data0 = this.toDoList.pop();
+                    let data1 = this.toDoList.pop();
+                    let data2 = this.toDoList.pop();
+                    BuildingData.instantiateBakeMany([data0, data1, data2], Main.instance.scene);
+                    t1 = (new Date()).getTime();
+                }
+                else {
+                    let data = this.toDoList.pop();
+                    data.instantiate(Main.instance.scene);
+                    t1 = (new Date()).getTime();
+                }
             }
             if (work && this.toDoList.length === 0) {
                 Failure.update();
@@ -173,9 +216,7 @@ class CameraManager {
         this.toTarget.copyFrom(target);
         this.onTransitionDone = () => {
             this.state = CameraState.local;
-            Main.instance.camera.useAutoRotationBehavior = true;
-            Main.instance.camera.autoRotationBehavior.idleRotationWaitTime = 500;
-            Main.instance.camera.autoRotationBehavior.idleRotationSpinupTime = 2000;
+            Main.instance.camera.useAutoRotationBehavior = false;
         };
         this.k = 0;
         Main.instance.scene.registerBeforeRender(this.transitionStep);
@@ -202,12 +243,16 @@ class Failure {
         Failure.instances.push(this);
         this.origin = origin.clone();
         this.sqrRange = range * range;
-        let debugSphere = BABYLON.MeshBuilder.CreateSphere("Sphere", {
-            diameter: 2 * range
-        }, Main.instance.scene);
-        debugSphere.position.x = origin.x;
-        debugSphere.position.z = origin.y;
-        debugSphere.material = Main.failureMaterial;
+        this.model = new PowerStation(true, Main.instance.scene);
+        this.model.position.x = origin.x;
+        this.model.position.z = origin.y;
+    }
+    Dispose() {
+        let index = Failure.instances.indexOf(this);
+        if (index !== -1) {
+            Failure.instances.splice(index, 1);
+        }
+        this.model.Dispose();
     }
     static update() {
         Building.instances.forEach((b) => {
@@ -289,14 +334,16 @@ class Main {
         this.camera.setPosition(new BABYLON.Vector3(-500, 500, -500));
         this.cameraManager = new CameraManager();
         Main.okMaterial = new BABYLON.StandardMaterial("Random", this.scene);
-        Main.okMaterial.diffuseColor = BABYLON.Color3.FromHexString("#42c8f4");
+        Main.okMaterial.diffuseColor = BABYLON.Color3.FromHexString("#ffffff");
         Main.okMaterial.backFaceCulling = false;
         Main.nokMaterial = new BABYLON.StandardMaterial("Random", this.scene);
-        Main.nokMaterial.diffuseColor = BABYLON.Color3.FromHexString("#f48042");
+        Main.nokMaterial.diffuseColor = BABYLON.Color3.FromHexString("#E74D3B");
         Main.nokMaterial.backFaceCulling = false;
         Main.failureMaterial = new BABYLON.StandardMaterial("Random", this.scene);
-        Main.failureMaterial.diffuseColor = BABYLON.Color3.FromHexString("#f48042");
+        Main.failureMaterial.diffuseColor = BABYLON.Color3.FromHexString("#E74D3B");
         Main.failureMaterial.backFaceCulling = false;
+        Main.greenMaterial = new BABYLON.StandardMaterial("Random", this.scene);
+        Main.greenMaterial.diffuseColor = BABYLON.Color3.FromHexString("#38c128");
         this.ui = new UI();
         setInterval(() => {
             if (this.cameraManager.state === CameraState.local) {
@@ -306,19 +353,21 @@ class Main {
                 position.scaleInPlace(64);
                 new Twittalert(position, "CA NE MARCHE PLUS #VENERE ! :((", "Today", "User-42", this.scene);
             }
-        }, 3000);
+        }, 5000);
+        setInterval(() => {
+            let position = BABYLON.Vector2.Zero();
+            position.x = Math.random() - 0.5;
+            position.y = Math.random() - 0.5;
+            position.scaleInPlace(64);
+            let range = Math.random() * 8 + 2;
+            new Failure(position, range);
+        }, 10000);
         let poc = new Poc();
         let h = 1024;
         let w = 1024;
         this.groundManager = new GroundManager(h, w);
-        new Failure(new BABYLON.Vector2(0, 0), 5);
-        BABYLON.SceneLoader.ImportMesh("", "http://svenfrankson.github.io/duck.babylon", "", this.scene, (meshes) => {
-            meshes[0].position.x -= 1;
-            meshes[0].position.z += 1.5;
-            meshes[0].position.y = 0.3;
-            this.scene.registerBeforeRender(() => {
-                meshes[0].rotation.y += 0.01;
-            });
+        this.canvas.addEventListener("keyup", () => {
+            PowerStation.instances[PowerStation.instances.length - 1].Dispose();
         });
         this.scene.onPointerObservable.add((eventData, eventState) => {
             if (eventData.type === BABYLON.PointerEventTypes._POINTERUP) {
@@ -369,7 +418,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 class Poc {
     constructor() {
-        this.tileSize = 0.005;
+        this.tileSize = 0.008;
     }
     getDataAt(long, lat, callback) {
         let box = (long - this.tileSize).toFixed(7) + "," + (lat - this.tileSize).toFixed(7) + "," + (long + this.tileSize).toFixed(7) + "," + (lat + this.tileSize).toFixed(7);
@@ -431,6 +480,44 @@ class Poc {
         });
     }
 }
+class PowerStation extends BABYLON.Mesh {
+    constructor(failure, scene) {
+        super("PowerStation", scene);
+        this.update = () => {
+            this.rotation.y += 0.02;
+            let s = BABYLON.Vector3.Distance(this.position, Main.instance.scene.activeCamera.position) / 20;
+            this.scaling.copyFromFloats(s, s, s);
+        };
+        PowerStation.instances.push(this);
+        BABYLON.SceneLoader.ImportMesh("", "./data/elec-logo.babylon", "", scene, (meshes) => {
+            this.model = meshes[0];
+            meshes[0].parent = this;
+            if (failure) {
+                meshes[0].material = Main.nokMaterial;
+            }
+            else {
+                meshes[0].material = Main.greenMaterial;
+            }
+            this.getScene().registerBeforeRender(this.update);
+        });
+    }
+    static LogPosition() {
+        let v3 = [];
+        PowerStation.instances.forEach((p) => {
+            v3.push(p.position);
+        });
+        console.log(v3);
+    }
+    Dispose() {
+        let index = PowerStation.instances.indexOf(this);
+        if (index !== -1) {
+            PowerStation.instances.splice(index, 1);
+        }
+        this.model.dispose();
+        this.dispose();
+    }
+}
+PowerStation.instances = [];
 var RAD2DEG = 180 / Math.PI;
 var PI_4 = Math.PI / 4;
 var zoom = 20;
@@ -452,37 +539,25 @@ class Tools {
 class Twittalert extends BABYLON.Mesh {
     constructor(position, content, date, author, scene) {
         super("TwittAlert", scene);
-        this.lifeSpan = 600;
+        this.lifeSpan = 10000;
         this.minDist = 20;
         this.maxDist = 80;
         this.timeout = 0;
         this.popIn = () => {
+            console.log("PopIn");
             this.container.alpha += 0.02;
-            if (this.container.alpha >= 1) {
+            if (this.container.alpha >= this.computeAlpha()) {
                 this.container.alpha = 1;
+                this.getScene().unregisterBeforeRender(this.popIn);
+                this.getScene().registerBeforeRender(this.update);
             }
-            this.getScene().unregisterBeforeRender(this.popIn);
-            this.getScene().registerBeforeRender(this.update);
         };
         this.update = () => {
-            this.timeout++;
-            let dist = BABYLON.Vector3.Distance(Main.instance.scene.activeCamera.position, this.position);
-            if (dist > this.maxDist) {
-                this.container.alpha = 0;
-            }
-            else if (dist < this.minDist) {
-                this.container.alpha = 1;
-            }
-            else {
-                let delta = dist - this.minDist;
-                this.container.alpha = -delta / (this.maxDist - this.minDist) + 1;
-            }
-            if (this.timeout > this.lifeSpan) {
-                this.getScene().unregisterBeforeRender(this.update);
-                this.getScene().registerBeforeRender(this.kill);
-            }
+            console.log("Update");
+            this.container.alpha = this.computeAlpha();
         };
         this.kill = () => {
+            console.log("Kill");
             this.container.alpha -= 0.01;
             if (this.container.alpha <= 0) {
                 this.getScene().unregisterBeforeRender(this.kill);
@@ -550,6 +625,26 @@ class Twittalert extends BABYLON.Mesh {
         this.container.linkOffsetY = "-80px";
         this.container.alpha = 0;
         scene.registerBeforeRender(this.popIn);
+        setTimeout(() => {
+            scene.unregisterBeforeRender(this.popIn);
+            scene.unregisterBeforeRender(this.update);
+            scene.registerBeforeRender(this.kill);
+        }, this.lifeSpan);
+    }
+    computeAlpha() {
+        let alpha = 0;
+        let dist = BABYLON.Vector3.Distance(Main.instance.scene.activeCamera.position, this.position);
+        if (dist > this.maxDist) {
+            alpha = 0;
+        }
+        else if (dist < this.minDist) {
+            alpha = 1;
+        }
+        else {
+            let delta = dist - this.minDist;
+            alpha = -delta / (this.maxDist - this.minDist) + 1;
+        }
+        return alpha;
     }
 }
 class UI {

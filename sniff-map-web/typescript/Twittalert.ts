@@ -1,6 +1,6 @@
 class Twittalert extends BABYLON.Mesh {
 
-    public lifeSpan: number = 600;
+    public lifeSpan: number = 10000;
     public minDist: number = 20;
     public maxDist: number = 80;
     public texture: BABYLON.GUI.AdvancedDynamicTexture;
@@ -81,37 +81,50 @@ class Twittalert extends BABYLON.Mesh {
         this.container.alpha = 0;
 
         scene.registerBeforeRender(this.popIn);
+
+        setTimeout(
+            () => {
+                scene.unregisterBeforeRender(this.popIn);
+                scene.unregisterBeforeRender(this.update);
+                scene.registerBeforeRender(this.kill);
+            },
+            this.lifeSpan
+        );
     }
 
     public timeout: number = 0;
 
     public popIn = () => {
+        console.log("PopIn");
         this.container.alpha += 0.02;
-        if (this.container.alpha >= 1) {
+        if (this.container.alpha >= this.computeAlpha()) {
             this.container.alpha = 1;
+            this.getScene().unregisterBeforeRender(this.popIn);
+            this.getScene().registerBeforeRender(this.update);
         }
-        this.getScene().unregisterBeforeRender(this.popIn);
-        this.getScene().registerBeforeRender(this.update);
+    }
+
+    public computeAlpha(): number {
+        let alpha: number = 0;
+        let dist: number = BABYLON.Vector3.Distance(Main.instance.scene.activeCamera.position, this.position);
+        if (dist > this.maxDist) {
+            alpha = 0;
+        } else if (dist < this.minDist) {
+            alpha = 1;
+        } else {
+            let delta: number = dist - this.minDist;
+            alpha = - delta / (this.maxDist - this.minDist) + 1;
+        }
+        return alpha;
     }
 
     public update = () => {
-        this.timeout ++;
-        let dist: number = BABYLON.Vector3.Distance(Main.instance.scene.activeCamera.position, this.position);
-        if (dist > this.maxDist) {
-            this.container.alpha = 0;
-        } else if (dist < this.minDist) {
-            this.container.alpha = 1;
-        } else {
-            let delta: number = dist - this.minDist;
-            this.container.alpha = - delta / (this.maxDist - this.minDist) + 1;
-        }
-        if (this.timeout > this.lifeSpan) {
-            this.getScene().unregisterBeforeRender(this.update);
-            this.getScene().registerBeforeRender(this.kill);
-        }
+        console.log("Update");
+        this.container.alpha = this.computeAlpha();
     }
 
     public kill = () => {
+        console.log("Kill");
         this.container.alpha -= 0.01;
         if (this.container.alpha <= 0) {
             this.getScene().unregisterBeforeRender(this.kill);
