@@ -46,7 +46,7 @@ class Main {
         this.camera.attachControl(this.canvas);
         this.camera.setPosition(
             new BABYLON.Vector3(
-                -1000, 1000, -1000
+                -500, 500, -500
             )
         );
 
@@ -68,7 +68,19 @@ class Main {
 
         setInterval(
             () => {
-                new Twittalert(BABYLON.Vector3.Zero(), "", "", "", this.scene);
+                if (this.cameraManager.state === CameraState.local) {
+                    let position: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+                    position.x = Math.random() - 0.5;
+                    position.z = Math.random() - 0.5;
+                    position.scaleInPlace(64);
+                    new Twittalert(
+                        position,
+                        "CA NE MARCHE PLUS #VENERE ! :((",
+                        "Today",
+                        "User-42",
+                        this.scene
+                    );
+                }
             },
             3000
         )

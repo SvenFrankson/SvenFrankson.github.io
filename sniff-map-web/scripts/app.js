@@ -186,7 +186,7 @@ class CameraManager {
         }
         this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
-        this.toPosition.copyFrom(new BABYLON.Vector3(-1000, 1000, -1000));
+        this.toPosition.copyFrom(new BABYLON.Vector3(-500, 500, -500));
         this.fromTarget.copyFrom(Main.instance.camera.target);
         this.toTarget.copyFromFloats(0, 0, 0);
         this.onTransitionDone = () => {
@@ -287,7 +287,7 @@ class Main {
         this.light = hemisphericLight;
         this.camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 1, BABYLON.Vector3.Zero(), this.scene);
         this.camera.attachControl(this.canvas);
-        this.camera.setPosition(new BABYLON.Vector3(-1000, 1000, -1000));
+        this.camera.setPosition(new BABYLON.Vector3(-500, 500, -500));
         this.cameraManager = new CameraManager();
         Main.okMaterial = new BABYLON.StandardMaterial("Random", this.scene);
         Main.okMaterial.diffuseColor = BABYLON.Color3.FromHexString("#42c8f4");
@@ -300,7 +300,13 @@ class Main {
         Main.failureMaterial.backFaceCulling = false;
         this.ui = new UI();
         setInterval(() => {
-            new Twittalert(BABYLON.Vector3.Zero(), "", "", "", this.scene);
+            if (this.cameraManager.state === CameraState.local) {
+                let position = BABYLON.Vector3.Zero();
+                position.x = Math.random() - 0.5;
+                position.z = Math.random() - 0.5;
+                position.scaleInPlace(64);
+                new Twittalert(position, "CA NE MARCHE PLUS #VENERE ! :((", "Today", "User-42", this.scene);
+            }
         }, 3000);
         let poc = new Poc();
         let h = 1024;
@@ -364,7 +370,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 class Poc {
     constructor() {
-        this.tileSize = 0.004;
+        this.tileSize = 0.0025;
     }
     getDataAt(long, lat, callback) {
         let box = (long - this.tileSize).toFixed(7) + "," + (lat - this.tileSize).toFixed(7) + "," + (long + this.tileSize).toFixed(7) + "," + (lat + this.tileSize).toFixed(7);
@@ -444,30 +450,104 @@ class Tools {
 class Twittalert extends BABYLON.Mesh {
     constructor(position, content, date, author, scene) {
         super("TwittAlert", scene);
-        this.position.copyFrom(position);
-        BABYLON.SceneLoader.ImportMesh("", "./data/twit-logo.babylon", "", scene, (meshes) => {
-            if (meshes[0]) {
-                meshes[0].scaling.copyFromFloats(0.2, 0.2, 0.2);
-                meshes[0].material = Main.okMaterial;
-                let k = 0;
-                let direction = new BABYLON.Vector3(Math.random() - 0.5, 2, Math.random() - 0.5);
-                direction.normalize();
-                direction.scaleInPlace(0.02);
-                let step = () => {
-                    meshes[0].position.addInPlace(direction);
-                    meshes[0].position.x += Math.cos(k / 10) / 50;
-                    meshes[0].position.z += Math.sin(k / 5) / 50;
-                    meshes[0].rotation.y += (Math.cos(k / 10) + 1) / 50;
-                    k++;
-                    if (k > 600) {
-                        scene.unregisterBeforeRender(step);
-                        meshes[0].dispose();
-                        this.dispose();
-                    }
-                };
-                scene.registerBeforeRender(step);
+        this.lifeSpan = 600;
+        this.minDist = 20;
+        this.maxDist = 80;
+        this.timeout = 0;
+        this.popIn = () => {
+            this.container.alpha += 0.02;
+            if (this.container.alpha >= 1) {
+                this.container.alpha = 1;
             }
-        });
+            this.getScene().unregisterBeforeRender(this.popIn);
+            this.getScene().registerBeforeRender(this.update);
+        };
+        this.update = () => {
+            this.timeout++;
+            let dist = BABYLON.Vector3.Distance(Main.instance.scene.activeCamera.position, this.position);
+            if (dist > this.maxDist) {
+                this.container.alpha = 0;
+            }
+            else if (dist < this.minDist) {
+                this.container.alpha = 1;
+            }
+            else {
+                let delta = dist - this.minDist;
+                this.container.alpha = -delta / (this.maxDist - this.minDist) + 1;
+            }
+            if (this.timeout > this.lifeSpan) {
+                this.getScene().unregisterBeforeRender(this.update);
+                this.getScene().registerBeforeRender(this.kill);
+            }
+        };
+        this.kill = () => {
+            this.container.alpha -= 0.01;
+            if (this.container.alpha <= 0) {
+                this.getScene().unregisterBeforeRender(this.kill);
+                this.container.linkWithMesh(undefined);
+                this.container.dispose();
+                this.texture.dispose();
+                this.dispose();
+            }
+        };
+        this.position.copyFrom(position);
+        this.texture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("tmp");
+        this.container = new BABYLON.GUI.Container("container");
+        this.container.width = "480px";
+        this.container.height = "80px";
+        this.texture.addControl(this.container);
+        let rectangle = new BABYLON.GUI.Rectangle("rectangle");
+        rectangle.background = "white";
+        rectangle.thickness = 1;
+        rectangle.color = "black";
+        this.container.addControl(rectangle);
+        let avatar = new BABYLON.GUI.Image("avatar", "./data/twitter-egg.png");
+        avatar.width = "60px";
+        avatar.height = "60px";
+        avatar.top = "0px";
+        avatar.left = "-200px";
+        this.container.addControl(avatar);
+        let authorBox = new BABYLON.GUI.TextBlock("author", author.split("@")[0]);
+        authorBox.color = "black";
+        authorBox.fontStyle = "bold";
+        authorBox.fontSize = 18;
+        authorBox.fontFamily = "Helvetica Neue";
+        authorBox.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+        authorBox.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+        authorBox.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+        authorBox.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+        authorBox.top = "5px";
+        authorBox.left = "90px";
+        this.container.addControl(authorBox);
+        let metaBox = new BABYLON.GUI.TextBlock("author", "@" + author.split("@")[1] + " - " + date);
+        metaBox.color = "grey";
+        metaBox.fontSize = 16;
+        metaBox.fontFamily = "Helvetica Neue";
+        metaBox.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+        metaBox.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+        metaBox.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+        metaBox.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+        metaBox.top = "5px";
+        metaBox.left = "200px";
+        this.container.addControl(metaBox);
+        let textBox = new BABYLON.GUI.TextBlock("content", content);
+        textBox.color = "black";
+        textBox.fontSize = 14;
+        textBox.fontFamily = "Helvetica Neue";
+        textBox.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+        textBox.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+        textBox.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+        textBox.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+        textBox.textWrapping = true;
+        textBox.top = "35px";
+        textBox.left = "90px";
+        textBox.width = "380px";
+        this.container.addControl(textBox);
+        this.container.linkWithMesh(this);
+        this.container.linkOffsetX = "120px";
+        this.container.linkOffsetY = "-80px";
+        this.container.alpha = 0;
+        scene.registerBeforeRender(this.popIn);
     }
 }
 class UI {

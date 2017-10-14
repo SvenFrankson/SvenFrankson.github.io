@@ -40,7 +40,7 @@ class CameraManager {
         this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(new BABYLON.Vector3(
-            -1000, 1000, -1000
+            -500, 500, -500
         ));
         this.fromTarget.copyFrom(Main.instance.camera.target);
         this.toTarget.copyFromFloats(0, 0, 0);
