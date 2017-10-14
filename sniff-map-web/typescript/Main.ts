@@ -66,6 +66,13 @@ class Main {
 
         this.ui = new UI();
 
+        setInterval(
+            () => {
+                new Twittalert(BABYLON.Vector3.Zero(), "", "", "", this.scene);
+            },
+            3000
+        )
+
         // let long: number = 7.76539;
         // let lat: number = 48.581;
         // if (localStorage.getItem("long-value") !== null) {
