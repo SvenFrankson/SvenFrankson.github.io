@@ -1,0 +1,45 @@
+Exporter version: 5.2.0, Blender version: 2.78 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used:
+		selected layers only:  true
+		flat shading entire scene:  false
+		inline textures:  false
+		texture directory:  C:\Users\Sven\Documents\SvenFrankson\HoloBomb\datas\
+	Python World class constructor completed
+	WARNING: No active camera has been assigned, or is not in a currently selected Blender layer
+	processing begun of mesh:  Explode
+		processing begun of Standard material:  Material
+		num positions      :  72
+		num normals        :  72
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  420
+	processing begun of mesh:  Ruin
+		registered as also a user of material:  Material
+		num positions      :  460
+		num normals        :  460
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  2682
+	processing begun of mesh:  Top
+		registered as also a user of material:  Material
+		num positions      :  344
+		num normals        :  344
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  2010
+	processing begun of mesh:  Block
+		registered as also a user of material:  Material
+		num positions      :  320
+		num normals        :  320
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  1824
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========
+elapsed time:  0 min, 0.2552 secs

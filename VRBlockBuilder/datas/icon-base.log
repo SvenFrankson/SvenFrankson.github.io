@@ -1,0 +1,165 @@
+Exporter version: 5.2.0, Blender version: 2.78 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used:
+		selected layers only:  false
+		flat shading entire scene:  false
+		inline textures:  false
+		texture directory:  C:\Users\Sven\Documents\SvenFrankson\vr-demo\datas\
+	Python World class constructor completed
+	WARNING: No active camera has been assigned, or is not in a currently selected Blender layer
+	processing begun of mesh:  S11
+		WARNING: No materials have been assigned: 
+		num positions      :  9
+		num normals        :  9
+		num uvs            :  18
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  24
+	processing begun of mesh:  S10
+		WARNING: No materials have been assigned: 
+		num positions      :  9
+		num normals        :  9
+		num uvs            :  18
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  24
+	processing begun of mesh:  M4
+		WARNING: No materials have been assigned: 
+		num positions      :  15
+		num normals        :  15
+		num uvs            :  30
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  48
+	processing begun of mesh:  M3
+		WARNING: No materials have been assigned: 
+		num positions      :  15
+		num normals        :  15
+		num uvs            :  30
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  48
+	processing begun of mesh:  M2
+		WARNING: No materials have been assigned: 
+		num positions      :  15
+		num normals        :  15
+		num uvs            :  30
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  48
+	processing begun of mesh:  M1
+		WARNING: No materials have been assigned: 
+		num positions      :  15
+		num normals        :  15
+		num uvs            :  30
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  48
+	processing begun of mesh:  L1
+		WARNING: No materials have been assigned: 
+		num positions      :  25
+		num normals        :  25
+		num uvs            :  50
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  96
+	processing begun of mesh:  L0
+		WARNING: No materials have been assigned: 
+		num positions      :  25
+		num normals        :  25
+		num uvs            :  50
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  96
+	processing begun of mesh:  M0
+		WARNING: No materials have been assigned: 
+		num positions      :  15
+		num normals        :  15
+		num uvs            :  30
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  48
+	processing begun of mesh:  L3
+		WARNING: No materials have been assigned: 
+		num positions      :  25
+		num normals        :  25
+		num uvs            :  50
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  96
+	processing begun of mesh:  S2
+		WARNING: No materials have been assigned: 
+		num positions      :  9
+		num normals        :  9
+		num uvs            :  18
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  24
+	processing begun of mesh:  S6
+		WARNING: No materials have been assigned: 
+		num positions      :  9
+		num normals        :  9
+		num uvs            :  18
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  24
+	processing begun of mesh:  S7
+		WARNING: No materials have been assigned: 
+		num positions      :  9
+		num normals        :  9
+		num uvs            :  18
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  24
+	processing begun of mesh:  S3
+		WARNING: No materials have been assigned: 
+		num positions      :  9
+		num normals        :  9
+		num uvs            :  18
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  24
+	processing begun of mesh:  S1
+		WARNING: No materials have been assigned: 
+		num positions      :  9
+		num normals        :  9
+		num uvs            :  18
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  24
+	processing begun of mesh:  S5
+		WARNING: No materials have been assigned: 
+		num positions      :  9
+		num normals        :  9
+		num uvs            :  18
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  24
+	processing begun of mesh:  S4
+		WARNING: No materials have been assigned: 
+		num positions      :  9
+		num normals        :  9
+		num uvs            :  18
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  24
+	processing begun of mesh:  S0
+		WARNING: No materials have been assigned: 
+		num positions      :  9
+		num normals        :  9
+		num uvs            :  18
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  24
+	processing begun of mesh:  L2
+		WARNING: No materials have been assigned: 
+		num positions      :  25
+		num normals        :  25
+		num uvs            :  50
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  96
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========
+elapsed time:  0 min, 0.0675 secs
