@@ -15,21 +15,14 @@ class Main {
     public static nokMaterial: BABYLON.StandardMaterial;
     public static failureMaterial: BABYLON.StandardMaterial;
 
-    public static minLon: number = 7.1665596;
-    public static maxLon: number = 8.1771085;
-    public static minLat: number = 48.3614766;
-    public static maxLat: number = 49.0194274;
-
-    public static medLon: number;
-    public static medLat: number;
+    public static medLon: number = 7.7554;
+    public static medLat: number = 48.5844;
 
     public static medX: number = 0;
     public static medZ: number = 0;
 
     constructor(canvasElement: string) {
         Main.instance = this;
-        Main.medLon = (Main.minLon + Main.maxLon) / 2;
-        Main.medLat = (Main.minLat + Main.maxLat) / 2;
         Main.medX = Tools.LonToX(Main.medLon);
         Main.medZ = Tools.LatToZ(Main.medLat);
         console.log("MedX " + Main.medX);
@@ -95,8 +88,8 @@ class Main {
         // });
         
         let poc: Poc = new Poc();
-        let h: number = Tools.LatToZ(Main.maxLat) - Tools.LatToZ(Main.minLat);
-        let w: number = Tools.LonToX(Main.maxLon) - Tools.LonToX(Main.minLon);
+        let h: number = 1024;
+        let w: number = 1024;
 
         this.groundManager = new GroundManager(h, w);
 
@@ -139,24 +132,6 @@ class Main {
             }
         );
 
-        let bottomLeft: BABYLON.Mesh = BABYLON.MeshBuilder.CreateBox("Cube", {size: 10}, this.scene);
-        bottomLeft.position.x = Tools.LonToX(Main.minLon);
-        bottomLeft.position.z = Tools.LatToZ(Main.minLat);
-        console.log("BottomLeft " + bottomLeft.position);
-        
-        let topLeft: BABYLON.Mesh = BABYLON.MeshBuilder.CreateBox("Cube", {size: 10}, this.scene);
-        topLeft.position.x = Tools.LonToX(Main.minLon);
-        topLeft.position.z = Tools.LatToZ(Main.maxLat);
-        
-        let topRight: BABYLON.Mesh = BABYLON.MeshBuilder.CreateBox("Cube", {size: 10}, this.scene);
-        topRight.position.x = Tools.LonToX(Main.maxLon);
-        topRight.position.z = Tools.LatToZ(Main.maxLat);
-        console.log("TopRight " + topRight.position);
-        
-        let bottomRight: BABYLON.Mesh = BABYLON.MeshBuilder.CreateBox("Cube", {size: 10}, this.scene);
-        bottomRight.position.x = Tools.LonToX(Main.maxLon);
-        bottomRight.position.z = Tools.LatToZ(Main.minLat);
-
         this.scene.onPointerObservable.add(
             (eventData: BABYLON.PointerInfo, eventState: BABYLON.EventState) => {
                 if (eventData.type === BABYLON.PointerEventTypes._POINTERUP) {
@@ -185,7 +160,7 @@ class Main {
                                                 lon + i * poc.tileSize * 2,
                                                 lat + j * poc.tileSize * 2,
                                                 () => {
-                                                    
+
                                                 }
                                             );
                                         }

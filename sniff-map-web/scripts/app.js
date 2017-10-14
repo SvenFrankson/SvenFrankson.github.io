@@ -16,8 +16,32 @@ class Building extends BABYLON.Mesh {
             Building.instances[0].Dispose();
         }
     }
+    static UpdateCenterAndRadius() {
+        if (Building.instances.length === 0) {
+            return;
+        }
+        let minX = Infinity;
+        let maxX = -Infinity;
+        let minZ = Infinity;
+        let maxZ = -Infinity;
+        Building.instances.forEach((b) => {
+            minX = Math.min(minX, b.coordinates.x);
+            minZ = Math.min(minZ, b.coordinates.y);
+            maxX = Math.max(maxX, b.coordinates.x);
+            maxZ = Math.max(maxZ, b.coordinates.y);
+        });
+        Building.center.x = (minX + maxX) / 2;
+        Building.center.z = (minZ + maxZ) / 2;
+        Building.radius = Math.max(maxZ - minZ, maxX - minX);
+        let lon = Tools.XToLon(Building.center.x);
+        let lat = Tools.ZToLat(Building.center.z);
+        Main.instance.groundManager.localGround.position.copyFrom(Building.center);
+        Main.instance.groundManager.localGround.scaling.copyFromFloats(Building.radius, Building.radius, Building.radius);
+    }
 }
 Building.instances = [];
+Building.center = BABYLON.Vector3.Zero();
+Building.radius = 10;
 class BuildingData {
     constructor() {
         this.coordinates = BABYLON.Vector2.Zero();
@@ -42,11 +66,14 @@ class BuildingData {
         let data = new BABYLON.VertexData();
         let positions = [];
         let indices = [];
+        let colors = [];
         for (let i = 0; i < points.length; i++) {
             positions.push(points[i].x, height, points[i].y);
+            colors.push(1, 1, 1, 1);
         }
         for (let i = 0; i < points.length; i++) {
             positions.push(points[i].x, 0, points[i].y);
+            colors.push(0.3, 0.3, 0.3, 1);
         }
         for (let i = 0; i < points.length; i++) {
             let a = i + points.length;
@@ -69,6 +96,7 @@ class BuildingData {
         indices.push(...Earcut.earcut(topPoints, [], 2));
         data.positions = positions;
         data.indices = indices;
+        data.colors = colors;
         return data;
     }
 }
@@ -77,15 +105,16 @@ class BuildingMaker {
         this.stepInstantiate = () => {
             let t0 = (new Date()).getTime();
             let t1 = t0;
+            let work = false;
             if (this.toDoList.length > 0) {
-                console.log(".");
+                work = true;
             }
             while (this.toDoList.length > 0 && (t1 - t0) < 10) {
                 let data = this.toDoList.pop();
                 data.instantiate(Main.instance.scene);
                 t1 = (new Date()).getTime();
             }
-            if (this.toDoList.length === 0) {
+            if (work && this.toDoList.length === 0) {
                 Failure.update();
             }
         };
@@ -216,15 +245,14 @@ class GroundManager {
         };
         this.globalGround = BABYLON.MeshBuilder.CreateGround("GlobalGround", { width: w, height: h }, Main.instance.scene);
         let groundMaterial = new BABYLON.StandardMaterial("GroundMaterial", Main.instance.scene);
-        groundMaterial.diffuseTexture = new BABYLON.Texture("./data/map.png", Main.instance.scene);
+        groundMaterial.diffuseTexture = new BABYLON.Texture("./data/alsace.png", Main.instance.scene);
         groundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
         this.globalGround.material = groundMaterial;
-        this.localGround = BABYLON.MeshBuilder.CreateDisc("LocalGround", { radius: 1 }, Main.instance.scene);
-        this.localGround.rotation.x = Math.PI / 2;
-        this.localGround.position.y = -0.05;
-        this.localGround.scaling.copyFromFloats(20, 20, 20);
+        this.localGround = BABYLON.MeshBuilder.CreateDisc("LocalGround", { radius: 1, sideOrientation: 1 }, Main.instance.scene);
+        this.localGround.rotation.x = -Math.PI / 2;
+        this.localGround.scaling.copyFromFloats(64, 64, 64);
         let localGroundMaterial = new BABYLON.StandardMaterial("LocalGroundMaterial", Main.instance.scene);
-        localGroundMaterial.diffuseColor.copyFromFloats(0.6, 0.6, 0.6);
+        localGroundMaterial.diffuseTexture = new BABYLON.Texture("./data/strasbourg.png", Main.instance.scene);
         localGroundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
         this.localGround.material = localGroundMaterial;
     }
@@ -242,8 +270,6 @@ class GroundManager {
 class Main {
     constructor(canvasElement) {
         Main.instance = this;
-        Main.medLon = (Main.minLon + Main.maxLon) / 2;
-        Main.medLat = (Main.minLat + Main.maxLat) / 2;
         Main.medX = Tools.LonToX(Main.medLon);
         Main.medZ = Tools.LatToZ(Main.medLat);
         console.log("MedX " + Main.medX);
@@ -274,8 +300,8 @@ class Main {
         Main.failureMaterial.backFaceCulling = false;
         this.ui = new UI();
         let poc = new Poc();
-        let h = Tools.LatToZ(Main.maxLat) - Tools.LatToZ(Main.minLat);
-        let w = Tools.LonToX(Main.maxLon) - Tools.LonToX(Main.minLon);
+        let h = 1024;
+        let w = 1024;
         this.groundManager = new GroundManager(h, w);
         new Failure(new BABYLON.Vector2(Tools.LonToX(7.76539), Tools.LatToZ(48.581)), 5);
         BABYLON.SceneLoader.ImportMesh("", "http://svenfrankson.github.io/duck.babylon", "", this.scene, (meshes) => {
@@ -286,20 +312,6 @@ class Main {
                 meshes[0].rotation.y += 0.01;
             });
         });
-        let bottomLeft = BABYLON.MeshBuilder.CreateBox("Cube", { size: 10 }, this.scene);
-        bottomLeft.position.x = Tools.LonToX(Main.minLon);
-        bottomLeft.position.z = Tools.LatToZ(Main.minLat);
-        console.log("BottomLeft " + bottomLeft.position);
-        let topLeft = BABYLON.MeshBuilder.CreateBox("Cube", { size: 10 }, this.scene);
-        topLeft.position.x = Tools.LonToX(Main.minLon);
-        topLeft.position.z = Tools.LatToZ(Main.maxLat);
-        let topRight = BABYLON.MeshBuilder.CreateBox("Cube", { size: 10 }, this.scene);
-        topRight.position.x = Tools.LonToX(Main.maxLon);
-        topRight.position.z = Tools.LatToZ(Main.maxLat);
-        console.log("TopRight " + topRight.position);
-        let bottomRight = BABYLON.MeshBuilder.CreateBox("Cube", { size: 10 }, this.scene);
-        bottomRight.position.x = Tools.LonToX(Main.maxLon);
-        bottomRight.position.z = Tools.LatToZ(Main.minLat);
         this.scene.onPointerObservable.add((eventData, eventState) => {
             if (eventData.type === BABYLON.PointerEventTypes._POINTERUP) {
                 let pickingInfo = this.scene.pick(this.scene.pointerX, this.scene.pointerY, (m) => {
@@ -338,10 +350,8 @@ class Main {
         this.engine.resize();
     }
 }
-Main.minLon = 7.1665596;
-Main.maxLon = 8.1771085;
-Main.minLat = 48.3614766;
-Main.maxLat = 49.0194274;
+Main.medLon = 7.7554;
+Main.medLat = 48.5844;
 Main.medX = 0;
 Main.medZ = 0;
 window.addEventListener("DOMContentLoaded", () => {
@@ -351,7 +361,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 class Poc {
     constructor() {
-        this.tileSize = 0.002;
+        this.tileSize = 0.004;
     }
     getDataAt(long, lat, callback) {
         let box = (long - this.tileSize).toFixed(7) + "," + (lat - this.tileSize).toFixed(7) + "," + (long + this.tileSize).toFixed(7) + "," + (lat + this.tileSize).toFixed(7);
@@ -416,16 +426,16 @@ var RAD2DEG = 180 / Math.PI;
 var PI_4 = Math.PI / 4;
 class Tools {
     static LonToX(lon) {
-        return lon * 1000 - Main.medX;
+        return lon * 1250 - Main.medX;
     }
     static LatToZ(lat) {
-        return Math.log(Math.tan((lat / 90 + 1) * PI_4)) * RAD2DEG * 1000 - Main.medZ;
+        return Math.log(Math.tan((lat / 90 + 1) * PI_4)) * RAD2DEG * 1250 - Main.medZ;
     }
     static XToLon(x) {
-        return (x + Main.medX) / 1000;
+        return (x + Main.medX) / 1250;
     }
     static ZToLat(z) {
-        return (Math.atan(Math.exp((z + Main.medZ) / 1000 / RAD2DEG)) / PI_4 - 1) * 90;
+        return (Math.atan(Math.exp((z + Main.medZ) / 1250 / RAD2DEG)) / PI_4 - 1) * 90;
     }
 }
 class UI {

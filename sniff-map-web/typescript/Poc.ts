@@ -1,6 +1,6 @@
 class Poc {
 
-    public tileSize: number = 0.002;
+    public tileSize: number = 0.004;
 
     public getDataAt(long: number, lat: number, callback: () => void): void {
         let box: string = (long - this.tileSize).toFixed(7) + "," + (lat - this.tileSize).toFixed(7) + "," + (long + this.tileSize).toFixed(7) + "," + (lat + this.tileSize).toFixed(7);

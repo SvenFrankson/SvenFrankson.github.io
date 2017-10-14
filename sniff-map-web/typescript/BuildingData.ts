@@ -31,12 +31,15 @@ class BuildingData {
 
         let positions: number[] = [];
         let indices: number[] = [];
+        let colors: number[] = [];
 
         for (let i: number = 0; i < points.length; i++) {
             positions.push(points[i].x, height, points[i].y);
+            colors.push(1, 1, 1, 1);
         }
         for (let i: number = 0; i < points.length; i++) {
             positions.push(points[i].x, 0, points[i].y);
+            colors.push(0.3, 0.3, 0.3, 1);
         }
 
         for (let i: number = 0; i < points.length; i++) {
@@ -63,6 +66,7 @@ class BuildingData {
 
         data.positions = positions;
         data.indices = indices;
+        data.colors = colors;
 
         return data;
     }
