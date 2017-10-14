@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+    <title>BabylonJS Empty Project</title>
+    <script src="./scripts/jquery.js"></script>
+    <script src="./scripts/babylon.max.js"></script>
+    <script src="./scripts/app.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./styles/app.css">
+</head>
+
+<body>
+    <div class="page-header text-center">
+        <h1>BabylonJS Empty Project</h1>
+    </div>
+    <div class="row">
+        <div class="col-xs-1">
+        </div>
+        <div class="col-xs-8">
+            <canvas id="render-canvas"></canvas>
+        </div>
+        <div class="col-xs-3">
+            Pick Long/Lat, then refresh page.
+            <br/>
+            <span>Long</span><input id="long-input" type="number" step="0.0001"/>
+            <br/>
+            <span>Lat</span><input id="lat-input" type="number" step="0.0001"/>
+        </div>
+    </div>
+</body>
+
+</html>
