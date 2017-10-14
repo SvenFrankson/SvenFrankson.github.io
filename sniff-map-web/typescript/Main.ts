@@ -1,12 +1,17 @@
 class Main {
 
+    public static instance: Main;
     public canvas: HTMLCanvasElement;
     public engine: BABYLON.Engine;
     public scene: BABYLON.Scene;
     public light: BABYLON.Light;
     public camera: BABYLON.Camera;
 
+    public static okMaterial: BABYLON.StandardMaterial;
+    public static failureMaterial: BABYLON.StandardMaterial;
+
     constructor(canvasElement: string) {
+        Main.instance = this;
         this.canvas = document.getElementById(canvasElement) as HTMLCanvasElement;
         this.engine = new BABYLON.Engine(this.canvas, true);
         BABYLON.Engine.ShadersRepository = "./shaders/";
@@ -24,6 +29,14 @@ class Main {
         arcRotateCamera.setPosition(new BABYLON.Vector3(3, 2, -5));
         arcRotateCamera.attachControl(this.canvas);
         this.scene.activeCamera = arcRotateCamera;
+
+        Main.okMaterial = new BABYLON.StandardMaterial("Random", this.scene);
+        Main.okMaterial.diffuseColor = BABYLON.Color3.FromHexString("#42c8f4");
+        Main.okMaterial.backFaceCulling = false;
+
+        Main.failureMaterial = new BABYLON.StandardMaterial("Random", this.scene);
+        Main.failureMaterial.diffuseColor = BABYLON.Color3.FromHexString("#f48042");
+        Main.failureMaterial.backFaceCulling = false;
 
         let long: number = 7.76539;
         let lat: number = 48.581;
@@ -51,11 +64,25 @@ class Main {
             long,
             lat,
             () => {
-                poc.instantiateBuildings(long, lat, this.scene);
+                poc.instantiateBuildings(this.scene);
+
+                setInterval(
+                    () => {
+                        new Failure(
+                            new BABYLON.Vector2(
+                                (Math.random() - 0.5) * 48,
+                                (Math.random() - 0.5) * 48
+                            ),
+                            Math.random() * 5
+                        );
+                        Failure.update();
+                    },
+                    1500
+                )
             }
         );
 
-        let ground: BABYLON.Mesh = BABYLON.MeshBuilder.CreateDisc("Ground", {radius: 12}, this.scene);
+        let ground: BABYLON.Mesh = BABYLON.MeshBuilder.CreateDisc("Ground", {radius: 24}, this.scene);
         ground.rotation.x = Math.PI / 2;
 
         BABYLON.SceneLoader.ImportMesh(
