@@ -1,6 +1,27 @@
 var RAD2DEG = 180 / Math.PI;
 var PI_4 = Math.PI / 4;
+var zoom: number = 20;
 
+class Tools {
+    public static LonToX(lon: number): number {
+        return (lon + 180) / 360 * Math.pow(2, zoom) - Main.medX;
+    }
+
+    public static LatToZ(lat: number): number {
+        let res: number = Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180));
+        return (1 - res / Math.PI) * Math.pow(2, zoom - 1)  - Main.medZ;
+    }
+
+    public static XToLon(x: number): number {
+        return (x + Main.medX) / Math.pow(2, zoom) * 360 - 180;
+    }
+    
+    public static ZToLat(z: number): number {
+        return Math.atan(Math.sinh(Math.PI - (z + Main.medZ) / Math.pow(2, zoom) * 2 * Math.PI)) * 180 / Math.PI;
+    }
+}
+
+/*
 class Tools {
     public static LonToX(lon: number): number {
         return lon * 1250 - Main.medX;
@@ -19,7 +40,6 @@ class Tools {
     }
 }
 
-/*
 class Tools {
     public static LonToX(lon: number): number {
         return (lon - Main.medLon) * 2000;

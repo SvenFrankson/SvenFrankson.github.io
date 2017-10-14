@@ -250,7 +250,8 @@ class GroundManager {
         this.globalGround.material = groundMaterial;
         this.localGround = BABYLON.MeshBuilder.CreateDisc("LocalGround", { radius: 1, sideOrientation: 1 }, Main.instance.scene);
         this.localGround.rotation.x = -Math.PI / 2;
-        this.localGround.scaling.copyFromFloats(64, 64, 64);
+        let s = 141.51682965;
+        this.localGround.scaling.copyFromFloats(s, s, s);
         let localGroundMaterial = new BABYLON.StandardMaterial("LocalGroundMaterial", Main.instance.scene);
         localGroundMaterial.diffuseTexture = new BABYLON.Texture("./data/strasbourg.png", Main.instance.scene);
         localGroundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
@@ -258,8 +259,6 @@ class GroundManager {
     }
     toLocalGround(target) {
         this.k = 0;
-        this.localGround.position.x = target.x;
-        this.localGround.position.z = target.z;
         Main.instance.scene.registerBeforeRender(this.transitionStepToLocal);
     }
     toGlobalGround() {
@@ -312,7 +311,7 @@ class Main {
         let h = 1024;
         let w = 1024;
         this.groundManager = new GroundManager(h, w);
-        new Failure(new BABYLON.Vector2(Tools.LonToX(7.76539), Tools.LatToZ(48.581)), 5);
+        new Failure(new BABYLON.Vector2(0, 0), 5);
         BABYLON.SceneLoader.ImportMesh("", "http://svenfrankson.github.io/duck.babylon", "", this.scene, (meshes) => {
             meshes[0].position.x -= 1;
             meshes[0].position.z += 1.5;
@@ -329,7 +328,7 @@ class Main {
                 if (pickingInfo.hit && this.cameraManager.state === CameraState.global) {
                     this.cameraManager.state = CameraState.ready;
                     let lon = Tools.XToLon(pickingInfo.pickedPoint.x);
-                    let lat = Tools.ZToLat(pickingInfo.pickedPoint.z);
+                    let lat = Tools.ZToLat(-pickingInfo.pickedPoint.z);
                     Building.Clear();
                     poc.getDataAt(lon, lat, () => {
                         this.cameraManager.goToLocal(pickingInfo.pickedPoint);
@@ -370,11 +369,12 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 class Poc {
     constructor() {
-        this.tileSize = 0.0025;
+        this.tileSize = 0.005;
     }
     getDataAt(long, lat, callback) {
         let box = (long - this.tileSize).toFixed(7) + "," + (lat - this.tileSize).toFixed(7) + "," + (long + this.tileSize).toFixed(7) + "," + (lat + this.tileSize).toFixed(7);
         let url = "http://api.openstreetmap.org/api/0.6/map?bbox=" + box;
+        console.log(url);
         $.ajax({
             url: url,
             success: (data) => {
@@ -388,7 +388,7 @@ class Poc {
                         let lLong = parseFloat(nodes[i].getAttribute("lon"));
                         let coordinates = new BABYLON.Vector2(lLong, lLat);
                         coordinates.x = Tools.LonToX(lLong);
-                        coordinates.y = Tools.LatToZ(lLat);
+                        coordinates.y = -Tools.LatToZ(lLat);
                         mapNodes.set(id, coordinates);
                     }
                     if (nodes[i].tagName === "way") {
@@ -433,18 +433,20 @@ class Poc {
 }
 var RAD2DEG = 180 / Math.PI;
 var PI_4 = Math.PI / 4;
+var zoom = 20;
 class Tools {
     static LonToX(lon) {
-        return lon * 1250 - Main.medX;
+        return (lon + 180) / 360 * Math.pow(2, zoom) - Main.medX;
     }
     static LatToZ(lat) {
-        return Math.log(Math.tan((lat / 90 + 1) * PI_4)) * RAD2DEG * 1250 - Main.medZ;
+        let res = Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180));
+        return (1 - res / Math.PI) * Math.pow(2, zoom - 1) - Main.medZ;
     }
     static XToLon(x) {
-        return (x + Main.medX) / 1250;
+        return (x + Main.medX) / Math.pow(2, zoom) * 360 - 180;
     }
     static ZToLat(z) {
-        return (Math.atan(Math.exp((z + Main.medZ) / 1250 / RAD2DEG)) / PI_4 - 1) * 90;
+        return Math.atan(Math.sinh(Math.PI - (z + Main.medZ) / Math.pow(2, zoom) * 2 * Math.PI)) * 180 / Math.PI;
     }
 }
 class Twittalert extends BABYLON.Mesh {

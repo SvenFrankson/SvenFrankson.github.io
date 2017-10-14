@@ -11,7 +11,8 @@ class GroundManager {
 
         this.localGround = BABYLON.MeshBuilder.CreateDisc("LocalGround", {radius: 1, sideOrientation: 1}, Main.instance.scene);
         this.localGround.rotation.x = -Math.PI / 2;
-        this.localGround.scaling.copyFromFloats(64, 64, 64);
+        let s: number = 141.51682965;
+        this.localGround.scaling.copyFromFloats(s, s, s);
         let localGroundMaterial: BABYLON.StandardMaterial = new BABYLON.StandardMaterial("LocalGroundMaterial", Main.instance.scene);
         localGroundMaterial.diffuseTexture = new BABYLON.Texture("./data/strasbourg.png", Main.instance.scene);
         localGroundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
@@ -20,8 +21,8 @@ class GroundManager {
 
     public toLocalGround(target: BABYLON.Vector3): void {
         this.k = 0;
-        this.localGround.position.x = target.x;
-        this.localGround.position.z = target.z;
+        // this.localGround.position.x = target.x;
+        // this.localGround.position.z = target.z;
         Main.instance.scene.registerBeforeRender(this.transitionStepToLocal);
     }
 

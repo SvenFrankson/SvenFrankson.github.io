@@ -114,8 +114,7 @@ class Main {
 
         new Failure(
             new BABYLON.Vector2(
-                Tools.LonToX(7.76539),
-                Tools.LatToZ(48.581)
+                0, 0
             ),
             5
         );
@@ -164,7 +163,7 @@ class Main {
                     if (pickingInfo.hit && this.cameraManager.state === CameraState.global) {
                         this.cameraManager.state = CameraState.ready;
                         let lon: number = Tools.XToLon(pickingInfo.pickedPoint.x);
-                        let lat: number = Tools.ZToLat(pickingInfo.pickedPoint.z);
+                        let lat: number = Tools.ZToLat(-pickingInfo.pickedPoint.z);
                         Building.Clear();
                         poc.getDataAt(
                             lon,
