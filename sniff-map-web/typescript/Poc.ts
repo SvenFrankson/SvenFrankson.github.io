@@ -1,5 +1,6 @@
 class Poc {
 
+    public tileSize: number = 0.002;
     public buildings: BuildingData[] = [];
 
     public instantiateBuildings(scene: BABYLON.Scene): void {
@@ -11,7 +12,8 @@ class Poc {
     }
 
     public getDataAt(long: number, lat: number, callback: () => void): void {
-        let box: string = (long - 0.008).toFixed(5) + "," + (lat - 0.008).toFixed(5) + "," + (long + 0.008).toFixed(5) + "," + (lat + 0.008).toFixed(5);
+        this.buildings = [];
+        let box: string = (long - this.tileSize).toFixed(7) + "," + (lat - this.tileSize).toFixed(7) + "," + (long + this.tileSize).toFixed(7) + "," + (lat + this.tileSize).toFixed(7);
         let url: string = "http://api.openstreetmap.org/api/0.6/map?bbox=" + box;
         console.log(url);
         $.ajax(
@@ -32,10 +34,8 @@ class Poc {
                             let lLat: number = parseFloat(nodes[i].getAttribute("lat"));
                             let lLong: number = parseFloat(nodes[i].getAttribute("lon"));
                             let coordinates: BABYLON.Vector2 = new BABYLON.Vector2(lLong, lLat);
-                            coordinates.x -= long;
-                            coordinates.x *= 2000;
-                            coordinates.y -= lat;
-                            coordinates.y *= 2000;
+                            coordinates.x = Tools.LonToX(lLong);
+                            coordinates.y = Tools.LatToZ(lLat);
                             mapNodes.set(id, coordinates);
                         }
                         if (nodes[i].tagName === "way") {

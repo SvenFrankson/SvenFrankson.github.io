@@ -11,6 +11,11 @@ class Building extends BABYLON.Mesh {
         }
         this.dispose();
     }
+    static Clear() {
+        while (Building.instances.length > 0) {
+            Building.instances[0].Dispose();
+        }
+    }
 }
 Building.instances = [];
 class BuildingData {
@@ -30,6 +35,7 @@ class BuildingData {
         building.coordinates = this.coordinates.clone();
         let data = BuildingData.extrudeToSolid(this.shape, this.level * 0.2 + 0.1 * Math.random());
         data.applyToMesh(building);
+        building.freezeWorldMatrix();
         return building;
     }
     static extrudeToSolid(points, height) {
@@ -66,18 +72,95 @@ class BuildingData {
         return data;
     }
 }
+var CameraState;
+(function (CameraState) {
+    CameraState[CameraState["global"] = 0] = "global";
+    CameraState[CameraState["ready"] = 1] = "ready";
+    CameraState[CameraState["transition"] = 2] = "transition";
+    CameraState[CameraState["local"] = 3] = "local";
+})(CameraState || (CameraState = {}));
+class CameraManager {
+    constructor() {
+        this.state = CameraState.global;
+        this.k = 0;
+        this.duration = 60;
+        this.fromPosition = BABYLON.Vector3.Zero();
+        this.toPosition = BABYLON.Vector3.Zero();
+        this.fromTarget = BABYLON.Vector3.Zero();
+        this.toTarget = BABYLON.Vector3.Zero();
+        this.tmpPosition = BABYLON.Vector3.Zero();
+        this.tmpTarget = BABYLON.Vector3.Zero();
+        this.transitionStep = () => {
+            this.k++;
+            this.tmpPosition.x = this.fromPosition.x * (1 - this.k / this.duration) + this.toPosition.x * this.k / this.duration;
+            this.tmpPosition.y = this.fromPosition.y * (1 - this.k / this.duration) + this.toPosition.y * this.k / this.duration;
+            this.tmpPosition.z = this.fromPosition.z * (1 - this.k / this.duration) + this.toPosition.z * this.k / this.duration;
+            this.tmpTarget.x = this.fromTarget.x * (1 - this.k / this.duration) + this.toTarget.x * this.k / this.duration;
+            this.tmpTarget.y = this.fromTarget.y * (1 - this.k / this.duration) + this.toTarget.y * this.k / this.duration;
+            this.tmpTarget.z = this.fromTarget.z * (1 - this.k / this.duration) + this.toTarget.z * this.k / this.duration;
+            Main.instance.camera.setPosition(this.tmpPosition);
+            Main.instance.camera.setTarget(this.tmpTarget);
+            if (this.k >= this.duration) {
+                Main.instance.scene.unregisterBeforeRender(this.transitionStep);
+                if (this.onTransitionDone) {
+                    this.onTransitionDone();
+                }
+            }
+        };
+    }
+    goToLocal(target) {
+        if (this.state !== CameraState.ready) {
+            return;
+        }
+        this.state = CameraState.transition;
+        this.fromPosition.copyFrom(Main.instance.camera.position);
+        this.toPosition.copyFrom(target);
+        this.toPosition.x -= 5;
+        this.toPosition.y += 2.5;
+        this.toPosition.z -= 3.75;
+        this.fromTarget.copyFrom(Main.instance.camera.target);
+        this.toTarget.copyFrom(target);
+        this.onTransitionDone = () => {
+            this.state = CameraState.local;
+        };
+        this.k = 0;
+        Main.instance.scene.registerBeforeRender(this.transitionStep);
+    }
+    goToGlobal() {
+        if (this.state !== CameraState.local) {
+            return;
+        }
+        this.state = CameraState.transition;
+        this.fromPosition.copyFrom(Main.instance.camera.position);
+        this.toPosition.copyFrom(new BABYLON.Vector3(-1000, 1000, -1000));
+        this.fromTarget.copyFrom(Main.instance.camera.target);
+        this.toTarget.copyFromFloats(0, 0, 0);
+        this.onTransitionDone = () => {
+            this.state = CameraState.global;
+        };
+        this.k = 0;
+        Main.instance.scene.registerBeforeRender(this.transitionStep);
+    }
+}
 class Failure {
     constructor(origin, range) {
         Failure.instances.push(this);
         this.origin = origin.clone();
         this.sqrRange = range * range;
+        let debugSphere = BABYLON.MeshBuilder.CreateDisc("Disc", {
+            radius: range
+        }, Main.instance.scene);
+        debugSphere.position.x = origin.x;
+        debugSphere.position.y = 0.05;
+        debugSphere.position.z = origin.y;
+        debugSphere.rotation.x = Math.PI / 2;
+        debugSphere.material = Main.failureMaterial;
     }
     static update() {
         Building.instances.forEach((b) => {
             b.material = Main.okMaterial;
             Failure.instances.forEach((f) => {
                 if (BABYLON.Vector2.DistanceSquared(b.coordinates, f.origin) < f.sqrRange) {
-                    console.log("FAIL");
                     b.material = Main.failureMaterial;
                 }
             });
@@ -85,9 +168,58 @@ class Failure {
     }
 }
 Failure.instances = [];
+class GroundManager {
+    constructor(w, h) {
+        this.k = 0;
+        this.duration = 60;
+        this.transitionStepToGlobal = () => {
+            this.k++;
+            this.localGround.visibility = (1 - this.k / this.duration);
+            this.globalGround.visibility = this.k / this.duration;
+            if (this.k >= this.duration) {
+                Main.instance.scene.unregisterBeforeRender(this.transitionStepToGlobal);
+            }
+        };
+        this.transitionStepToLocal = () => {
+            this.k++;
+            this.localGround.visibility = this.k / this.duration;
+            this.globalGround.visibility = 1 - this.k / this.duration;
+            if (this.k >= this.duration) {
+                Main.instance.scene.unregisterBeforeRender(this.transitionStepToLocal);
+            }
+        };
+        this.globalGround = BABYLON.MeshBuilder.CreateGround("GlobalGround", { width: w, height: h }, Main.instance.scene);
+        let groundMaterial = new BABYLON.StandardMaterial("GroundMaterial", Main.instance.scene);
+        groundMaterial.diffuseTexture = new BABYLON.Texture("./data/map.png", Main.instance.scene);
+        this.globalGround.material = groundMaterial;
+        this.localGround = BABYLON.MeshBuilder.CreateDisc("LocalGround", { radius: 1 }, Main.instance.scene);
+        this.localGround.rotation.x = Math.PI / 2;
+        this.localGround.position.y = -0.05;
+        this.localGround.scaling.copyFromFloats(20, 20, 20);
+        let localGroundMaterial = new BABYLON.StandardMaterial("LocalGroundMaterial", Main.instance.scene);
+        localGroundMaterial.diffuseColor.copyFromFloats(0.6, 0.6, 0.6);
+        localGroundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
+    }
+    toLocalGround(target) {
+        this.k = 0;
+        this.localGround.position.x = target.x;
+        this.localGround.position.z = target.z;
+        Main.instance.scene.registerBeforeRender(this.transitionStepToLocal);
+    }
+    toGlobalGround() {
+        this.k = 0;
+        Main.instance.scene.registerBeforeRender(this.transitionStepToGlobal);
+    }
+}
 class Main {
     constructor(canvasElement) {
         Main.instance = this;
+        Main.medLon = (Main.minLon + Main.maxLon) / 2;
+        Main.medLat = (Main.minLat + Main.maxLat) / 2;
+        Main.medX = Tools.LonToX(Main.medLon);
+        Main.medZ = Tools.LatToZ(Main.medLat);
+        console.log("MedX " + Main.medX);
+        console.log("MedZ " + Main.medZ);
         this.canvas = document.getElementById(canvasElement);
         this.engine = new BABYLON.Engine(this.canvas, true);
         BABYLON.Engine.ShadersRepository = "./shaders/";
@@ -98,44 +230,22 @@ class Main {
         this.resize();
         let hemisphericLight = new BABYLON.HemisphericLight("Light", BABYLON.Vector3.Up(), this.scene);
         this.light = hemisphericLight;
-        let arcRotateCamera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 1, BABYLON.Vector3.Zero(), this.scene);
-        arcRotateCamera.setPosition(new BABYLON.Vector3(3, 2, -5));
-        arcRotateCamera.attachControl(this.canvas);
-        this.scene.activeCamera = arcRotateCamera;
+        this.camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 1, BABYLON.Vector3.Zero(), this.scene);
+        this.camera.attachControl(this.canvas);
+        this.camera.setPosition(new BABYLON.Vector3(-1000, 1000, -1000));
+        this.cameraManager = new CameraManager();
         Main.okMaterial = new BABYLON.StandardMaterial("Random", this.scene);
         Main.okMaterial.diffuseColor = BABYLON.Color3.FromHexString("#42c8f4");
         Main.okMaterial.backFaceCulling = false;
         Main.failureMaterial = new BABYLON.StandardMaterial("Random", this.scene);
         Main.failureMaterial.diffuseColor = BABYLON.Color3.FromHexString("#f48042");
         Main.failureMaterial.backFaceCulling = false;
-        let long = 7.76539;
-        let lat = 48.581;
-        if (localStorage.getItem("long-value") !== null) {
-            long = parseFloat(localStorage.getItem("long-value"));
-        }
-        if (localStorage.getItem("lat-value") !== null) {
-            lat = parseFloat(localStorage.getItem("lat-value"));
-        }
-        $("#long-input").val(long + "");
-        $("#lat-input").val(lat + "");
-        $("#long-input").on("input change", (e) => {
-            long = parseFloat(e.currentTarget.value);
-            localStorage.setItem("long-value", long + "");
-        });
-        $("#lat-input").on("input change", (e) => {
-            lat = parseFloat(e.currentTarget.value);
-            localStorage.setItem("lat-value", lat + "");
-        });
+        this.ui = new UI();
         let poc = new Poc();
-        poc.getDataAt(long, lat, () => {
-            poc.instantiateBuildings(this.scene);
-            setInterval(() => {
-                new Failure(new BABYLON.Vector2((Math.random() - 0.5) * 48, (Math.random() - 0.5) * 48), Math.random() * 5);
-                Failure.update();
-            }, 1500);
-        });
-        let ground = BABYLON.MeshBuilder.CreateDisc("Ground", { radius: 24 }, this.scene);
-        ground.rotation.x = Math.PI / 2;
+        let h = Tools.LatToZ(Main.maxLat) - Tools.LatToZ(Main.minLat);
+        let w = Tools.LonToX(Main.maxLon) - Tools.LonToX(Main.minLon);
+        this.groundManager = new GroundManager(h, w);
+        new Failure(new BABYLON.Vector2(Tools.LonToX(7.76539), Tools.LatToZ(48.581)), 5);
         BABYLON.SceneLoader.ImportMesh("", "http://svenfrankson.github.io/duck.babylon", "", this.scene, (meshes) => {
             meshes[0].position.x -= 1;
             meshes[0].position.z += 1.5;
@@ -143,6 +253,49 @@ class Main {
             this.scene.registerBeforeRender(() => {
                 meshes[0].rotation.y += 0.01;
             });
+        });
+        let bottomLeft = BABYLON.MeshBuilder.CreateBox("Cube", { size: 10 }, this.scene);
+        bottomLeft.position.x = Tools.LonToX(Main.minLon);
+        bottomLeft.position.z = Tools.LatToZ(Main.minLat);
+        console.log("BottomLeft " + bottomLeft.position);
+        let topLeft = BABYLON.MeshBuilder.CreateBox("Cube", { size: 10 }, this.scene);
+        topLeft.position.x = Tools.LonToX(Main.minLon);
+        topLeft.position.z = Tools.LatToZ(Main.maxLat);
+        let topRight = BABYLON.MeshBuilder.CreateBox("Cube", { size: 10 }, this.scene);
+        topRight.position.x = Tools.LonToX(Main.maxLon);
+        topRight.position.z = Tools.LatToZ(Main.maxLat);
+        console.log("TopRight " + topRight.position);
+        let bottomRight = BABYLON.MeshBuilder.CreateBox("Cube", { size: 10 }, this.scene);
+        bottomRight.position.x = Tools.LonToX(Main.maxLon);
+        bottomRight.position.z = Tools.LatToZ(Main.minLat);
+        this.scene.onPointerObservable.add((eventData, eventState) => {
+            if (eventData.type === BABYLON.PointerEventTypes._POINTERUP) {
+                let pickingInfo = this.scene.pick(this.scene.pointerX, this.scene.pointerY, (m) => {
+                    return m === this.groundManager.globalGround;
+                });
+                if (pickingInfo.hit && this.cameraManager.state === CameraState.global) {
+                    this.cameraManager.state = CameraState.ready;
+                    let lon = Tools.XToLon(pickingInfo.pickedPoint.x);
+                    let lat = Tools.ZToLat(pickingInfo.pickedPoint.z);
+                    Building.Clear();
+                    poc.getDataAt(lon, lat, () => {
+                        poc.instantiateBuildings(this.scene);
+                        Failure.update();
+                        this.cameraManager.goToLocal(pickingInfo.pickedPoint);
+                        this.groundManager.toLocalGround(pickingInfo.pickedPoint);
+                        for (let i = -1; i <= 1; i++) {
+                            for (let j = -1; j <= 1; j++) {
+                                if (i !== j) {
+                                    poc.getDataAt(lon + i * poc.tileSize * 2, lat + j * poc.tileSize * 2, () => {
+                                        poc.instantiateBuildings(this.scene);
+                                        Failure.update();
+                                    });
+                                }
+                            }
+                        }
+                    });
+                }
+            }
         });
     }
     animate() {
@@ -157,6 +310,12 @@ class Main {
         this.engine.resize();
     }
 }
+Main.minLon = 7.1665596;
+Main.maxLon = 8.1771085;
+Main.minLat = 48.3614766;
+Main.maxLat = 49.0194274;
+Main.medX = 0;
+Main.medZ = 0;
 window.addEventListener("DOMContentLoaded", () => {
     let game = new Main("render-canvas");
     game.createScene();
@@ -164,6 +323,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 class Poc {
     constructor() {
+        this.tileSize = 0.002;
         this.buildings = [];
     }
     instantiateBuildings(scene) {
@@ -172,7 +332,8 @@ class Poc {
         });
     }
     getDataAt(long, lat, callback) {
-        let box = (long - 0.008).toFixed(5) + "," + (lat - 0.008).toFixed(5) + "," + (long + 0.008).toFixed(5) + "," + (lat + 0.008).toFixed(5);
+        this.buildings = [];
+        let box = (long - this.tileSize).toFixed(7) + "," + (lat - this.tileSize).toFixed(7) + "," + (long + this.tileSize).toFixed(7) + "," + (lat + this.tileSize).toFixed(7);
         let url = "http://api.openstreetmap.org/api/0.6/map?bbox=" + box;
         console.log(url);
         $.ajax({
@@ -191,10 +352,8 @@ class Poc {
                         let lLat = parseFloat(nodes[i].getAttribute("lat"));
                         let lLong = parseFloat(nodes[i].getAttribute("lon"));
                         let coordinates = new BABYLON.Vector2(lLong, lLat);
-                        coordinates.x -= long;
-                        coordinates.x *= 2000;
-                        coordinates.y -= lat;
-                        coordinates.y *= 2000;
+                        coordinates.x = Tools.LonToX(lLong);
+                        coordinates.y = Tools.LatToZ(lLat);
                         mapNodes.set(id, coordinates);
                     }
                     if (nodes[i].tagName === "way") {
@@ -235,5 +394,42 @@ class Poc {
                 console.log("Error");
             }
         });
+    }
+}
+var RAD2DEG = 180 / Math.PI;
+var PI_4 = Math.PI / 4;
+class Tools {
+    static LonToX(lon) {
+        return lon * 1000 - Main.medX;
+    }
+    static LatToZ(lat) {
+        return Math.log(Math.tan((lat / 90 + 1) * PI_4)) * RAD2DEG * 1000 - Main.medZ;
+    }
+    static XToLon(x) {
+        return (x + Main.medX) / 1000;
+    }
+    static ZToLat(z) {
+        return (Math.atan(Math.exp((z + Main.medZ) / 1000 / RAD2DEG)) / PI_4 - 1) * 90;
+    }
+}
+class UI {
+    constructor() {
+        this.texture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        this.back = BABYLON.GUI.Button.CreateSimpleButton("Back", "Back");
+        this.back.left = -0.95;
+        this.back.top = -0.95;
+        this.back.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+        this.back.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+        this.back.width = 0.1;
+        this.back.height = 0.1;
+        this.back.background = "black";
+        this.back.color = "white";
+        this.back.onPointerUpObservable.add(() => {
+            if (Main.instance.cameraManager.state === CameraState.local) {
+                Main.instance.cameraManager.goToGlobal();
+                Main.instance.groundManager.toGlobalGround();
+            }
+        });
+        this.texture.addControl(this.back);
     }
 }

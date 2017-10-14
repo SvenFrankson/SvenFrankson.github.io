@@ -21,6 +21,7 @@ class BuildingData {
         building.coordinates = this.coordinates.clone();
         let data: BABYLON.VertexData = BuildingData.extrudeToSolid(this.shape, this.level * 0.2 + 0.1 * Math.random());
         data.applyToMesh(building);
+        building.freezeWorldMatrix();
 
         return building;
     }

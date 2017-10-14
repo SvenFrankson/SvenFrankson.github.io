@@ -16,4 +16,10 @@ class Building extends BABYLON.Mesh {
         }
         this.dispose();
     }
+
+    public static Clear(): void {
+        while (Building.instances.length > 0) {
+            Building.instances[0].Dispose();
+        }
+    }
 }
