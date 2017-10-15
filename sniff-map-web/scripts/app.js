@@ -659,6 +659,7 @@ class Twittalert extends BABYLON.Mesh {
             this.tube.material = Main.greenMaterial;
         }
         this.texture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("tmp");
+        this.texture.idealWidth = 1250;
         this.container = new BABYLON.GUI.Container("container");
         this.container.width = "480px";
         this.container.height = "80px";
@@ -806,6 +807,7 @@ Twittalert.instances = [];
 class UI {
     constructor() {
         this.texture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        this.texture.idealWidth = 1250;
         this.back = BABYLON.GUI.Button.CreateSimpleButton("Back", "Back");
         this.back.width = 0.1;
         this.back.height = 0.1;

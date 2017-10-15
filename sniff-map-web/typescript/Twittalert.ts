@@ -91,6 +91,7 @@ class Twittalert extends BABYLON.Mesh {
         }
 
         this.texture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("tmp");
+        this.texture.idealWidth = 1250;
 
         this.container = new BABYLON.GUI.Container("container");
         this.container.width = "480px";

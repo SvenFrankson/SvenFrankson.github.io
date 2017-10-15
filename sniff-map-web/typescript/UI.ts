@@ -5,6 +5,7 @@ class UI {
 
     constructor() {
         this.texture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        this.texture.idealWidth = 1250;
 
         this.back = BABYLON.GUI.Button.CreateSimpleButton("Back", "Back");
         this.back.width = 0.1;
