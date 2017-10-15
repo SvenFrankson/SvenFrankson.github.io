@@ -1,7 +1,7 @@
 class Poc {
 
     public static newNewBuildings: BuildingData[][] = [];
-    public tileSize: number = 0.007;
+    public tileSize: number = 0.006;
 
     public loadTile(index: number, callback: () => void) {
         let url: string = "./Content/tile_" + index + ".osm";

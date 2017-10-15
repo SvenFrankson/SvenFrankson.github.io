@@ -410,7 +410,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 class Poc {
     constructor() {
-        this.tileSize = 0.007;
+        this.tileSize = 0.006;
         this.success = (data, box, callback) => {
             let mapNodes = new Map();
             let root = data.firstElementChild;
