@@ -9,7 +9,7 @@ class GroundManager {
         this.globalGround.scaling.copyFromFloats(globalScale, globalScale, globalScale);
         let groundMaterial: BABYLON.StandardMaterial = new BABYLON.StandardMaterial("GroundMaterial", Main.instance.scene);
         groundMaterial.diffuseTexture = new BABYLON.Texture("http://svenfrankson.github.io/sniff-map-web/Content/alsace.png", Main.instance.scene);
-        groundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#2D1E73");
+        //groundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#2D1E73");
         groundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
         this.globalGround.material = groundMaterial;
 
@@ -19,7 +19,7 @@ class GroundManager {
         this.localGround.scaling.copyFromFloats(s, s, s);
         let localGroundMaterial: BABYLON.StandardMaterial = new BABYLON.StandardMaterial("LocalGroundMaterial", Main.instance.scene);
         localGroundMaterial.diffuseTexture = new BABYLON.Texture("http://svenfrankson.github.io/sniff-map-web/Content/strasbourg.png", Main.instance.scene);
-        localGroundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#2D1E73");
+        //localGroundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#2D1E73");
         localGroundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
         this.localGround.material = localGroundMaterial;
     }

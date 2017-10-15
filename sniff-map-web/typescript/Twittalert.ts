@@ -161,6 +161,7 @@ class Twittalert extends BABYLON.Mesh {
         warning.thickness = 0;
         warning.onPointerUpObservable.add(() => {
             new Failure(new BABYLON.Vector2(this.ground.x, this.ground.z), 10);
+            Main.instance.positionPointerDown.x = -42;
         });
         this.container.addControl(warning);
 
@@ -172,6 +173,7 @@ class Twittalert extends BABYLON.Mesh {
         hide.thickness = 0;
         hide.onPointerUpObservable.add(() => {
             this.hidden = !this.hidden;
+            Main.instance.positionPointerDown.x = -42;
         });
         this.container.addControl(hide);
 
@@ -227,7 +229,6 @@ class Twittalert extends BABYLON.Mesh {
     public timeout: number = 0;
 
     public popIn = () => {
-        console.log("PopIn");
         this.container.alpha += 0.02;
         if (this.container.alpha >= this.computeAlpha()) {
             this.container.alpha = 1;
@@ -251,12 +252,10 @@ class Twittalert extends BABYLON.Mesh {
     }
 
     public update = () => {
-        console.log("Update");
         this.container.alpha = this.computeAlpha();
     }
 
     public kill = () => {
-        console.log("Kill");
         this.container.alpha -= 0.01;
         if (this.container.alpha <= 0) {
             this.getScene().unregisterBeforeRender(this.kill);

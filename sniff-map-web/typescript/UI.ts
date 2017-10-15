@@ -21,6 +21,7 @@ class UI {
             () => {
                 Main.instance.cameraManager.goToGlobal();
                 Main.instance.groundManager.toGlobalGround();
+                Main.instance.positionPointerDown.x = -42;
             }
         )
 

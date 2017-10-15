@@ -10,6 +10,7 @@ class Main {
     public ui: UI;
     public groundManager: GroundManager;
     public buildingMaker: BuildingMaker;
+    public positionPointerDown: BABYLON.Vector2;
 
     public static okMaterial: BABYLON.StandardMaterial;
     public static nokMaterial: BABYLON.StandardMaterial;
@@ -32,6 +33,7 @@ class Main {
         console.log("MedZ " + Main.medZ);
         this.canvas = document.getElementById(canvasElement) as HTMLCanvasElement;
         this.engine = new BABYLON.Engine(this.canvas, true);
+        this.positionPointerDown = BABYLON.Vector2.Zero();
         BABYLON.Engine.ShadersRepository = "./shaders/";
     }
 
@@ -43,7 +45,6 @@ class Main {
         this.buildingMaker = new BuildingMaker();
 
         let hemisphericLight: BABYLON.HemisphericLight = new BABYLON.HemisphericLight("Light", BABYLON.Vector3.Up(), this.scene);
-        hemisphericLight.groundColor.copyFromFloats(0.5, 0.5, 0.5);
         this.light = hemisphericLight;
 
         this.camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 1, BABYLON.Vector3.Zero(), this.scene);
@@ -85,7 +86,6 @@ class Main {
 
         this.groundManager = new GroundManager(h, w);
 
-        /*
         for (let i: number = 0; i < 10; i++) {
             $.ajax(
                 {
@@ -96,7 +96,6 @@ class Main {
                 }
             )
         }
-        */
         /*
         setInterval(
             () => {
@@ -163,9 +162,17 @@ class Main {
             }
         );
 
+        let positionPointerUp: BABYLON.Vector2 = BABYLON.Vector2.Zero();
         this.scene.onPointerObservable.add(
             (eventData: BABYLON.PointerInfo, eventState: BABYLON.EventState) => {
                 if (eventData.type === BABYLON.PointerEventTypes._POINTERUP) {
+                    positionPointerUp.x = this.scene.pointerX;
+                    positionPointerUp.y = this.scene.pointerY;
+
+                    if (BABYLON.Vector2.Distance(this.positionPointerDown, positionPointerUp) > 5) {
+                        return;
+                    }
+
                     this.cameraManager.preventForcedMove = false;
                     let pickingInfo: BABYLON.PickingInfo = this.scene.pick(
                         this.scene.pointerX,
@@ -190,6 +197,8 @@ class Main {
                     }
                 } else if (eventData.type === BABYLON.PointerEventTypes._POINTERDOWN) {
                     this.cameraManager.preventForcedMove = true;
+                    this.positionPointerDown.x = this.scene.pointerX;
+                    this.positionPointerDown.y = this.scene.pointerY;
                 } else if (eventData.type === BABYLON.PointerEventTypes._POINTERWHEEL) {
                     this.cameraManager.preventForcedMove = true;
                     this.cameraManager.preventForcedMove = false;

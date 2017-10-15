@@ -38,12 +38,12 @@ class CameraManager {
     public goToGlobal() {
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(new BABYLON.Vector3(
-            -500, 500, -500
+            -80, 80, -80
         ));
         this.fromTarget.copyFrom(Main.instance.camera.target);
         this.toTarget.copyFromFloats(0, 0, 0);
         this.onTransitionDone = () => {
-            Main.instance.camera.useAutoRotationBehavior = false;
+            
         }
 
         this.k = 0;

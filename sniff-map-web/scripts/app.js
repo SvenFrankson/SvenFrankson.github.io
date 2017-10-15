@@ -92,12 +92,8 @@ class BuildingData {
         let positions = [];
         let indices = [];
         let colors = [];
-        let colorTop = BABYLON.Color4.FromHexString("#0FEACAFF");
-        let colorBottom = BABYLON.Color4.FromHexString("#AD5EECFF");
-        if (Math.random() < 0.5) {
-            colorTop = BABYLON.Color4.FromHexString("#AD5EECFF");
-            colorBottom = BABYLON.Color4.FromHexString("#0FEACAFF");
-        }
+        let colorTop = BABYLON.Color4.FromHexString("#FFFFFFFF");
+        let colorBottom = BABYLON.Color4.FromHexString("#A0A0A0FF");
         for (let i = 0; i < points.length; i++) {
             positions.push(points[i].x, height, points[i].y);
             colors.push(colorTop.r, colorTop.g, colorTop.b, colorTop.a);
@@ -236,11 +232,10 @@ class CameraManager {
     }
     goToGlobal() {
         this.fromPosition.copyFrom(Main.instance.camera.position);
-        this.toPosition.copyFrom(new BABYLON.Vector3(-500, 500, -500));
+        this.toPosition.copyFrom(new BABYLON.Vector3(-80, 80, -80));
         this.fromTarget.copyFrom(Main.instance.camera.target);
         this.toTarget.copyFromFloats(0, 0, 0);
         this.onTransitionDone = () => {
-            Main.instance.camera.useAutoRotationBehavior = false;
         };
         this.k = 0;
         Main.instance.scene.registerBeforeRender(this.transitionStep);
@@ -300,7 +295,6 @@ class GroundManager {
         this.globalGround.scaling.copyFromFloats(globalScale, globalScale, globalScale);
         let groundMaterial = new BABYLON.StandardMaterial("GroundMaterial", Main.instance.scene);
         groundMaterial.diffuseTexture = new BABYLON.Texture("http://svenfrankson.github.io/sniff-map-web/Content/alsace.png", Main.instance.scene);
-        groundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#2D1E73");
         groundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
         this.globalGround.material = groundMaterial;
         this.localGround = BABYLON.MeshBuilder.CreateDisc("LocalGround", { radius: 1, sideOrientation: 1 }, Main.instance.scene);
@@ -309,7 +303,6 @@ class GroundManager {
         this.localGround.scaling.copyFromFloats(s, s, s);
         let localGroundMaterial = new BABYLON.StandardMaterial("LocalGroundMaterial", Main.instance.scene);
         localGroundMaterial.diffuseTexture = new BABYLON.Texture("http://svenfrankson.github.io/sniff-map-web/Content/strasbourg.png", Main.instance.scene);
-        localGroundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#2D1E73");
         localGroundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
         this.localGround.material = localGroundMaterial;
     }
@@ -331,6 +324,7 @@ class Main {
         console.log("MedZ " + Main.medZ);
         this.canvas = document.getElementById(canvasElement);
         this.engine = new BABYLON.Engine(this.canvas, true);
+        this.positionPointerDown = BABYLON.Vector2.Zero();
         BABYLON.Engine.ShadersRepository = "./shaders/";
     }
     createScene() {
@@ -339,7 +333,6 @@ class Main {
         this.resize();
         this.buildingMaker = new BuildingMaker();
         let hemisphericLight = new BABYLON.HemisphericLight("Light", BABYLON.Vector3.Up(), this.scene);
-        hemisphericLight.groundColor.copyFromFloats(0.5, 0.5, 0.5);
         this.light = hemisphericLight;
         this.camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 1, BABYLON.Vector3.Zero(), this.scene);
         this.camera.attachControl(this.canvas);
@@ -365,6 +358,14 @@ class Main {
         let h = 1024;
         let w = 1024;
         this.groundManager = new GroundManager(h, w);
+        for (let i = 0; i < 10; i++) {
+            $.ajax({
+                url: "http://svenfrankson.github.io/sniff-map-web/Content/test-tweet.json",
+                success: (data) => {
+                    myMethod(data);
+                }
+            });
+        }
         let lon = Tools.XToLon(0);
         let lat = Tools.ZToLat(0);
         Building.Clear();
@@ -386,8 +387,14 @@ class Main {
                 });
             });
         });
+        let positionPointerUp = BABYLON.Vector2.Zero();
         this.scene.onPointerObservable.add((eventData, eventState) => {
             if (eventData.type === BABYLON.PointerEventTypes._POINTERUP) {
+                positionPointerUp.x = this.scene.pointerX;
+                positionPointerUp.y = this.scene.pointerY;
+                if (BABYLON.Vector2.Distance(this.positionPointerDown, positionPointerUp) > 5) {
+                    return;
+                }
                 this.cameraManager.preventForcedMove = false;
                 let pickingInfo = this.scene.pick(this.scene.pointerX, this.scene.pointerY, (m) => {
                     return m.name === "Tile";
@@ -405,6 +412,8 @@ class Main {
             }
             else if (eventData.type === BABYLON.PointerEventTypes._POINTERDOWN) {
                 this.cameraManager.preventForcedMove = true;
+                this.positionPointerDown.x = this.scene.pointerX;
+                this.positionPointerDown.y = this.scene.pointerY;
             }
             else if (eventData.type === BABYLON.PointerEventTypes._POINTERWHEEL) {
                 this.cameraManager.preventForcedMove = true;
@@ -617,7 +626,6 @@ class Twittalert extends BABYLON.Mesh {
         this.maxDist = 100;
         this.timeout = 0;
         this.popIn = () => {
-            console.log("PopIn");
             this.container.alpha += 0.02;
             if (this.container.alpha >= this.computeAlpha()) {
                 this.container.alpha = 1;
@@ -626,11 +634,9 @@ class Twittalert extends BABYLON.Mesh {
             }
         };
         this.update = () => {
-            console.log("Update");
             this.container.alpha = this.computeAlpha();
         };
         this.kill = () => {
-            console.log("Kill");
             this.container.alpha -= 0.01;
             if (this.container.alpha <= 0) {
                 this.getScene().unregisterBeforeRender(this.kill);
@@ -725,6 +731,7 @@ class Twittalert extends BABYLON.Mesh {
         warning.thickness = 0;
         warning.onPointerUpObservable.add(() => {
             new Failure(new BABYLON.Vector2(this.ground.x, this.ground.z), 10);
+            Main.instance.positionPointerDown.x = -42;
         });
         this.container.addControl(warning);
         let hide = BABYLON.GUI.Button.CreateImageOnlyButton("Hide", "http://svenfrankson.github.io/sniff-map-web/Content/hide.png");
@@ -735,6 +742,7 @@ class Twittalert extends BABYLON.Mesh {
         hide.thickness = 0;
         hide.onPointerUpObservable.add(() => {
             this.hidden = !this.hidden;
+            Main.instance.positionPointerDown.x = -42;
         });
         this.container.addControl(hide);
         this.container.linkWithMesh(this);
@@ -820,6 +828,7 @@ class UI {
         this.back.onPointerUpObservable.add(() => {
             Main.instance.cameraManager.goToGlobal();
             Main.instance.groundManager.toGlobalGround();
+            Main.instance.positionPointerDown.x = -42;
         });
         this.texture.addControl(this.back);
     }

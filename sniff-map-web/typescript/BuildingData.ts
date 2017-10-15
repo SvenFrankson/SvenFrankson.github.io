@@ -62,12 +62,8 @@ class BuildingData {
         let positions: number[] = [];
         let indices: number[] = [];
         let colors: number[] = [];
-        let colorTop: BABYLON.Color4 = BABYLON.Color4.FromHexString("#0FEACAFF");
-        let colorBottom: BABYLON.Color4 = BABYLON.Color4.FromHexString("#AD5EECFF");
-        if (Math.random() < 0.5) {
-            colorTop = BABYLON.Color4.FromHexString("#AD5EECFF");
-            colorBottom = BABYLON.Color4.FromHexString("#0FEACAFF");
-        }
+        let colorTop: BABYLON.Color4 = BABYLON.Color4.FromHexString("#FFFFFFFF");
+        let colorBottom: BABYLON.Color4 = BABYLON.Color4.FromHexString("#A0A0A0FF");
 
         for (let i: number = 0; i < points.length; i++) {
             positions.push(points[i].x, height, points[i].y);
