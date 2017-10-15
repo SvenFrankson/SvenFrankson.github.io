@@ -80,19 +80,19 @@ class Main {
 
         this.groundManager = new GroundManager(h, w);
 
-        setInterval(
-            () => {
-                $.ajax(
-                    {
-                        url: "http://svenfrankson.github.io/sniff-map-web/Content/test-tweet.json",
-                        success: (data: ITweet) => {
-                            myMethod(data);
-                        }
-                    }
-                )
-            },
-            30000
-        )
+        // setInterval(
+        //     () => {
+        //         $.ajax(
+        //             {
+        //                 url: "http://svenfrankson.github.io/sniff-map-web/Content/test-tweet.json",
+        //                 success: (data: ITweet) => {
+        //                     myMethod(data);
+        //                 }
+        //             }
+        //         )
+        //     },
+        //     30000
+        // )
 
         let lon: number = Tools.XToLon(0);
         let lat: number = Tools.ZToLat(0);
