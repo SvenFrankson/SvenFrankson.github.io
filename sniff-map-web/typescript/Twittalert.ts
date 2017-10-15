@@ -92,6 +92,7 @@ class Twittalert extends BABYLON.Mesh {
 
         scene.registerBeforeRender(this.popIn);
 
+        Main.instance.cameraManager.goToLocal(this.position);
         setTimeout(
             () => {
                 scene.unregisterBeforeRender(this.popIn);
@@ -102,8 +103,7 @@ class Twittalert extends BABYLON.Mesh {
         );
     }
 
-    Main.instance.cameraManager.goToLocal(this.position);
-    
+
     public timeout: number = 0;
 
     public popIn = () => {

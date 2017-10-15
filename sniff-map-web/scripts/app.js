@@ -648,6 +648,7 @@ class Twittalert extends BABYLON.Mesh {
         this.container.linkOffsetY = "-80px";
         this.container.alpha = 0;
         scene.registerBeforeRender(this.popIn);
+        Main.instance.cameraManager.goToLocal(this.position);
         setTimeout(() => {
             scene.unregisterBeforeRender(this.popIn);
             scene.unregisterBeforeRender(this.update);
