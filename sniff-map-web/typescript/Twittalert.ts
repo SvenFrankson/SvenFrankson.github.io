@@ -13,6 +13,7 @@ class Twittalert extends BABYLON.Mesh {
     public maxDist: number = 80;
     public texture: BABYLON.GUI.AdvancedDynamicTexture;
     public container: BABYLON.GUI.Container;
+    public offset: BABYLON.Vector3;
 
     constructor(
         position: BABYLON.Vector3,

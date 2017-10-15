@@ -15,11 +15,13 @@ class BuildingMaker {
             work = true;
         }
         while (this.toDoList.length > 0 && (t1 - t0) < 10) {
-            if (this.toDoList.length > 2) {
+            if (this.toDoList.length > 4) {
                 let data0: BuildingData = this.toDoList.pop();
                 let data1: BuildingData = this.toDoList.pop();
                 let data2: BuildingData = this.toDoList.pop();
-                BuildingData.instantiateBakeMany([data0, data1, data2], Main.instance.scene);
+                let data3: BuildingData = this.toDoList.pop();
+                let data4: BuildingData = this.toDoList.pop();
+                BuildingData.instantiateBakeMany([data0, data1, data2, data3, data4], Main.instance.scene);
                 t1 = (new Date()).getTime();
             } else {
                 let data: BuildingData = this.toDoList.pop();
