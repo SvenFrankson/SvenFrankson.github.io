@@ -38,8 +38,8 @@ class GroundManager {
     public duration: number = 120;
     public transitionStepToGlobal = () => {
         this.k++;
-        this.localGround.visibility = (1 - this.k / this.duration);
-        this.globalGround.visibility = this.k / this.duration;
+        //this.localGround.visibility = (1 - this.k / this.duration);
+        //this.globalGround.visibility = this.k / this.duration;
         Main.failureMaterial.alpha = this.k / this.duration;
 
         if (this.k >= this.duration) {
@@ -49,8 +49,8 @@ class GroundManager {
 
     public transitionStepToLocal = () => {
         this.k++;
-        this.localGround.visibility = this.k / this.duration;
-        this.globalGround.visibility = 1 - this.k / this.duration;
+        //this.localGround.visibility = this.k / this.duration;
+        //this.globalGround.visibility = 1 - this.k / this.duration;
         Main.failureMaterial.alpha = 1 - this.k / this.duration;
 
         if (this.k >= this.duration) {

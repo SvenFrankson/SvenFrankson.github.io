@@ -8,9 +8,9 @@ interface ITweet {
 
 class Twittalert extends BABYLON.Mesh {
 
-    public lifeSpan: number = 10000;
+    public lifeSpan: number = 20000;
     public minDist: number = 20;
-    public maxDist: number = 80;
+    public maxDist: number = 1000;
     public texture: BABYLON.GUI.AdvancedDynamicTexture;
     public container: BABYLON.GUI.Container;
     public offset: BABYLON.Vector3;

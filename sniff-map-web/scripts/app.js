@@ -273,8 +273,6 @@ class GroundManager {
         this.duration = 120;
         this.transitionStepToGlobal = () => {
             this.k++;
-            this.localGround.visibility = (1 - this.k / this.duration);
-            this.globalGround.visibility = this.k / this.duration;
             Main.failureMaterial.alpha = this.k / this.duration;
             if (this.k >= this.duration) {
                 Main.instance.scene.unregisterBeforeRender(this.transitionStepToGlobal);
@@ -282,8 +280,6 @@ class GroundManager {
         };
         this.transitionStepToLocal = () => {
             this.k++;
-            this.localGround.visibility = this.k / this.duration;
-            this.globalGround.visibility = 1 - this.k / this.duration;
             Main.failureMaterial.alpha = 1 - this.k / this.duration;
             if (this.k >= this.duration) {
                 Main.instance.scene.unregisterBeforeRender(this.transitionStepToLocal);
@@ -558,9 +554,9 @@ class Tools {
 class Twittalert extends BABYLON.Mesh {
     constructor(position, content, date, author, pictureUrl, scene) {
         super("TwittAlert", scene);
-        this.lifeSpan = 10000;
+        this.lifeSpan = 20000;
         this.minDist = 20;
-        this.maxDist = 80;
+        this.maxDist = 1000;
         this.timeout = 0;
         this.popIn = () => {
             console.log("PopIn");
