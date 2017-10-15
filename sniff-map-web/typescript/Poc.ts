@@ -4,28 +4,23 @@ class Poc {
     public tileSize: number = 0.007;
 
     public loadTile(index: number, callback: () => void) {
+        let url: string = "./Content/tile_" + index + ".osm";
         $.ajax(
             {
-                url: "./Content/tile_" + index + ".json",
-                success: (data: BuildingData[]) => {
-                    data.forEach(
-                        (b: BuildingData) => {
-                            Main.instance.buildingMaker.toDoList.push(b);
-                        }
-                    );
-                    if (callback) {
-                        callback();
-                    }
+                url: url,
+                success: (data: XMLDocument) => {
+                    this.success(data, "", callback);
+                },
+                error: () => {
+                    console.log("Error");
                 }
             }
-            
-        )
+        );
     }
 
     public getDataAt(long: number, lat: number, callback: () => void): void {
         let box: string = (long - this.tileSize).toFixed(7) + "," + (lat - this.tileSize).toFixed(7) + "," + (long + this.tileSize).toFixed(7) + "," + (lat + this.tileSize).toFixed(7);
         
-        let dataString: string = localStorage.getItem(box);
         if (false) {
             
         } else {
@@ -47,6 +42,9 @@ class Poc {
     public success = (data: XMLDocument, box: string, callback: () => void) => {
         let mapNodes = new Map<number, BABYLON.Vector2>();
         let root = data.firstElementChild;
+        if (!root) {
+            root = data.rootElement;
+        }
         let nodes = root.children;
         let newBuildings: BuildingData[] = [];
         for (let i: number = 0; i < nodes.length; i++) {

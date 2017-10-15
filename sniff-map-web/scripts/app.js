@@ -414,6 +414,9 @@ class Poc {
         this.success = (data, box, callback) => {
             let mapNodes = new Map();
             let root = data.firstElementChild;
+            if (!root) {
+                root = data.rootElement;
+            }
             let nodes = root.children;
             let newBuildings = [];
             for (let i = 0; i < nodes.length; i++) {
@@ -462,21 +465,19 @@ class Poc {
         };
     }
     loadTile(index, callback) {
+        let url = "./Content/tile_" + index + ".osm";
         $.ajax({
-            url: "./Content/tile_" + index + ".json",
+            url: url,
             success: (data) => {
-                data.forEach((b) => {
-                    Main.instance.buildingMaker.toDoList.push(b);
-                });
-                if (callback) {
-                    callback();
-                }
+                this.success(data, "", callback);
+            },
+            error: () => {
+                console.log("Error");
             }
         });
     }
     getDataAt(long, lat, callback) {
         let box = (long - this.tileSize).toFixed(7) + "," + (lat - this.tileSize).toFixed(7) + "," + (long + this.tileSize).toFixed(7) + "," + (lat + this.tileSize).toFixed(7);
-        let dataString = localStorage.getItem(box);
         if (false) {
         }
         else {
