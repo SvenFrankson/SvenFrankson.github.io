@@ -7,6 +7,19 @@ enum CameraState {
 class CameraManager {
 
     public state: CameraState = CameraState.global;
+    private _preventForcedMove: boolean = false;
+    public get preventForcedMove(): boolean {
+        return this._preventForcedMove;
+    }
+    public set preventForcedMove(b: boolean) {
+        this._preventForcedMove = b;
+        if (this.preventForcedMove) {
+            Main.instance.scene.unregisterBeforeRender(this.transitionStep);
+            if (this.onTransitionDone) {
+                this.onTransitionDone();
+            }
+        }
+    }
 
     public goToLocal(target: BABYLON.Vector3) {
         this.state = CameraState.transition;

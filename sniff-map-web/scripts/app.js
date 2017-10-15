@@ -177,6 +177,7 @@ var CameraState;
 class CameraManager {
     constructor() {
         this.state = CameraState.global;
+        this._preventForcedMove = false;
         this.k = 0;
         this.duration = 180;
         this.fromPosition = BABYLON.Vector3.Zero();
@@ -202,6 +203,18 @@ class CameraManager {
                 }
             }
         };
+    }
+    get preventForcedMove() {
+        return this._preventForcedMove;
+    }
+    set preventForcedMove(b) {
+        this._preventForcedMove = b;
+        if (this.preventForcedMove) {
+            Main.instance.scene.unregisterBeforeRender(this.transitionStep);
+            if (this.onTransitionDone) {
+                this.onTransitionDone();
+            }
+        }
     }
     goToLocal(target) {
         this.state = CameraState.transition;
@@ -375,12 +388,20 @@ class Main {
         });
         this.scene.onPointerObservable.add((eventData, eventState) => {
             if (eventData.type === BABYLON.PointerEventTypes._POINTERUP) {
+                this.cameraManager.preventForcedMove = false;
                 let pickingInfo = this.scene.pick(this.scene.pointerX, this.scene.pointerY, (m) => {
                     return m === this.groundManager.globalGround;
                 });
                 if (pickingInfo.hit && this.cameraManager.state === CameraState.global) {
                     this.cameraManager.goToLocal(pickingInfo.pickedPoint);
                 }
+            }
+            else if (eventData.type === BABYLON.PointerEventTypes._POINTERDOWN) {
+                this.cameraManager.preventForcedMove = true;
+            }
+            else if (eventData.type === BABYLON.PointerEventTypes._POINTERWHEEL) {
+                this.cameraManager.preventForcedMove = true;
+                this.cameraManager.preventForcedMove = false;
             }
         });
     }
@@ -561,7 +582,7 @@ class Twittalert extends BABYLON.Mesh {
         super("TwittAlert", scene);
         this.lifeSpan = 20000;
         this.minDist = 20;
-        this.maxDist = 1000;
+        this.maxDist = 100;
         this.timeout = 0;
         this.popIn = () => {
             console.log("PopIn");

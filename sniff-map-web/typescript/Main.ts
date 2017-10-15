@@ -80,19 +80,21 @@ class Main {
 
         this.groundManager = new GroundManager(h, w);
 
-        // setInterval(
-        //     () => {
-        //         $.ajax(
-        //             {
-        //                 url: "http://svenfrankson.github.io/sniff-map-web/Content/test-tweet.json",
-        //                 success: (data: ITweet) => {
-        //                     myMethod(data);
-        //                 }
-        //             }
-        //         )
-        //     },
-        //     30000
-        // )
+        /*
+        setInterval(
+            () => {
+                $.ajax(
+                    {
+                        url: "http://svenfrankson.github.io/sniff-map-web/Content/test-tweet.json",
+                        success: (data: ITweet) => {
+                            myMethod(data);
+                        }
+                    }
+                )
+            },
+            5000
+        )
+        */
 
         let lon: number = Tools.XToLon(0);
         let lat: number = Tools.ZToLat(0);
@@ -147,6 +149,7 @@ class Main {
         this.scene.onPointerObservable.add(
             (eventData: BABYLON.PointerInfo, eventState: BABYLON.EventState) => {
                 if (eventData.type === BABYLON.PointerEventTypes._POINTERUP) {
+                    this.cameraManager.preventForcedMove = false;
                     let pickingInfo: BABYLON.PickingInfo = this.scene.pick(
                         this.scene.pointerX,
                         this.scene.pointerY,
@@ -157,6 +160,11 @@ class Main {
                     if (pickingInfo.hit && this.cameraManager.state === CameraState.global) {
                         this.cameraManager.goToLocal(pickingInfo.pickedPoint);
                     }
+                } else if (eventData.type === BABYLON.PointerEventTypes._POINTERDOWN) {
+                    this.cameraManager.preventForcedMove = true;
+                } else if (eventData.type === BABYLON.PointerEventTypes._POINTERWHEEL) {
+                    this.cameraManager.preventForcedMove = true;
+                    this.cameraManager.preventForcedMove = false;
                 }
             }
         )
