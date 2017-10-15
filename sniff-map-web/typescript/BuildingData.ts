@@ -1,30 +1,30 @@
 class BuildingData {
     public static instances: BuildingData[] = [];
-    public coordinates: BABYLON.Vector2;
-    public shape: BABYLON.Vector2[];
-    public level: number;
+    public c: BABYLON.Vector2;
+    public s: BABYLON.Vector2[];
+    public l: number;
 
     constructor() {
-        this.coordinates = BABYLON.Vector2.Zero();
-        this.shape = [];
-        this.level = 1;
+        this.c = BABYLON.Vector2.Zero();
+        this.s = [];
+        this.l = 1;
     }
 
     public pushNode(node: BABYLON.Vector2): void {
-        this.coordinates.scaleInPlace(this.shape.length);
-        this.shape.push(node);
-        this.coordinates.addInPlace(node);
-        this.coordinates.scaleInPlace(1 / this.shape.length);
+        this.c.scaleInPlace(this.s.length);
+        this.s.push(node);
+        this.c.addInPlace(node);
+        this.c.scaleInPlace(1 / this.s.length);
     }
 
     public static instantiateBakeMany(data: BuildingData[], scene: BABYLON.Scene): Building {
         if (data.length === 0) {
             return undefined;
         }
-        let rawData = BuildingData.extrudeToSolidRaw(data[0].shape, data[0].level * 0.2 + 0.1 * Math.random());
+        let rawData = BuildingData.extrudeToSolidRaw(data[0].s, data[0].l * 0.2 + 0.1 * Math.random());
         let vCount: number = rawData.positions.length / 3;
         for (let i: number = 1; i < data.length; i++) {
-            let otherRawData = BuildingData.extrudeToSolidRaw(data[i].shape, data[i].level * 0.2 + 0.1 * Math.random());
+            let otherRawData = BuildingData.extrudeToSolidRaw(data[i].s, data[i].l * 0.2 + 0.1 * Math.random());
             for (let j: number = 0; j < otherRawData.indices.length; j++) {
                 otherRawData.indices[j] += vCount;
             }
@@ -35,7 +35,7 @@ class BuildingData {
         }
 
         let building: Building = new Building(scene);
-        building.coordinates = data[0].coordinates.clone();
+        building.c = data[0].c.clone();
         let vertexData: BABYLON.VertexData = new BABYLON.VertexData();
         vertexData.positions = rawData.positions;
         vertexData.indices = rawData.indices;
@@ -48,8 +48,8 @@ class BuildingData {
 
     public instantiate(scene: BABYLON.Scene): Building {
         let building: Building = new Building(scene);
-        building.coordinates = this.coordinates.clone();
-        let data: BABYLON.VertexData = BuildingData.extrudeToSolid(this.shape, this.level * 0.2 + 0.1 * Math.random());
+        building.c = this.c.clone();
+        let data: BABYLON.VertexData = BuildingData.extrudeToSolid(this.s, this.l * 0.2 + 0.1 * Math.random());
         data.applyToMesh(building);
         building.freezeWorldMatrix();
 

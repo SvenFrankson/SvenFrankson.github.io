@@ -12,7 +12,7 @@ class CameraManager {
         this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(target);
-        let direction: BABYLON.Vector3 = new BABYLON.Vector3(-3, 5, -4);
+        let direction: BABYLON.Vector3 = new BABYLON.Vector3(-3, 3, -4);
         direction.normalize();
         direction.scaleInPlace(20);
         this.toPosition.addInPlace(direction);
@@ -20,9 +20,9 @@ class CameraManager {
         this.toTarget.copyFrom(target);
         this.onTransitionDone = () => {
             this.state = CameraState.local;
-            Main.instance.camera.useAutoRotationBehavior = false;
-            //Main.instance.camera.autoRotationBehavior.idleRotationWaitTime = 500;
-            //Main.instance.camera.autoRotationBehavior.idleRotationSpinupTime = 2000;
+            Main.instance.camera.useAutoRotationBehavior = true;
+            Main.instance.camera.autoRotationBehavior.idleRotationWaitTime = 500;
+            Main.instance.camera.autoRotationBehavior.idleRotationSpinupTime = 2000;
         }
 
         this.k = 0;

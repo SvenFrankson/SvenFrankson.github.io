@@ -70,39 +70,6 @@ class Main {
 
         this.ui = new UI();
 
-        setInterval(
-            () => {
-                let position: BABYLON.Vector2 = BABYLON.Vector2.Zero();
-                position.x = Math.random() - 0.5;
-                position.y = Math.random() - 0.5;
-                position.scaleInPlace(64);
-                let range: number = Math.random() * 8 + 2;
-                new Failure(position, range);
-            },
-            10000
-        );
-
-        // let long: number = 7.76539;
-        // let lat: number = 48.581;
-        // if (localStorage.getItem("long-value") !== null) {
-        //     long = parseFloat(localStorage.getItem("long-value"));
-        // }
-        // if (localStorage.getItem("lat-value") !== null) {
-        //     lat = parseFloat(localStorage.getItem("lat-value"));
-        // }
-        // $("#long-input").val(long + "");
-        // $("#lat-input").val(lat + "");
-        // 
-        // $("#long-input").on("input change", (e) => {
-        //     long = parseFloat((e.currentTarget as HTMLInputElement).value);
-        //     localStorage.setItem("long-value", long + "");
-        // });
-        // 
-        // $("#lat-input").on("input change", (e) => {
-        //     lat = parseFloat((e.currentTarget as HTMLInputElement).value);
-        //     localStorage.setItem("lat-value", lat + "");
-        // });
-        
         let poc: Poc = new Poc();
         let h: number = 1024;
         let w: number = 1024;
@@ -208,7 +175,7 @@ function myMethod(node1: ITweet) {
     new Twittalert(
         position,
         node1.Text,
-        " today",
+        " Today",
         node1.Name,
         node1.URLPicture,
         Main.instance.scene

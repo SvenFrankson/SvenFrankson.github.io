@@ -25,10 +25,10 @@ class Building extends BABYLON.Mesh {
         let minZ = Infinity;
         let maxZ = -Infinity;
         Building.instances.forEach((b) => {
-            minX = Math.min(minX, b.coordinates.x);
-            minZ = Math.min(minZ, b.coordinates.y);
-            maxX = Math.max(maxX, b.coordinates.x);
-            maxZ = Math.max(maxZ, b.coordinates.y);
+            minX = Math.min(minX, b.c.x);
+            minZ = Math.min(minZ, b.c.y);
+            maxX = Math.max(maxX, b.c.x);
+            maxZ = Math.max(maxZ, b.c.y);
         });
         Building.center.x = (minX + maxX) / 2;
         Building.center.z = (minZ + maxZ) / 2;
@@ -44,24 +44,24 @@ Building.center = BABYLON.Vector3.Zero();
 Building.radius = 10;
 class BuildingData {
     constructor() {
-        this.coordinates = BABYLON.Vector2.Zero();
-        this.shape = [];
-        this.level = 1;
+        this.c = BABYLON.Vector2.Zero();
+        this.s = [];
+        this.l = 1;
     }
     pushNode(node) {
-        this.coordinates.scaleInPlace(this.shape.length);
-        this.shape.push(node);
-        this.coordinates.addInPlace(node);
-        this.coordinates.scaleInPlace(1 / this.shape.length);
+        this.c.scaleInPlace(this.s.length);
+        this.s.push(node);
+        this.c.addInPlace(node);
+        this.c.scaleInPlace(1 / this.s.length);
     }
     static instantiateBakeMany(data, scene) {
         if (data.length === 0) {
             return undefined;
         }
-        let rawData = BuildingData.extrudeToSolidRaw(data[0].shape, data[0].level * 0.2 + 0.1 * Math.random());
+        let rawData = BuildingData.extrudeToSolidRaw(data[0].s, data[0].l * 0.2 + 0.1 * Math.random());
         let vCount = rawData.positions.length / 3;
         for (let i = 1; i < data.length; i++) {
-            let otherRawData = BuildingData.extrudeToSolidRaw(data[i].shape, data[i].level * 0.2 + 0.1 * Math.random());
+            let otherRawData = BuildingData.extrudeToSolidRaw(data[i].s, data[i].l * 0.2 + 0.1 * Math.random());
             for (let j = 0; j < otherRawData.indices.length; j++) {
                 otherRawData.indices[j] += vCount;
             }
@@ -71,7 +71,7 @@ class BuildingData {
             rawData.colors.push(...otherRawData.colors);
         }
         let building = new Building(scene);
-        building.coordinates = data[0].coordinates.clone();
+        building.c = data[0].c.clone();
         let vertexData = new BABYLON.VertexData();
         vertexData.positions = rawData.positions;
         vertexData.indices = rawData.indices;
@@ -82,8 +82,8 @@ class BuildingData {
     }
     instantiate(scene) {
         let building = new Building(scene);
-        building.coordinates = this.coordinates.clone();
-        let data = BuildingData.extrudeToSolid(this.shape, this.level * 0.2 + 0.1 * Math.random());
+        building.c = this.c.clone();
+        let data = BuildingData.extrudeToSolid(this.s, this.l * 0.2 + 0.1 * Math.random());
         data.applyToMesh(building);
         building.freezeWorldMatrix();
         return building;
@@ -205,7 +205,7 @@ class CameraManager {
         this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(target);
-        let direction = new BABYLON.Vector3(-3, 5, -4);
+        let direction = new BABYLON.Vector3(-3, 3, -4);
         direction.normalize();
         direction.scaleInPlace(20);
         this.toPosition.addInPlace(direction);
@@ -213,7 +213,9 @@ class CameraManager {
         this.toTarget.copyFrom(target);
         this.onTransitionDone = () => {
             this.state = CameraState.local;
-            Main.instance.camera.useAutoRotationBehavior = false;
+            Main.instance.camera.useAutoRotationBehavior = true;
+            Main.instance.camera.autoRotationBehavior.idleRotationWaitTime = 500;
+            Main.instance.camera.autoRotationBehavior.idleRotationSpinupTime = 2000;
         };
         this.k = 0;
         Main.instance.scene.registerBeforeRender(this.transitionStep);
@@ -255,7 +257,7 @@ class Failure {
         Building.instances.forEach((b) => {
             b.material = Main.okMaterial;
             Failure.instances.forEach((f) => {
-                if (BABYLON.Vector2.DistanceSquared(b.coordinates, f.origin) < f.sqrRange) {
+                if (BABYLON.Vector2.DistanceSquared(b.c, f.origin) < f.sqrRange) {
                     b.material = Main.nokMaterial;
                 }
             });
@@ -343,14 +345,6 @@ class Main {
         Main.greenMaterial = new BABYLON.StandardMaterial("Random", this.scene);
         Main.greenMaterial.diffuseColor = BABYLON.Color3.FromHexString("#38c128");
         this.ui = new UI();
-        setInterval(() => {
-            let position = BABYLON.Vector2.Zero();
-            position.x = Math.random() - 0.5;
-            position.y = Math.random() - 0.5;
-            position.scaleInPlace(64);
-            let range = Math.random() * 8 + 2;
-            new Failure(position, range);
-        }, 10000);
         let poc = new Poc();
         let h = 1024;
         let w = 1024;
@@ -407,7 +401,7 @@ function myMethod(node1) {
     let position = BABYLON.Vector3.Zero();
     position.x = Tools.LonToX(node1.Longitude);
     position.z = -Tools.LatToZ(node1.Latitude);
-    new Twittalert(position, node1.Text, " today", node1.Name, node1.URLPicture, Main.instance.scene);
+    new Twittalert(position, node1.Text, " Today", node1.Name, node1.URLPicture, Main.instance.scene);
 }
 window.addEventListener("DOMContentLoaded", () => {
     let game = new Main("supermap");
@@ -417,68 +411,89 @@ window.addEventListener("DOMContentLoaded", () => {
 class Poc {
     constructor() {
         this.tileSize = 0.007;
-    }
-    getDataAt(long, lat, callback) {
-        let box = (long - this.tileSize).toFixed(7) + "," + (lat - this.tileSize).toFixed(7) + "," + (long + this.tileSize).toFixed(7) + "," + (lat + this.tileSize).toFixed(7);
-        let url = "http://api.openstreetmap.org/api/0.6/map?bbox=" + box;
-        console.log(url);
-        $.ajax({
-            url: url,
-            success: (data) => {
-                let mapNodes = new Map();
-                let root = data.firstElementChild;
-                let nodes = root.children;
-                for (let i = 0; i < nodes.length; i++) {
-                    if (nodes[i].tagName === "node") {
-                        let id = parseInt(nodes[i].id);
-                        let lLat = parseFloat(nodes[i].getAttribute("lat"));
-                        let lLong = parseFloat(nodes[i].getAttribute("lon"));
-                        let coordinates = new BABYLON.Vector2(lLong, lLat);
-                        coordinates.x = Tools.LonToX(lLong);
-                        coordinates.y = -Tools.LatToZ(lLat);
-                        mapNodes.set(id, coordinates);
+        this.success = (data, box, callback) => {
+            let mapNodes = new Map();
+            let root = data.firstElementChild;
+            let nodes = root.children;
+            let newBuildings = [];
+            for (let i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === "node") {
+                    let id = parseInt(nodes[i].id);
+                    let lLat = parseFloat(nodes[i].getAttribute("lat"));
+                    let lLong = parseFloat(nodes[i].getAttribute("lon"));
+                    let coordinates = new BABYLON.Vector2(lLong, lLat);
+                    coordinates.x = Tools.LonToX(lLong);
+                    coordinates.y = -Tools.LatToZ(lLat);
+                    mapNodes.set(id, coordinates);
+                }
+                if (nodes[i].tagName === "way") {
+                    let itsBuilding = false;
+                    let level = 1;
+                    let nodeIChildren = nodes[i].children;
+                    for (let j = 0; j < nodeIChildren.length; j++) {
+                        if (nodeIChildren[j].tagName === "tag") {
+                            if (nodeIChildren[j].hasAttribute("k")) {
+                                if (nodeIChildren[j].getAttribute("k") === "building") {
+                                    itsBuilding = true;
+                                }
+                                if (nodeIChildren[j].getAttribute("k") === "building:levels") {
+                                    level = parseInt(nodeIChildren[j].getAttribute("v"));
+                                }
+                            }
+                        }
                     }
-                    if (nodes[i].tagName === "way") {
-                        let itsBuilding = false;
-                        let level = 1;
-                        let nodeIChildren = nodes[i].children;
+                    if (itsBuilding) {
+                        let newBuilding = new BuildingData();
+                        newBuilding.l = level;
                         for (let j = 0; j < nodeIChildren.length; j++) {
-                            if (nodeIChildren[j].tagName === "tag") {
-                                if (nodeIChildren[j].hasAttribute("k")) {
-                                    if (nodeIChildren[j].getAttribute("k") === "building") {
-                                        itsBuilding = true;
-                                    }
-                                    if (nodeIChildren[j].getAttribute("k") === "building:levels") {
-                                        level = parseInt(nodeIChildren[j].getAttribute("v"));
-                                    }
-                                }
+                            if (nodeIChildren[j].tagName === "nd") {
+                                let nodeRef = parseInt(nodeIChildren[j].getAttribute("ref"));
+                                let node = mapNodes.get(nodeRef);
+                                newBuilding.pushNode(node);
                             }
                         }
-                        if (itsBuilding) {
-                            let newBuilding = new BuildingData();
-                            newBuilding.level = level;
-                            for (let j = 0; j < nodeIChildren.length; j++) {
-                                if (nodeIChildren[j].tagName === "nd") {
-                                    let nodeRef = parseInt(nodeIChildren[j].getAttribute("ref"));
-                                    let node = mapNodes.get(nodeRef);
-                                    newBuilding.pushNode(node);
-                                }
-                            }
-                            Main.instance.buildingMaker.toDoList.push(newBuilding);
-                            BuildingData.instances.push(newBuilding);
-                        }
+                        Main.instance.buildingMaker.toDoList.push(newBuilding);
                     }
                 }
+            }
+            if (callback) {
+                callback();
+            }
+        };
+    }
+    loadTile(index, callback) {
+        $.ajax({
+            url: "./Content/tile_" + index + ".json",
+            success: (data) => {
+                data.forEach((b) => {
+                    Main.instance.buildingMaker.toDoList.push(b);
+                });
                 if (callback) {
                     callback();
                 }
-            },
-            error: () => {
-                console.log("Error");
             }
         });
     }
+    getDataAt(long, lat, callback) {
+        let box = (long - this.tileSize).toFixed(7) + "," + (lat - this.tileSize).toFixed(7) + "," + (long + this.tileSize).toFixed(7) + "," + (lat + this.tileSize).toFixed(7);
+        let dataString = localStorage.getItem(box);
+        if (false) {
+        }
+        else {
+            let url = "http://api.openstreetmap.org/api/0.6/map?bbox=" + box;
+            $.ajax({
+                url: url,
+                success: (data) => {
+                    this.success(data, box, callback);
+                },
+                error: () => {
+                    console.log("Error");
+                }
+            });
+        }
+    }
 }
+Poc.newNewBuildings = [];
 class PowerStation extends BABYLON.Mesh {
     constructor(failure, scene) {
         super("PowerStation", scene);

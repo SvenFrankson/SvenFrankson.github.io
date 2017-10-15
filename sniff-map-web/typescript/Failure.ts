@@ -28,7 +28,7 @@ class Failure {
                 b.material = Main.okMaterial;
                 Failure.instances.forEach(
                     (f: Failure) => {
-                        if (BABYLON.Vector2.DistanceSquared(b.coordinates, f.origin) < f.sqrRange) {
+                        if (BABYLON.Vector2.DistanceSquared(b.c, f.origin) < f.sqrRange) {
                             b.material = Main.nokMaterial;
                         }
                     }

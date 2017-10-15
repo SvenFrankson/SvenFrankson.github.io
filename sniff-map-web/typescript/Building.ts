@@ -1,7 +1,7 @@
 class Building extends BABYLON.Mesh {
 
     public static instances: Building[] = [];
-    public coordinates: BABYLON.Vector2;
+    public c: BABYLON.Vector2;
 
     constructor(scene: BABYLON.Scene) {
         super("Building", scene);
@@ -36,10 +36,10 @@ class Building extends BABYLON.Mesh {
 
         Building.instances.forEach(
             (b: Building) => {
-                minX = Math.min(minX, b.coordinates.x);
-                minZ = Math.min(minZ, b.coordinates.y);
-                maxX = Math.max(maxX, b.coordinates.x);
-                maxZ = Math.max(maxZ, b.coordinates.y);
+                minX = Math.min(minX, b.c.x);
+                minZ = Math.min(minZ, b.c.y);
+                maxX = Math.max(maxX, b.c.x);
+                maxZ = Math.max(maxZ, b.c.y);
             }
         )
 
