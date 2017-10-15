@@ -465,7 +465,7 @@ class Poc {
         };
     }
     loadTile(index, callback) {
-        let url = "./Content/map_" + index + ".xml";
+        let url = "http://svenfrankson.github.io/sniff-map-web/Content/map_" + index + ".xml";
         $.ajax({
             url: url,
             success: (data) => {
