@@ -102,6 +102,8 @@ class Twittalert extends BABYLON.Mesh {
         );
     }
 
+    Main.instance.cameraManager.goToLocal(this.position);
+    
     public timeout: number = 0;
 
     public popIn = () => {
