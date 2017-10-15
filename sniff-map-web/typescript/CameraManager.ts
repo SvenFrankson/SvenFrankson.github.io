@@ -1,6 +1,5 @@
 enum CameraState {
     global,
-    ready,
     transition,
     local
 }
@@ -10,9 +9,6 @@ class CameraManager {
     public state: CameraState = CameraState.global;
 
     public goToLocal(target: BABYLON.Vector3) {
-        if (this.state !== CameraState.ready) {
-            return;
-        }
         this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(target);

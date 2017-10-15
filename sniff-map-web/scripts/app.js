@@ -169,9 +169,8 @@ class BuildingMaker {
 var CameraState;
 (function (CameraState) {
     CameraState[CameraState["global"] = 0] = "global";
-    CameraState[CameraState["ready"] = 1] = "ready";
-    CameraState[CameraState["transition"] = 2] = "transition";
-    CameraState[CameraState["local"] = 3] = "local";
+    CameraState[CameraState["transition"] = 1] = "transition";
+    CameraState[CameraState["local"] = 2] = "local";
 })(CameraState || (CameraState = {}));
 class CameraManager {
     constructor() {
@@ -203,9 +202,6 @@ class CameraManager {
         };
     }
     goToLocal(target) {
-        if (this.state !== CameraState.ready) {
-            return;
-        }
         this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(target);
@@ -292,7 +288,7 @@ class GroundManager {
         this.globalGround = BABYLON.MeshBuilder.CreateGround("GlobalGround", { width: w, height: h }, Main.instance.scene);
         this.globalGround.position.y = -0.2;
         let groundMaterial = new BABYLON.StandardMaterial("GroundMaterial", Main.instance.scene);
-        groundMaterial.diffuseTexture = new BABYLON.Texture("./Content/alsace.png", Main.instance.scene);
+        groundMaterial.diffuseTexture = new BABYLON.Texture("http://svenfrankson.github.io/sniff-map-web/Content/alsace.png", Main.instance.scene);
         groundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
         this.globalGround.material = groundMaterial;
         this.localGround = BABYLON.MeshBuilder.CreateDisc("LocalGround", { radius: 1, sideOrientation: 1 }, Main.instance.scene);
@@ -300,7 +296,7 @@ class GroundManager {
         let s = 141.51682965;
         this.localGround.scaling.copyFromFloats(s, s, s);
         let localGroundMaterial = new BABYLON.StandardMaterial("LocalGroundMaterial", Main.instance.scene);
-        localGroundMaterial.diffuseTexture = new BABYLON.Texture("./Content/strasbourg.png", Main.instance.scene);
+        localGroundMaterial.diffuseTexture = new BABYLON.Texture("http://svenfrankson.github.io/sniff-map-web/Content/strasbourg.png", Main.instance.scene);
         localGroundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
         this.localGround.material = localGroundMaterial;
     }
@@ -355,19 +351,10 @@ class Main {
             let range = Math.random() * 8 + 2;
             new Failure(position, range);
         }, 10000);
-        setTimeout(() => {
-            $.ajax({
-                url: "./Content/test-tweet.json",
-                success: (data) => {
-                    myMethod(data);
-                }
-            });
-        }, 3000);
         let poc = new Poc();
         let h = 1024;
         let w = 1024;
         this.groundManager = new GroundManager(h, w);
-        this.cameraManager.state = CameraState.ready;
         let lon = Tools.XToLon(0);
         let lat = Tools.ZToLat(0);
         Building.Clear();
@@ -501,7 +488,7 @@ class PowerStation extends BABYLON.Mesh {
             this.scaling.copyFromFloats(s, s, s);
         };
         PowerStation.instances.push(this);
-        BABYLON.SceneLoader.ImportMesh("", "./Content/elec-logo.babylon", "", scene, (meshes) => {
+        BABYLON.SceneLoader.ImportMesh("", "http://svenfrankson.github.io/sniff-map-web/Content/elec-logo.babylon", "", scene, (meshes) => {
             this.model = meshes[0];
             meshes[0].parent = this;
             if (failure) {

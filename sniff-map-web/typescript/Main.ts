@@ -82,20 +82,6 @@ class Main {
             10000
         );
 
-        setTimeout(
-            () => {
-                $.ajax(
-                    {
-                        url: "./Content/test-tweet.json",
-                        success: (data) => {
-                            myMethod(data);
-                        }
-                    }
-                )
-            },
-            3000
-        );
-
         // let long: number = 7.76539;
         // let lat: number = 48.581;
         // if (localStorage.getItem("long-value") !== null) {
@@ -123,7 +109,6 @@ class Main {
 
         this.groundManager = new GroundManager(h, w);
 
-        this.cameraManager.state = CameraState.ready;
         let lon: number = Tools.XToLon(0);
         let lat: number = Tools.ZToLat(0);
         Building.Clear();
