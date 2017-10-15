@@ -6,7 +6,7 @@ class GroundManager {
         this.globalGround = BABYLON.MeshBuilder.CreateGround("GlobalGround", {width: w, height: h}, Main.instance.scene);
         this.globalGround.position.y = -0.2;
         let groundMaterial: BABYLON.StandardMaterial = new BABYLON.StandardMaterial("GroundMaterial", Main.instance.scene);
-        groundMaterial.diffuseTexture = new BABYLON.Texture("./data/alsace.png", Main.instance.scene);
+        groundMaterial.diffuseTexture = new BABYLON.Texture("./Content/alsace.png", Main.instance.scene);
         groundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
         this.globalGround.material = groundMaterial;
 
@@ -15,7 +15,7 @@ class GroundManager {
         let s: number = 141.51682965;
         this.localGround.scaling.copyFromFloats(s, s, s);
         let localGroundMaterial: BABYLON.StandardMaterial = new BABYLON.StandardMaterial("LocalGroundMaterial", Main.instance.scene);
-        localGroundMaterial.diffuseTexture = new BABYLON.Texture("./data/strasbourg.png", Main.instance.scene);
+        localGroundMaterial.diffuseTexture = new BABYLON.Texture("./Content/strasbourg.png", Main.instance.scene);
         localGroundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
         this.localGround.material = localGroundMaterial;
     }

@@ -292,7 +292,7 @@ class GroundManager {
         this.globalGround = BABYLON.MeshBuilder.CreateGround("GlobalGround", { width: w, height: h }, Main.instance.scene);
         this.globalGround.position.y = -0.2;
         let groundMaterial = new BABYLON.StandardMaterial("GroundMaterial", Main.instance.scene);
-        groundMaterial.diffuseTexture = new BABYLON.Texture("./data/alsace.png", Main.instance.scene);
+        groundMaterial.diffuseTexture = new BABYLON.Texture("./Content/alsace.png", Main.instance.scene);
         groundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
         this.globalGround.material = groundMaterial;
         this.localGround = BABYLON.MeshBuilder.CreateDisc("LocalGround", { radius: 1, sideOrientation: 1 }, Main.instance.scene);
@@ -300,7 +300,7 @@ class GroundManager {
         let s = 141.51682965;
         this.localGround.scaling.copyFromFloats(s, s, s);
         let localGroundMaterial = new BABYLON.StandardMaterial("LocalGroundMaterial", Main.instance.scene);
-        localGroundMaterial.diffuseTexture = new BABYLON.Texture("./data/strasbourg.png", Main.instance.scene);
+        localGroundMaterial.diffuseTexture = new BABYLON.Texture("./Content/strasbourg.png", Main.instance.scene);
         localGroundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
         this.localGround.material = localGroundMaterial;
     }
@@ -357,7 +357,7 @@ class Main {
         }, 10000);
         setTimeout(() => {
             $.ajax({
-                url: "./data/test-tweet.json",
+                url: "./Content/test-tweet.json",
                 success: (data) => {
                     myMethod(data);
                 }
@@ -501,7 +501,7 @@ class PowerStation extends BABYLON.Mesh {
             this.scaling.copyFromFloats(s, s, s);
         };
         PowerStation.instances.push(this);
-        BABYLON.SceneLoader.ImportMesh("", "./data/elec-logo.babylon", "", scene, (meshes) => {
+        BABYLON.SceneLoader.ImportMesh("", "./Content/elec-logo.babylon", "", scene, (meshes) => {
             this.model = meshes[0];
             meshes[0].parent = this;
             if (failure) {

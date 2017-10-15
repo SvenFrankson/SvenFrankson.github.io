@@ -19,7 +19,7 @@ class PowerStation extends BABYLON.Mesh {
 
         BABYLON.SceneLoader.ImportMesh(
             "",
-            "./data/elec-logo.babylon",
+            "./Content/elec-logo.babylon",
             "",
             scene,
             (meshes) => {

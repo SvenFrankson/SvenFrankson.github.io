@@ -86,7 +86,7 @@ class Main {
             () => {
                 $.ajax(
                     {
-                        url: "./data/test-tweet.json",
+                        url: "./Content/test-tweet.json",
                         success: (data) => {
                             myMethod(data);
                         }
