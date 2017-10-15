@@ -11,9 +11,9 @@ class Twittalert extends BABYLON.Mesh {
     public static instances: Twittalert[] = [];
 
     public ground: BABYLON.Vector3;
-    public lifeSpan: number = 20000;
-    public minDist: number = 20;
-    public maxDist: number = 100;
+    public lifeSpan: number = 100000;
+    public minDist: number = 900;
+    public maxDist: number = 1000;
     public texture: BABYLON.GUI.AdvancedDynamicTexture;
     public container: BABYLON.GUI.Container;
     public offset: BABYLON.Vector3;
@@ -118,11 +118,20 @@ class Twittalert extends BABYLON.Mesh {
         textBox.width = "380px";
         this.container.addControl(textBox);
 
+        let warning = BABYLON.GUI.Button.CreateImageOnlyButton("Warning", "http://svenfrankson.github.io/sniff-map-web/Content/alert.png");
+        warning.width = "60px";
+        warning.height = "60px";
+        warning.top = "0px";
+        warning.left = "200px";
+        warning.thickness = 0;
+        warning.onPointerUpObservable.add(() => {
+            new Failure(new BABYLON.Vector2(this.ground.x, this.ground.z), 10);
+        });
+        this.container.addControl(warning);
+
         this.container.linkWithMesh(this);
         this.container.linkOffsetX = "120px";
         this.container.alpha = 0;
-
-        // this.DemoTryCauseFailure();
 
         scene.registerBeforeRender(this.popIn);
 

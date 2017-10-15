@@ -48,7 +48,7 @@ class Main {
         this.camera.attachControl(this.canvas);
         this.camera.setPosition(
             new BABYLON.Vector3(
-                -500, 500, -500
+                -350, 350, -350
             )
         );
 
@@ -81,6 +81,15 @@ class Main {
         this.groundManager = new GroundManager(h, w);
 
         /*
+        $.ajax(
+            {
+                url: "http://svenfrankson.github.io/sniff-map-web/Content/test-tweet.json",
+                success: (data: ITweet) => {
+                    myMethod(data);
+                }
+            }
+        )*/
+        /*
         setInterval(
             () => {
                 $.ajax(
@@ -92,9 +101,9 @@ class Main {
                     }
                 )
             },
-            5000
-        )*/
-        
+            3000
+        )
+        */
 
         let lon: number = Tools.XToLon(0);
         let lat: number = Tools.ZToLat(0);
@@ -182,6 +191,38 @@ class Main {
 
     public resize(): void {
         this.engine.resize();
+    }
+
+    public pointsOfInterestBoundingInfo(): {min: BABYLON.Vector3, max: BABYLON.Vector3} {
+        let min: BABYLON.Vector3 = new BABYLON.Vector3(-1, -1, -1);
+        let max: BABYLON.Vector3 = new BABYLON.Vector3(1, 1, 1);
+
+        Twittalert.instances.forEach(
+            (t: Twittalert) => {
+                min.x = Math.min(t.position.x, min.x);
+                min.y = Math.min(t.position.y, min.y);
+                min.z = Math.min(t.position.z, min.z);
+
+                max.x = Math.max(t.position.x, max.x);
+                max.y = Math.max(t.position.y, max.y);
+                max.z = Math.max(t.position.z, max.z);
+            }
+        );
+
+        Failure.instances.forEach(
+            (f: Failure) => {
+                min.x = Math.min(f.origin.x, min.x);
+                min.z = Math.min(f.origin.y, min.z);
+
+                max.x = Math.max(f.origin.x, max.x);
+                max.z = Math.max(f.origin.y, max.z);
+            }
+        );
+
+        return {
+            min: min,
+            max: max
+        };
     }
 }
 

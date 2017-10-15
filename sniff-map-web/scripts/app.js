@@ -348,7 +348,7 @@ class Main {
         this.light = hemisphericLight;
         this.camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 1, BABYLON.Vector3.Zero(), this.scene);
         this.camera.attachControl(this.canvas);
-        this.camera.setPosition(new BABYLON.Vector3(-500, 500, -500));
+        this.camera.setPosition(new BABYLON.Vector3(-350, 350, -350));
         this.cameraManager = new CameraManager();
         Main.okMaterial = new BABYLON.StandardMaterial("Random", this.scene);
         Main.okMaterial.diffuseColor = BABYLON.Color3.FromHexString("#FFFFFF");
@@ -418,6 +418,28 @@ class Main {
     }
     resize() {
         this.engine.resize();
+    }
+    pointsOfInterestBoundingInfo() {
+        let min = new BABYLON.Vector3(-1, -1, -1);
+        let max = new BABYLON.Vector3(1, 1, 1);
+        Twittalert.instances.forEach((t) => {
+            min.x = Math.min(t.position.x, min.x);
+            min.y = Math.min(t.position.y, min.y);
+            min.z = Math.min(t.position.z, min.z);
+            max.x = Math.max(t.position.x, max.x);
+            max.y = Math.max(t.position.y, max.y);
+            max.z = Math.max(t.position.z, max.z);
+        });
+        Failure.instances.forEach((f) => {
+            min.x = Math.min(f.origin.x, min.x);
+            min.z = Math.min(f.origin.y, min.z);
+            max.x = Math.max(f.origin.x, max.x);
+            max.z = Math.max(f.origin.y, max.z);
+        });
+        return {
+            min: min,
+            max: max
+        };
     }
 }
 Main.medLon = 7.7554;
@@ -583,9 +605,9 @@ class Tools {
 class Twittalert extends BABYLON.Mesh {
     constructor(position, content, date, author, pictureUrl, scene) {
         super("TwittAlert", scene);
-        this.lifeSpan = 20000;
-        this.minDist = 20;
-        this.maxDist = 100;
+        this.lifeSpan = 100000;
+        this.minDist = 900;
+        this.maxDist = 1000;
         this.timeout = 0;
         this.popIn = () => {
             console.log("PopIn");
@@ -681,6 +703,16 @@ class Twittalert extends BABYLON.Mesh {
         textBox.left = "90px";
         textBox.width = "380px";
         this.container.addControl(textBox);
+        let warning = BABYLON.GUI.Button.CreateImageOnlyButton("Warning", "http://svenfrankson.github.io/sniff-map-web/Content/alert.png");
+        warning.width = "60px";
+        warning.height = "60px";
+        warning.top = "0px";
+        warning.left = "200px";
+        warning.thickness = 0;
+        warning.onPointerUpObservable.add(() => {
+            new Failure(new BABYLON.Vector2(this.ground.x, this.ground.z), 10);
+        });
+        this.container.addControl(warning);
         this.container.linkWithMesh(this);
         this.container.linkOffsetX = "120px";
         this.container.alpha = 0;
