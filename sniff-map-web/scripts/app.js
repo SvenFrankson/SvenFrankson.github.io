@@ -358,14 +358,6 @@ class Main {
         let h = 1024;
         let w = 1024;
         this.groundManager = new GroundManager(h, w);
-        for (let i = 0; i < 10; i++) {
-            $.ajax({
-                url: "http://svenfrankson.github.io/sniff-map-web/Content/test-tweet.json",
-                success: (data) => {
-                    myMethod(data);
-                }
-            });
-        }
         let lon = Tools.XToLon(0);
         let lat = Tools.ZToLat(0);
         Building.Clear();

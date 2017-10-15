@@ -86,6 +86,7 @@ class Main {
 
         this.groundManager = new GroundManager(h, w);
 
+        /*
         for (let i: number = 0; i < 10; i++) {
             $.ajax(
                 {
@@ -96,6 +97,7 @@ class Main {
                 }
             )
         }
+        */
         /*
         setInterval(
             () => {
