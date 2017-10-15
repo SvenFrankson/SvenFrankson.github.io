@@ -91,7 +91,7 @@ class Main {
                     }
                 )
             },
-            5000
+            30000
         )
 
         let lon: number = Tools.XToLon(0);

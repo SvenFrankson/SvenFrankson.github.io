@@ -359,7 +359,7 @@ class Main {
                     myMethod(data);
                 }
             });
-        }, 5000);
+        }, 30000);
         let lon = Tools.XToLon(0);
         let lat = Tools.ZToLat(0);
         Building.Clear();
