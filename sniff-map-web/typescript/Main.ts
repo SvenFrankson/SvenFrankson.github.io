@@ -55,7 +55,7 @@ class Main {
         this.cameraManager = new CameraManager();
 
         Main.okMaterial = new BABYLON.StandardMaterial("Random", this.scene);
-        Main.okMaterial.diffuseColor = BABYLON.Color3.FromHexString("#ffffff");
+        Main.okMaterial.diffuseColor = BABYLON.Color3.FromHexString("#FFFFFF");
         Main.okMaterial.backFaceCulling = false;
         
         Main.nokMaterial = new BABYLON.StandardMaterial("Random", this.scene);
@@ -80,7 +80,7 @@ class Main {
 
         this.groundManager = new GroundManager(h, w);
 
-        /*
+        
         setInterval(
             () => {
                 $.ajax(
@@ -92,9 +92,9 @@ class Main {
                     }
                 )
             },
-            2500
+            5000
         )
-        */
+        
 
         let lon: number = Tools.XToLon(0);
         let lat: number = Tools.ZToLat(0);

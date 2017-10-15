@@ -351,7 +351,7 @@ class Main {
         this.camera.setPosition(new BABYLON.Vector3(-500, 500, -500));
         this.cameraManager = new CameraManager();
         Main.okMaterial = new BABYLON.StandardMaterial("Random", this.scene);
-        Main.okMaterial.diffuseColor = BABYLON.Color3.FromHexString("#ffffff");
+        Main.okMaterial.diffuseColor = BABYLON.Color3.FromHexString("#FFFFFF");
         Main.okMaterial.backFaceCulling = false;
         Main.nokMaterial = new BABYLON.StandardMaterial("Random", this.scene);
         Main.nokMaterial.diffuseColor = BABYLON.Color3.FromHexString("#E74D3B");
@@ -368,6 +368,14 @@ class Main {
         let h = 1024;
         let w = 1024;
         this.groundManager = new GroundManager(h, w);
+        setInterval(() => {
+            $.ajax({
+                url: "http://svenfrankson.github.io/sniff-map-web/Content/test-tweet.json",
+                success: (data) => {
+                    myMethod(data);
+                }
+            });
+        }, 5000);
         let lon = Tools.XToLon(0);
         let lat = Tools.ZToLat(0);
         Building.Clear();
