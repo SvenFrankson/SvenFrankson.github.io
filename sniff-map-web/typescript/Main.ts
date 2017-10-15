@@ -185,7 +185,7 @@ class Main {
                             return m === this.groundManager.globalGround;
                         }
                     );
-                    if (pickingInfo.hit && this.cameraManager.state === CameraState.global) {
+                    if (pickingInfo.hit) {
                         this.cameraManager.goToLocal(pickingInfo.pickedPoint);
                     }
                 } else if (eventData.type === BABYLON.PointerEventTypes._POINTERDOWN) {

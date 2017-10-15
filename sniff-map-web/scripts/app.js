@@ -94,6 +94,10 @@ class BuildingData {
         let colors = [];
         let colorTop = BABYLON.Color4.FromHexString("#0FEACAFF");
         let colorBottom = BABYLON.Color4.FromHexString("#AD5EECFF");
+        if (Math.random() < 0.5) {
+            colorTop = BABYLON.Color4.FromHexString("#AD5EECFF");
+            colorBottom = BABYLON.Color4.FromHexString("#0FEACAFF");
+        }
         for (let i = 0; i < points.length; i++) {
             positions.push(points[i].x, height, points[i].y);
             colors.push(colorTop.r, colorTop.g, colorTop.b, colorTop.a);
@@ -170,15 +174,8 @@ class BuildingMaker {
         Main.instance.scene.registerBeforeRender(this.stepInstantiate);
     }
 }
-var CameraState;
-(function (CameraState) {
-    CameraState[CameraState["global"] = 0] = "global";
-    CameraState[CameraState["transition"] = 1] = "transition";
-    CameraState[CameraState["local"] = 2] = "local";
-})(CameraState || (CameraState = {}));
 class CameraManager {
     constructor() {
-        this.state = CameraState.global;
         this._preventForcedMove = false;
         this.k = 0;
         this.duration = 180;
@@ -220,7 +217,6 @@ class CameraManager {
     }
     goToLocal(target) {
         Main.instance.scene.unregisterBeforeRender(this.transitionStep);
-        this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(target);
         let direction = target.subtract(Main.instance.camera.position);
@@ -231,7 +227,6 @@ class CameraManager {
         this.fromTarget.copyFrom(Main.instance.camera.target);
         this.toTarget.copyFrom(target);
         this.onTransitionDone = () => {
-            this.state = CameraState.local;
             Main.instance.camera.useAutoRotationBehavior = true;
             Main.instance.camera.autoRotationBehavior.idleRotationWaitTime = 3000;
             Main.instance.camera.autoRotationBehavior.idleRotationSpinupTime = 3000;
@@ -240,16 +235,11 @@ class CameraManager {
         Main.instance.scene.registerBeforeRender(this.transitionStep);
     }
     goToGlobal() {
-        if (this.state !== CameraState.local) {
-            return;
-        }
-        this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(new BABYLON.Vector3(-500, 500, -500));
         this.fromTarget.copyFrom(Main.instance.camera.target);
         this.toTarget.copyFromFloats(0, 0, 0);
         this.onTransitionDone = () => {
-            this.state = CameraState.global;
             Main.instance.camera.useAutoRotationBehavior = false;
         };
         this.k = 0;
@@ -407,7 +397,7 @@ class Main {
                 pickingInfo = this.scene.pick(this.scene.pointerX, this.scene.pointerY, (m) => {
                     return m === this.groundManager.globalGround;
                 });
-                if (pickingInfo.hit && this.cameraManager.state === CameraState.global) {
+                if (pickingInfo.hit) {
                     this.cameraManager.goToLocal(pickingInfo.pickedPoint);
                 }
             }

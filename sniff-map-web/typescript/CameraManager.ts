@@ -1,12 +1,5 @@
-enum CameraState {
-    global,
-    transition,
-    local
-}
-
 class CameraManager {
 
-    public state: CameraState = CameraState.global;
     private _preventForcedMove: boolean = false;
     public get preventForcedMove(): boolean {
         return this._preventForcedMove;
@@ -23,7 +16,6 @@ class CameraManager {
 
     public goToLocal(target: BABYLON.Vector3) {
         Main.instance.scene.unregisterBeforeRender(this.transitionStep);
-        this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(target);
         let direction: BABYLON.Vector3 = target.subtract(Main.instance.camera.position);
@@ -34,7 +26,6 @@ class CameraManager {
         this.fromTarget.copyFrom(Main.instance.camera.target);
         this.toTarget.copyFrom(target);
         this.onTransitionDone = () => {
-            this.state = CameraState.local;
             Main.instance.camera.useAutoRotationBehavior = true;
             Main.instance.camera.autoRotationBehavior.idleRotationWaitTime = 3000;
             Main.instance.camera.autoRotationBehavior.idleRotationSpinupTime = 3000;
@@ -45,10 +36,6 @@ class CameraManager {
     }
 
     public goToGlobal() {
-        if (this.state !== CameraState.local) {
-            return;
-        }
-        this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(new BABYLON.Vector3(
             -500, 500, -500
@@ -56,7 +43,6 @@ class CameraManager {
         this.fromTarget.copyFrom(Main.instance.camera.target);
         this.toTarget.copyFromFloats(0, 0, 0);
         this.onTransitionDone = () => {
-            this.state = CameraState.global;
             Main.instance.camera.useAutoRotationBehavior = false;
         }
 
