@@ -769,14 +769,16 @@ class UI {
     constructor() {
         this.texture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
         this.back = BABYLON.GUI.Button.CreateSimpleButton("Back", "Back");
-        this.back.left = -0.95;
-        this.back.top = -0.95;
-        this.back.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
-        this.back.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
         this.back.width = 0.1;
         this.back.height = 0.1;
-        this.back.background = "black";
-        this.back.color = "white";
+        this.back.left = "4Opx";
+        this.back.top = "10px";
+        this.back.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+        this.back.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+        this.back.background = "white";
+        this.back.color = "#13EA8D";
+        this.back.children[0].color = "black";
+        this.back.cornerRadius = 5;
         this.back.onPointerUpObservable.add(() => {
             if (Main.instance.cameraManager.state === CameraState.local) {
                 Main.instance.cameraManager.goToGlobal();
