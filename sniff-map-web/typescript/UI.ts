@@ -19,10 +19,8 @@ class UI {
         this.back.cornerRadius = 5;
         this.back.onPointerUpObservable.add(
             () => {
-                if (Main.instance.cameraManager.state === CameraState.local) {
-                    Main.instance.cameraManager.goToGlobal();
-                    Main.instance.groundManager.toGlobalGround();
-                }
+                Main.instance.cameraManager.goToGlobal();
+                Main.instance.groundManager.toGlobalGround();
             }
         )
 

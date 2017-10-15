@@ -16,6 +16,7 @@ class Main {
     public static failureMaterial: BABYLON.StandardMaterial;
     public static greenMaterial: BABYLON.StandardMaterial;
     public static purpleMaterial: BABYLON.StandardMaterial;
+    public static twitterMaterial: BABYLON.StandardMaterial;
 
     public static medLon: number = 7.7554;
     public static medLat: number = 48.5844;
@@ -72,6 +73,9 @@ class Main {
         Main.purpleMaterial = new BABYLON.StandardMaterial("Random", this.scene);
         Main.purpleMaterial.diffuseColor = BABYLON.Color3.FromHexString("#AD5EEC");
 
+        Main.twitterMaterial = new BABYLON.StandardMaterial("TwitterMaterial", this.scene);
+        Main.twitterMaterial.diffuseTexture = new BABYLON.Texture("./Content/twitter-logo.png", this.scene);
+
         this.ui = new UI();
 
         let poc: Poc = new Poc();
@@ -81,14 +85,17 @@ class Main {
         this.groundManager = new GroundManager(h, w);
 
         /*
-        $.ajax(
-            {
-                url: "http://svenfrankson.github.io/sniff-map-web/Content/test-tweet.json",
-                success: (data: ITweet) => {
-                    myMethod(data);
+        for (let i: number = 0; i < 10; i++) {
+            $.ajax(
+                {
+                    url: "http://svenfrankson.github.io/sniff-map-web/Content/test-tweet.json",
+                    success: (data: ITweet) => {
+                        myMethod(data);
+                    }
                 }
-            }
-        )*/
+            )
+        }
+        */
         /*
         setInterval(
             () => {
@@ -160,6 +167,17 @@ class Main {
                 if (eventData.type === BABYLON.PointerEventTypes._POINTERUP) {
                     this.cameraManager.preventForcedMove = false;
                     let pickingInfo: BABYLON.PickingInfo = this.scene.pick(
+                        this.scene.pointerX,
+                        this.scene.pointerY,
+                        (m: BABYLON.AbstractMesh) => {
+                            return m.name === "Tile";
+                        }
+                    )
+                    if (pickingInfo.pickedMesh) {
+                        let tweetAlert = pickingInfo.pickedMesh.parent as Twittalert;
+                        tweetAlert.hidden = !tweetAlert.hidden;
+                    }
+                    pickingInfo = this.scene.pick(
                         this.scene.pointerX,
                         this.scene.pointerY,
                         (m : BABYLON.AbstractMesh) => {
