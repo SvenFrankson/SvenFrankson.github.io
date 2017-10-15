@@ -289,6 +289,8 @@ class GroundManager {
         };
         this.globalGround = BABYLON.MeshBuilder.CreateGround("GlobalGround", { width: w, height: h }, Main.instance.scene);
         this.globalGround.position.y = -0.2;
+        let globalScale = 2.14;
+        this.globalGround.scaling.copyFromFloats(globalScale, globalScale, globalScale);
         let groundMaterial = new BABYLON.StandardMaterial("GroundMaterial", Main.instance.scene);
         groundMaterial.diffuseTexture = new BABYLON.Texture("http://svenfrankson.github.io/sniff-map-web/Content/alsace.png", Main.instance.scene);
         groundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
