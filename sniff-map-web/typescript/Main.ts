@@ -72,25 +72,6 @@ class Main {
 
         setInterval(
             () => {
-                if (this.cameraManager.state === CameraState.local) {
-                    let position: BABYLON.Vector3 = BABYLON.Vector3.Zero();
-                    position.x = Math.random() - 0.5;
-                    position.z = Math.random() - 0.5;
-                    position.scaleInPlace(64);
-                    new Twittalert(
-                        position,
-                        "CA NE MARCHE PLUS #VENERE ! :((",
-                        "Today",
-                        "User-42",
-                        this.scene
-                    );
-                }
-            },
-            5000
-        );
-
-        setInterval(
-            () => {
                 let position: BABYLON.Vector2 = BABYLON.Vector2.Zero();
                 position.x = Math.random() - 0.5;
                 position.y = Math.random() - 0.5;
@@ -99,6 +80,20 @@ class Main {
                 new Failure(position, range);
             },
             10000
+        );
+
+        setTimeout(
+            () => {
+                $.ajax(
+                    {
+                        url: "./data/test-tweet.json",
+                        success: (data) => {
+                            myMethod(data);
+                        }
+                    }
+                )
+            },
+            3000
         );
 
         // let long: number = 7.76539;
@@ -128,9 +123,65 @@ class Main {
 
         this.groundManager = new GroundManager(h, w);
 
-        this.canvas.addEventListener("keyup", () => {
-            PowerStation.instances[PowerStation.instances.length - 1].Dispose();
-        });
+        this.cameraManager.state = CameraState.ready;
+        let lon: number = Tools.XToLon(0);
+        let lat: number = Tools.ZToLat(0);
+        Building.Clear();
+        poc.getDataAt(
+            lon,
+            lat,
+            () => {
+                poc.getDataAt(
+                    lon - poc.tileSize * 2,
+                    lat - poc.tileSize * 2,
+                    () => {
+                        poc.getDataAt(
+                            lon + poc.tileSize * 2,
+                            lat + poc.tileSize * 2,
+                            () => {
+                                poc.getDataAt(
+                                    lon - poc.tileSize * 2,
+                                    lat + poc.tileSize * 2,
+                                    () => {
+                                        poc.getDataAt(
+                                            lon + poc.tileSize * 2,
+                                            lat - poc.tileSize * 2,
+                                            () => {
+                                                poc.getDataAt(
+                                                    lon - poc.tileSize * 2,
+                                                    lat,
+                                                    () => {
+                                                        poc.getDataAt(
+                                                            lon + poc.tileSize * 2,
+                                                            lat,
+                                                            () => {
+                                                                poc.getDataAt(
+                                                                    lon,
+                                                                    lat + poc.tileSize * 2,
+                                                                    () => {
+                                                                        poc.getDataAt(
+                                                                            lon,
+                                                                            lat - poc.tileSize * 2,
+                                                                            () => {
+                                                                                
+                                                                            }
+                                                                        );
+                                                                    }
+                                                                );
+                                                            }
+                                                        );
+                                                    }
+                                                );
+                                            }
+                                        );
+                                    }
+                                );
+                            }
+                        );
+                    }
+                );
+            }
+        );
 
         this.scene.onPointerObservable.add(
             (eventData: BABYLON.PointerInfo, eventState: BABYLON.EventState) => {
@@ -143,31 +194,7 @@ class Main {
                         }
                     );
                     if (pickingInfo.hit && this.cameraManager.state === CameraState.global) {
-                        this.cameraManager.state = CameraState.ready;
-                        let lon: number = Tools.XToLon(pickingInfo.pickedPoint.x);
-                        let lat: number = Tools.ZToLat(-pickingInfo.pickedPoint.z);
-                        Building.Clear();
-                        poc.getDataAt(
-                            lon,
-                            lat,
-                            () => {
-                                this.cameraManager.goToLocal(pickingInfo.pickedPoint);
-                                this.groundManager.toLocalGround(pickingInfo.pickedPoint);
-                                for (let i: number = -1; i <= 1; i++) {
-                                    for (let j: number = -1; j <= 1; j++) {
-                                        if (i !== j) {
-                                            poc.getDataAt(
-                                                lon + i * poc.tileSize * 2,
-                                                lat + j * poc.tileSize * 2,
-                                                () => {
-
-                                                }
-                                            );
-                                        }
-                                    }
-                                }
-                            }
-                        );
+                        this.cameraManager.goToLocal(pickingInfo.pickedPoint);
                     }
                 }
             }
@@ -189,8 +216,22 @@ class Main {
     }
 }
 
+function myMethod(node1: ITweet) {
+    let position: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+    position.x = Tools.LonToX(node1.Longitude);
+    position.z = -Tools.LatToZ(node1.Latitude);
+    new Twittalert(
+        position,
+        node1.Text,
+        " today",
+        node1.Name,
+        node1.URLPicture,
+        Main.instance.scene
+    );
+}
+
 window.addEventListener("DOMContentLoaded", () => {
-    let game: Main = new Main("render-canvas");
+    let game: Main = new Main("supermap");
     game.createScene();
     game.animate();
 });

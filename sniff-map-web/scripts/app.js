@@ -134,6 +134,7 @@ class BuildingData {
         return data;
     }
 }
+BuildingData.instances = [];
 class BuildingMaker {
     constructor() {
         this.stepInstantiate = () => {
@@ -289,6 +290,7 @@ class GroundManager {
             }
         };
         this.globalGround = BABYLON.MeshBuilder.CreateGround("GlobalGround", { width: w, height: h }, Main.instance.scene);
+        this.globalGround.position.y = -0.2;
         let groundMaterial = new BABYLON.StandardMaterial("GroundMaterial", Main.instance.scene);
         groundMaterial.diffuseTexture = new BABYLON.Texture("./data/alsace.png", Main.instance.scene);
         groundMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
@@ -346,15 +348,6 @@ class Main {
         Main.greenMaterial.diffuseColor = BABYLON.Color3.FromHexString("#38c128");
         this.ui = new UI();
         setInterval(() => {
-            if (this.cameraManager.state === CameraState.local) {
-                let position = BABYLON.Vector3.Zero();
-                position.x = Math.random() - 0.5;
-                position.z = Math.random() - 0.5;
-                position.scaleInPlace(64);
-                new Twittalert(position, "CA NE MARCHE PLUS #VENERE ! :((", "Today", "User-42", this.scene);
-            }
-        }, 5000);
-        setInterval(() => {
             let position = BABYLON.Vector2.Zero();
             position.x = Math.random() - 0.5;
             position.y = Math.random() - 0.5;
@@ -362,12 +355,39 @@ class Main {
             let range = Math.random() * 8 + 2;
             new Failure(position, range);
         }, 10000);
+        setTimeout(() => {
+            $.ajax({
+                url: "./data/test-tweet.json",
+                success: (data) => {
+                    myMethod(data);
+                }
+            });
+        }, 3000);
         let poc = new Poc();
         let h = 1024;
         let w = 1024;
         this.groundManager = new GroundManager(h, w);
-        this.canvas.addEventListener("keyup", () => {
-            PowerStation.instances[PowerStation.instances.length - 1].Dispose();
+        this.cameraManager.state = CameraState.ready;
+        let lon = Tools.XToLon(0);
+        let lat = Tools.ZToLat(0);
+        Building.Clear();
+        poc.getDataAt(lon, lat, () => {
+            poc.getDataAt(lon - poc.tileSize * 2, lat - poc.tileSize * 2, () => {
+                poc.getDataAt(lon + poc.tileSize * 2, lat + poc.tileSize * 2, () => {
+                    poc.getDataAt(lon - poc.tileSize * 2, lat + poc.tileSize * 2, () => {
+                        poc.getDataAt(lon + poc.tileSize * 2, lat - poc.tileSize * 2, () => {
+                            poc.getDataAt(lon - poc.tileSize * 2, lat, () => {
+                                poc.getDataAt(lon + poc.tileSize * 2, lat, () => {
+                                    poc.getDataAt(lon, lat + poc.tileSize * 2, () => {
+                                        poc.getDataAt(lon, lat - poc.tileSize * 2, () => {
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
         });
         this.scene.onPointerObservable.add((eventData, eventState) => {
             if (eventData.type === BABYLON.PointerEventTypes._POINTERUP) {
@@ -375,22 +395,7 @@ class Main {
                     return m === this.groundManager.globalGround;
                 });
                 if (pickingInfo.hit && this.cameraManager.state === CameraState.global) {
-                    this.cameraManager.state = CameraState.ready;
-                    let lon = Tools.XToLon(pickingInfo.pickedPoint.x);
-                    let lat = Tools.ZToLat(-pickingInfo.pickedPoint.z);
-                    Building.Clear();
-                    poc.getDataAt(lon, lat, () => {
-                        this.cameraManager.goToLocal(pickingInfo.pickedPoint);
-                        this.groundManager.toLocalGround(pickingInfo.pickedPoint);
-                        for (let i = -1; i <= 1; i++) {
-                            for (let j = -1; j <= 1; j++) {
-                                if (i !== j) {
-                                    poc.getDataAt(lon + i * poc.tileSize * 2, lat + j * poc.tileSize * 2, () => {
-                                    });
-                                }
-                            }
-                        }
-                    });
+                    this.cameraManager.goToLocal(pickingInfo.pickedPoint);
                 }
             }
         });
@@ -411,14 +416,20 @@ Main.medLon = 7.7554;
 Main.medLat = 48.5844;
 Main.medX = 0;
 Main.medZ = 0;
+function myMethod(node1) {
+    let position = BABYLON.Vector3.Zero();
+    position.x = Tools.LonToX(node1.Longitude);
+    position.z = -Tools.LatToZ(node1.Latitude);
+    new Twittalert(position, node1.Text, " today", node1.Name, node1.URLPicture, Main.instance.scene);
+}
 window.addEventListener("DOMContentLoaded", () => {
-    let game = new Main("render-canvas");
+    let game = new Main("supermap");
     game.createScene();
     game.animate();
 });
 class Poc {
     constructor() {
-        this.tileSize = 0.008;
+        this.tileSize = 0.007;
     }
     getDataAt(long, lat, callback) {
         let box = (long - this.tileSize).toFixed(7) + "," + (lat - this.tileSize).toFixed(7) + "," + (long + this.tileSize).toFixed(7) + "," + (lat + this.tileSize).toFixed(7);
@@ -467,6 +478,7 @@ class Poc {
                                 }
                             }
                             Main.instance.buildingMaker.toDoList.push(newBuilding);
+                            BuildingData.instances.push(newBuilding);
                         }
                     }
                 }
@@ -537,7 +549,7 @@ class Tools {
     }
 }
 class Twittalert extends BABYLON.Mesh {
-    constructor(position, content, date, author, scene) {
+    constructor(position, content, date, author, pictureUrl, scene) {
         super("TwittAlert", scene);
         this.lifeSpan = 10000;
         this.minDist = 20;
@@ -578,13 +590,13 @@ class Twittalert extends BABYLON.Mesh {
         rectangle.thickness = 1;
         rectangle.color = "black";
         this.container.addControl(rectangle);
-        let avatar = new BABYLON.GUI.Image("avatar", "./data/twitter-egg.png");
+        let avatar = new BABYLON.GUI.Image("avatar", pictureUrl);
         avatar.width = "60px";
         avatar.height = "60px";
         avatar.top = "0px";
         avatar.left = "-200px";
         this.container.addControl(avatar);
-        let authorBox = new BABYLON.GUI.TextBlock("author", author.split("@")[0]);
+        let authorBox = new BABYLON.GUI.TextBlock("author", author);
         authorBox.color = "black";
         authorBox.fontStyle = "bold";
         authorBox.fontSize = 18;
@@ -596,7 +608,7 @@ class Twittalert extends BABYLON.Mesh {
         authorBox.top = "5px";
         authorBox.left = "90px";
         this.container.addControl(authorBox);
-        let metaBox = new BABYLON.GUI.TextBlock("author", "@" + author.split("@")[1] + " - " + date);
+        let metaBox = new BABYLON.GUI.TextBlock("date", " - " + date);
         metaBox.color = "grey";
         metaBox.fontSize = 16;
         metaBox.fontFamily = "Helvetica Neue";
@@ -604,8 +616,8 @@ class Twittalert extends BABYLON.Mesh {
         metaBox.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
         metaBox.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
         metaBox.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
-        metaBox.top = "5px";
-        metaBox.left = "200px";
+        metaBox.top = "10px";
+        metaBox.left = "250px";
         this.container.addControl(metaBox);
         let textBox = new BABYLON.GUI.TextBlock("content", content);
         textBox.color = "black";

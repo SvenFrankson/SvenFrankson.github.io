@@ -1,4 +1,5 @@
 class BuildingData {
+    public static instances: BuildingData[] = [];
     public coordinates: BABYLON.Vector2;
     public shape: BABYLON.Vector2[];
     public level: number;

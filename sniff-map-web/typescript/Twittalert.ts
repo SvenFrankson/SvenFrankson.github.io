@@ -1,3 +1,11 @@
+interface ITweet {
+    Name: string;
+    Text: string;
+    URLPicture: string;
+    Longitude: 7.7554;
+    Latitude: 48.5844;
+}
+
 class Twittalert extends BABYLON.Mesh {
 
     public lifeSpan: number = 10000;
@@ -11,6 +19,7 @@ class Twittalert extends BABYLON.Mesh {
         content: string,
         date: string,
         author: string,
+        pictureUrl: string,
         scene: BABYLON.Scene
     ) {
         super("TwittAlert", scene);
@@ -29,14 +38,14 @@ class Twittalert extends BABYLON.Mesh {
         rectangle.color = "black";
         this.container.addControl(rectangle);
         
-        let avatar = new BABYLON.GUI.Image("avatar", "./data/twitter-egg.png");
+        let avatar = new BABYLON.GUI.Image("avatar", pictureUrl);
         avatar.width = "60px";
         avatar.height = "60px";
         avatar.top = "0px";
         avatar.left = "-200px";
         this.container.addControl(avatar);
 
-        let authorBox = new BABYLON.GUI.TextBlock("author", author.split("@")[0]);
+        let authorBox = new BABYLON.GUI.TextBlock("author", author);
         authorBox.color = "black";
         authorBox.fontStyle = "bold";
         authorBox.fontSize = 18
@@ -49,7 +58,7 @@ class Twittalert extends BABYLON.Mesh {
         authorBox.left = "90px";
         this.container.addControl(authorBox);
 
-        let metaBox = new BABYLON.GUI.TextBlock("author", "@" + author.split("@")[1] + " - " + date);
+        let metaBox = new BABYLON.GUI.TextBlock("date", " - " + date);
         metaBox.color = "grey";
         metaBox.fontSize = 16
         metaBox.fontFamily = "Helvetica Neue";
@@ -57,8 +66,8 @@ class Twittalert extends BABYLON.Mesh {
         metaBox.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
         metaBox.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
         metaBox.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
-        metaBox.top = "5px";
-        metaBox.left = "200px";
+        metaBox.top = "10px";
+        metaBox.left = "250px";
         this.container.addControl(metaBox);
 
         let textBox = new BABYLON.GUI.TextBlock("content", content);
