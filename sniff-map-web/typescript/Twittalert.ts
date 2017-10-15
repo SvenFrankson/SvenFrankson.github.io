@@ -8,6 +8,8 @@ interface ITweet {
 
 class Twittalert extends BABYLON.Mesh {
 
+    public static instances: Twittalert[] = [];
+
     public ground: BABYLON.Vector3;
     public lifeSpan: number = 20000;
     public minDist: number = 20;
@@ -120,6 +122,8 @@ class Twittalert extends BABYLON.Mesh {
         this.container.linkOffsetX = "120px";
         this.container.alpha = 0;
 
+        // this.DemoTryCauseFailure();
+
         scene.registerBeforeRender(this.popIn);
 
         Main.instance.cameraManager.goToLocal(this.ground);
@@ -133,6 +137,37 @@ class Twittalert extends BABYLON.Mesh {
         );
     }
 
+    public Dispose(): void {
+        let index: number = Twittalert.instances.indexOf(this);
+        if (index !== -1) {
+            Twittalert.instances.splice(index, 1);
+        }
+        this.container.linkWithMesh(undefined);
+        this.container.dispose();
+        this.texture.dispose();
+        this.tube.dispose();
+        this.dispose();
+    }
+
+    public DemoTryCauseFailure(): void {
+        let proba: number = 0.2;
+        for (let i: number = 0; i < Twittalert.instances.length; i++) {
+            if (Twittalert.instances[i] !== this) {
+                if (BABYLON.Vector3.DistanceSquared(Twittalert.instances[i].position, this.position) < 10000) {
+                    proba += 0.2;
+                }
+            }
+        }
+        if (Math.random() < proba) {
+            new Failure(
+                new BABYLON.Vector2(
+                    this.position.x,
+                    this.position.z
+                ),
+                10 + 10 * Math.random()
+            );
+        }
+    }
 
     public timeout: number = 0;
 
@@ -170,11 +205,7 @@ class Twittalert extends BABYLON.Mesh {
         this.container.alpha -= 0.01;
         if (this.container.alpha <= 0) {
             this.getScene().unregisterBeforeRender(this.kill);
-            this.container.linkWithMesh(undefined);
-            this.container.dispose();
-            this.texture.dispose();
-            this.tube.dispose();
-            this.dispose();
+            this.Dispose();
         }
     }
 }

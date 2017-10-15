@@ -217,6 +217,7 @@ class CameraManager {
         }
     }
     goToLocal(target) {
+        Main.instance.scene.unregisterBeforeRender(this.transitionStep);
         this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(target);
@@ -261,6 +262,7 @@ class Failure {
         this.model = new PowerStation(true, Main.instance.scene);
         this.model.position.x = origin.x;
         this.model.position.z = origin.y;
+        Failure.update();
     }
     Dispose() {
         let index = Failure.instances.indexOf(this);
@@ -268,6 +270,7 @@ class Failure {
             Failure.instances.splice(index, 1);
         }
         this.model.Dispose();
+        Failure.update();
     }
     static update() {
         Building.instances.forEach((b) => {
@@ -602,11 +605,7 @@ class Twittalert extends BABYLON.Mesh {
             this.container.alpha -= 0.01;
             if (this.container.alpha <= 0) {
                 this.getScene().unregisterBeforeRender(this.kill);
-                this.container.linkWithMesh(undefined);
-                this.container.dispose();
-                this.texture.dispose();
-                this.tube.dispose();
-                this.dispose();
+                this.Dispose();
             }
         };
         let color = true;
@@ -693,6 +692,30 @@ class Twittalert extends BABYLON.Mesh {
             scene.registerBeforeRender(this.kill);
         }, this.lifeSpan);
     }
+    Dispose() {
+        let index = Twittalert.instances.indexOf(this);
+        if (index !== -1) {
+            Twittalert.instances.splice(index, 1);
+        }
+        this.container.linkWithMesh(undefined);
+        this.container.dispose();
+        this.texture.dispose();
+        this.tube.dispose();
+        this.dispose();
+    }
+    DemoTryCauseFailure() {
+        let proba = 0.2;
+        for (let i = 0; i < Twittalert.instances.length; i++) {
+            if (Twittalert.instances[i] !== this) {
+                if (BABYLON.Vector3.DistanceSquared(Twittalert.instances[i].position, this.position) < 10000) {
+                    proba += 0.2;
+                }
+            }
+        }
+        if (Math.random() < proba) {
+            new Failure(new BABYLON.Vector2(this.position.x, this.position.z), 10 + 10 * Math.random());
+        }
+    }
     computeAlpha() {
         let alpha = 0;
         let dist = BABYLON.Vector3.Distance(Main.instance.scene.activeCamera.position, this.position);
@@ -709,6 +732,7 @@ class Twittalert extends BABYLON.Mesh {
         return alpha;
     }
 }
+Twittalert.instances = [];
 class UI {
     constructor() {
         this.texture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");

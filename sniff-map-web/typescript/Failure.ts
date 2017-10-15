@@ -12,6 +12,7 @@ class Failure {
         this.model = new PowerStation(true, Main.instance.scene);
         this.model.position.x = origin.x;
         this.model.position.z = origin.y;
+        Failure.update();
     }
 
     public Dispose(): void {
@@ -20,6 +21,7 @@ class Failure {
             Failure.instances.splice(index, 1);
         }
         this.model.Dispose();
+        Failure.update();
     }
 
     public static update(): void {

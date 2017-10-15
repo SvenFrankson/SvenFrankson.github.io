@@ -22,6 +22,7 @@ class CameraManager {
     }
 
     public goToLocal(target: BABYLON.Vector3) {
+        Main.instance.scene.unregisterBeforeRender(this.transitionStep);
         this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(target);
