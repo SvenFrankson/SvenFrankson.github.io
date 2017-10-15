@@ -43,6 +43,7 @@ class Main {
         this.buildingMaker = new BuildingMaker();
 
         let hemisphericLight: BABYLON.HemisphericLight = new BABYLON.HemisphericLight("Light", BABYLON.Vector3.Up(), this.scene);
+        hemisphericLight.groundColor.copyFromFloats(0.5, 0.5, 0.5);
         this.light = hemisphericLight;
 
         this.camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 1, BABYLON.Vector3.Zero(), this.scene);

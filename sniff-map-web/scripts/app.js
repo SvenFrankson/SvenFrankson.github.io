@@ -92,13 +92,15 @@ class BuildingData {
         let positions = [];
         let indices = [];
         let colors = [];
+        let colorTop = BABYLON.Color4.FromHexString("#0FEACAFF");
+        let colorBottom = BABYLON.Color4.FromHexString("#AD5EECFF");
         for (let i = 0; i < points.length; i++) {
             positions.push(points[i].x, height, points[i].y);
-            colors.push(1, 1, 1, 1);
+            colors.push(colorTop.r, colorTop.g, colorTop.b, colorTop.a);
         }
         for (let i = 0; i < points.length; i++) {
             positions.push(points[i].x, 0, points[i].y);
-            colors.push(0.3, 0.3, 0.3, 1);
+            colors.push(colorBottom.r, colorBottom.g, colorBottom.b, colorBottom.a);
         }
         for (let i = 0; i < points.length; i++) {
             let a = i + points.length;
@@ -345,6 +347,7 @@ class Main {
         this.resize();
         this.buildingMaker = new BuildingMaker();
         let hemisphericLight = new BABYLON.HemisphericLight("Light", BABYLON.Vector3.Up(), this.scene);
+        hemisphericLight.groundColor.copyFromFloats(0.5, 0.5, 0.5);
         this.light = hemisphericLight;
         this.camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 1, BABYLON.Vector3.Zero(), this.scene);
         this.camera.attachControl(this.canvas);
