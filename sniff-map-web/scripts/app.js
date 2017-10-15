@@ -352,15 +352,15 @@ class Main {
         let lon = Tools.XToLon(0);
         let lat = Tools.ZToLat(0);
         Building.Clear();
-        poc.getDataAt(lon, lat, () => {
-            poc.getDataAt(lon - poc.tileSize * 2, lat - poc.tileSize * 2, () => {
-                poc.getDataAt(lon + poc.tileSize * 2, lat + poc.tileSize * 2, () => {
-                    poc.getDataAt(lon - poc.tileSize * 2, lat + poc.tileSize * 2, () => {
-                        poc.getDataAt(lon + poc.tileSize * 2, lat - poc.tileSize * 2, () => {
-                            poc.getDataAt(lon - poc.tileSize * 2, lat, () => {
-                                poc.getDataAt(lon + poc.tileSize * 2, lat, () => {
-                                    poc.getDataAt(lon, lat + poc.tileSize * 2, () => {
-                                        poc.getDataAt(lon, lat - poc.tileSize * 2, () => {
+        poc.loadTile(0, () => {
+            poc.loadTile(1, () => {
+                poc.loadTile(2, () => {
+                    poc.loadTile(3, () => {
+                        poc.loadTile(4, () => {
+                            poc.loadTile(5, () => {
+                                poc.loadTile(6, () => {
+                                    poc.loadTile(7, () => {
+                                        poc.loadTile(8, () => {
                                         });
                                     });
                                 });
@@ -465,7 +465,7 @@ class Poc {
         };
     }
     loadTile(index, callback) {
-        let url = "./Content/tile_" + index + ".osm";
+        let url = "./Content/map_" + index + ".xml";
         $.ajax({
             url: url,
             success: (data) => {

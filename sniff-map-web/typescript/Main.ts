@@ -79,41 +79,32 @@ class Main {
         let lon: number = Tools.XToLon(0);
         let lat: number = Tools.ZToLat(0);
         Building.Clear();
-        poc.getDataAt(
-            lon,
-            lat,
+        poc.loadTile(
+            0,
             () => {
-                poc.getDataAt(
-                    lon - poc.tileSize * 2,
-                    lat - poc.tileSize * 2,
+                poc.loadTile(
+                    1,
                     () => {
-                        poc.getDataAt(
-                            lon + poc.tileSize * 2,
-                            lat + poc.tileSize * 2,
+                        poc.loadTile(
+                            2,
                             () => {
-                                poc.getDataAt(
-                                    lon - poc.tileSize * 2,
-                                    lat + poc.tileSize * 2,
+                                poc.loadTile(
+                                    3,
                                     () => {
-                                        poc.getDataAt(
-                                            lon + poc.tileSize * 2,
-                                            lat - poc.tileSize * 2,
+                                        poc.loadTile(
+                                            4,
                                             () => {
-                                                poc.getDataAt(
-                                                    lon - poc.tileSize * 2,
-                                                    lat,
+                                                poc.loadTile(
+                                                    5,
                                                     () => {
-                                                        poc.getDataAt(
-                                                            lon + poc.tileSize * 2,
-                                                            lat,
+                                                        poc.loadTile(
+                                                            6,
                                                             () => {
-                                                                poc.getDataAt(
-                                                                    lon,
-                                                                    lat + poc.tileSize * 2,
+                                                                poc.loadTile(
+                                                                    7,
                                                                     () => {
-                                                                        poc.getDataAt(
-                                                                            lon,
-                                                                            lat - poc.tileSize * 2,
+                                                                        poc.loadTile(
+                                                                            8,
                                                                             () => {
                                                                                 
                                                                             }

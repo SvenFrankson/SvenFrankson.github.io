@@ -4,7 +4,7 @@ class Poc {
     public tileSize: number = 0.006;
 
     public loadTile(index: number, callback: () => void) {
-        let url: string = "./Content/tile_" + index + ".osm";
+        let url: string = "./Content/map_" + index + ".xml";
         $.ajax(
             {
                 url: url,
