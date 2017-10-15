@@ -8,12 +8,14 @@ interface ITweet {
 
 class Twittalert extends BABYLON.Mesh {
 
+    public ground: BABYLON.Vector3;
     public lifeSpan: number = 20000;
     public minDist: number = 20;
     public maxDist: number = 1000;
     public texture: BABYLON.GUI.AdvancedDynamicTexture;
     public container: BABYLON.GUI.Container;
     public offset: BABYLON.Vector3;
+    public tube: BABYLON.Mesh;
 
     constructor(
         position: BABYLON.Vector3,
@@ -24,7 +26,32 @@ class Twittalert extends BABYLON.Mesh {
         scene: BABYLON.Scene
     ) {
         super("TwittAlert", scene);
+
+        let color: boolean = true;
+        if (Math.random() > 0.5) {
+            color = false;
+        }
+
+        this.ground = position.clone();
         this.position.copyFrom(position);
+        this.position.x += (Math.random() - 0.5) * 3;
+        this.position.y += Math.random() * 2 + 1;
+        this.position.y += (Math.random() - 0.5) * 3;
+        
+        this.tube = BABYLON.Mesh.CreateTube(
+            "Tube",
+            [this.ground, this.position],
+            0.05,
+            6,
+            undefined,
+            1,
+            scene
+        );
+        if (color) {
+            this.tube.material = Main.purpleMaterial;
+        } else {
+            this.tube.material = Main.greenMaterial;
+        }
 
         this.texture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("tmp");
 
@@ -35,8 +62,12 @@ class Twittalert extends BABYLON.Mesh {
             
         let rectangle = new BABYLON.GUI.Rectangle("rectangle");
         rectangle.background = "white";
-        rectangle.thickness = 1;
-        rectangle.color = "black";
+        rectangle.thickness = 3;
+        if (color) {
+            rectangle.color = "#AD5EEC";
+        } else {
+            rectangle.color = "#0FEACA";
+        }
         this.container.addControl(rectangle);
         
         let avatar = new BABYLON.GUI.Image("avatar", pictureUrl);
@@ -87,12 +118,11 @@ class Twittalert extends BABYLON.Mesh {
 
         this.container.linkWithMesh(this);
         this.container.linkOffsetX = "120px";
-        this.container.linkOffsetY = "-80px";
         this.container.alpha = 0;
 
         scene.registerBeforeRender(this.popIn);
 
-        Main.instance.cameraManager.goToLocal(this.position);
+        Main.instance.cameraManager.goToLocal(this.ground);
         setTimeout(
             () => {
                 scene.unregisterBeforeRender(this.popIn);
@@ -143,6 +173,7 @@ class Twittalert extends BABYLON.Mesh {
             this.container.linkWithMesh(undefined);
             this.container.dispose();
             this.texture.dispose();
+            this.tube.dispose();
             this.dispose();
         }
     }

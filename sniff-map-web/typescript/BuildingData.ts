@@ -21,10 +21,10 @@ class BuildingData {
         if (data.length === 0) {
             return undefined;
         }
-        let rawData = BuildingData.extrudeToSolidRaw(data[0].s, data[0].l * 0.2 + 0.1 * Math.random());
+        let rawData = BuildingData.extrudeToSolidRaw(data[0].s, data[0].l * 0.3 + 0.15 * Math.random());
         let vCount: number = rawData.positions.length / 3;
         for (let i: number = 1; i < data.length; i++) {
-            let otherRawData = BuildingData.extrudeToSolidRaw(data[i].s, data[i].l * 0.2 + 0.1 * Math.random());
+            let otherRawData = BuildingData.extrudeToSolidRaw(data[i].s, data[i].l * 0.3 + 0.15 * Math.random());
             for (let j: number = 0; j < otherRawData.indices.length; j++) {
                 otherRawData.indices[j] += vCount;
             }
@@ -49,7 +49,7 @@ class BuildingData {
     public instantiate(scene: BABYLON.Scene): Building {
         let building: Building = new Building(scene);
         building.c = this.c.clone();
-        let data: BABYLON.VertexData = BuildingData.extrudeToSolid(this.s, this.l * 0.2 + 0.1 * Math.random());
+        let data: BABYLON.VertexData = BuildingData.extrudeToSolid(this.s, this.l * 0.3 + 0.15 * Math.random());
         data.applyToMesh(building);
         building.freezeWorldMatrix();
 

@@ -58,10 +58,10 @@ class BuildingData {
         if (data.length === 0) {
             return undefined;
         }
-        let rawData = BuildingData.extrudeToSolidRaw(data[0].s, data[0].l * 0.2 + 0.1 * Math.random());
+        let rawData = BuildingData.extrudeToSolidRaw(data[0].s, data[0].l * 0.3 + 0.15 * Math.random());
         let vCount = rawData.positions.length / 3;
         for (let i = 1; i < data.length; i++) {
-            let otherRawData = BuildingData.extrudeToSolidRaw(data[i].s, data[i].l * 0.2 + 0.1 * Math.random());
+            let otherRawData = BuildingData.extrudeToSolidRaw(data[i].s, data[i].l * 0.3 + 0.15 * Math.random());
             for (let j = 0; j < otherRawData.indices.length; j++) {
                 otherRawData.indices[j] += vCount;
             }
@@ -83,7 +83,7 @@ class BuildingData {
     instantiate(scene) {
         let building = new Building(scene);
         building.c = this.c.clone();
-        let data = BuildingData.extrudeToSolid(this.s, this.l * 0.2 + 0.1 * Math.random());
+        let data = BuildingData.extrudeToSolid(this.s, this.l * 0.3 + 0.15 * Math.random());
         data.applyToMesh(building);
         building.freezeWorldMatrix();
         return building;
@@ -178,7 +178,7 @@ class CameraManager {
     constructor() {
         this.state = CameraState.global;
         this.k = 0;
-        this.duration = 120;
+        this.duration = 180;
         this.fromPosition = BABYLON.Vector3.Zero();
         this.toPosition = BABYLON.Vector3.Zero();
         this.fromTarget = BABYLON.Vector3.Zero();
@@ -207,9 +207,10 @@ class CameraManager {
         this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(target);
-        let direction = new BABYLON.Vector3(-3, 3, -4);
+        let direction = target.subtract(Main.instance.camera.position);
         direction.normalize();
-        direction.scaleInPlace(20);
+        direction.scaleInPlace(10);
+        direction.y = Math.min(10, Main.instance.camera.position.y);
         this.toPosition.addInPlace(direction);
         this.fromTarget.copyFrom(Main.instance.camera.target);
         this.toTarget.copyFrom(target);
@@ -343,20 +344,22 @@ class Main {
         Main.failureMaterial.diffuseColor = BABYLON.Color3.FromHexString("#E74D3B");
         Main.failureMaterial.backFaceCulling = false;
         Main.greenMaterial = new BABYLON.StandardMaterial("Random", this.scene);
-        Main.greenMaterial.diffuseColor = BABYLON.Color3.FromHexString("#38c128");
+        Main.greenMaterial.diffuseColor = BABYLON.Color3.FromHexString("#0FEACA");
+        Main.purpleMaterial = new BABYLON.StandardMaterial("Random", this.scene);
+        Main.purpleMaterial.diffuseColor = BABYLON.Color3.FromHexString("#AD5EEC");
         this.ui = new UI();
         let poc = new Poc();
         let h = 1024;
         let w = 1024;
         this.groundManager = new GroundManager(h, w);
-        setTimeout(() => {
+        setInterval(() => {
             $.ajax({
                 url: "http://svenfrankson.github.io/sniff-map-web/Content/test-tweet.json",
                 success: (data) => {
                     myMethod(data);
                 }
             });
-        });
+        }, 5000);
         let lon = Tools.XToLon(0);
         let lat = Tools.ZToLat(0);
         Building.Clear();
@@ -409,6 +412,8 @@ function myMethod(node1) {
     let position = BABYLON.Vector3.Zero();
     position.x = Tools.LonToX(node1.Longitude);
     position.z = -Tools.LatToZ(node1.Latitude);
+    position.x += (Math.random() - 0.5) * 64;
+    position.z += (Math.random() - 0.5) * 64;
     new Twittalert(position, node1.Text, " Today", node1.Name, node1.URLPicture, Main.instance.scene);
 }
 window.addEventListener("DOMContentLoaded", () => {
@@ -587,10 +592,26 @@ class Twittalert extends BABYLON.Mesh {
                 this.container.linkWithMesh(undefined);
                 this.container.dispose();
                 this.texture.dispose();
+                this.tube.dispose();
                 this.dispose();
             }
         };
+        let color = true;
+        if (Math.random() > 0.5) {
+            color = false;
+        }
+        this.ground = position.clone();
         this.position.copyFrom(position);
+        this.position.x += (Math.random() - 0.5) * 3;
+        this.position.y += Math.random() * 2 + 1;
+        this.position.y += (Math.random() - 0.5) * 3;
+        this.tube = BABYLON.Mesh.CreateTube("Tube", [this.ground, this.position], 0.05, 6, undefined, 1, scene);
+        if (color) {
+            this.tube.material = Main.purpleMaterial;
+        }
+        else {
+            this.tube.material = Main.greenMaterial;
+        }
         this.texture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("tmp");
         this.container = new BABYLON.GUI.Container("container");
         this.container.width = "480px";
@@ -598,8 +619,13 @@ class Twittalert extends BABYLON.Mesh {
         this.texture.addControl(this.container);
         let rectangle = new BABYLON.GUI.Rectangle("rectangle");
         rectangle.background = "white";
-        rectangle.thickness = 1;
-        rectangle.color = "black";
+        rectangle.thickness = 3;
+        if (color) {
+            rectangle.color = "#AD5EEC";
+        }
+        else {
+            rectangle.color = "#0FEACA";
+        }
         this.container.addControl(rectangle);
         let avatar = new BABYLON.GUI.Image("avatar", pictureUrl);
         avatar.width = "60px";
@@ -645,10 +671,9 @@ class Twittalert extends BABYLON.Mesh {
         this.container.addControl(textBox);
         this.container.linkWithMesh(this);
         this.container.linkOffsetX = "120px";
-        this.container.linkOffsetY = "-80px";
         this.container.alpha = 0;
         scene.registerBeforeRender(this.popIn);
-        Main.instance.cameraManager.goToLocal(this.position);
+        Main.instance.cameraManager.goToLocal(this.ground);
         setTimeout(() => {
             scene.unregisterBeforeRender(this.popIn);
             scene.unregisterBeforeRender(this.update);

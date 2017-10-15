@@ -15,6 +15,7 @@ class Main {
     public static nokMaterial: BABYLON.StandardMaterial;
     public static failureMaterial: BABYLON.StandardMaterial;
     public static greenMaterial: BABYLON.StandardMaterial;
+    public static purpleMaterial: BABYLON.StandardMaterial;
 
     public static medLon: number = 7.7554;
     public static medLat: number = 48.5844;
@@ -66,7 +67,10 @@ class Main {
         Main.failureMaterial.backFaceCulling = false;
         
         Main.greenMaterial = new BABYLON.StandardMaterial("Random", this.scene);
-        Main.greenMaterial.diffuseColor = BABYLON.Color3.FromHexString("#38c128");
+        Main.greenMaterial.diffuseColor = BABYLON.Color3.FromHexString("#0FEACA");
+        
+        Main.purpleMaterial = new BABYLON.StandardMaterial("Random", this.scene);
+        Main.purpleMaterial.diffuseColor = BABYLON.Color3.FromHexString("#AD5EEC");
 
         this.ui = new UI();
 
@@ -76,7 +80,7 @@ class Main {
 
         this.groundManager = new GroundManager(h, w);
 
-        setTimeout(
+        setInterval(
             () => {
                 $.ajax(
                     {
@@ -86,7 +90,8 @@ class Main {
                         }
                     }
                 )
-            }
+            },
+            5000
         )
 
         let lon: number = Tools.XToLon(0);
@@ -176,6 +181,8 @@ function myMethod(node1: ITweet) {
     let position: BABYLON.Vector3 = BABYLON.Vector3.Zero();
     position.x = Tools.LonToX(node1.Longitude);
     position.z = -Tools.LatToZ(node1.Latitude);
+    position.x += (Math.random() - 0.5) * 64;
+    position.z += (Math.random() - 0.5) * 64;
     new Twittalert(
         position,
         node1.Text,

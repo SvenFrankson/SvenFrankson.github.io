@@ -12,9 +12,10 @@ class CameraManager {
         this.state = CameraState.transition;
         this.fromPosition.copyFrom(Main.instance.camera.position);
         this.toPosition.copyFrom(target);
-        let direction: BABYLON.Vector3 = new BABYLON.Vector3(-3, 3, -4);
+        let direction: BABYLON.Vector3 = target.subtract(Main.instance.camera.position);
         direction.normalize();
-        direction.scaleInPlace(20);
+        direction.scaleInPlace(10);
+        direction.y = Math.min(10, Main.instance.camera.position.y);
         this.toPosition.addInPlace(direction);
         this.fromTarget.copyFrom(Main.instance.camera.target);
         this.toTarget.copyFrom(target);
@@ -50,7 +51,7 @@ class CameraManager {
     }
 
     public k: number = 0;
-    public duration: number = 120;
+    public duration: number = 180;
     public fromPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
     public toPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
     public fromTarget: BABYLON.Vector3 = BABYLON.Vector3.Zero();
