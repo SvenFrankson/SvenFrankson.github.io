@@ -80,7 +80,7 @@ class Main {
 
         this.groundManager = new GroundManager(h, w);
 
-        
+        /*
         setInterval(
             () => {
                 $.ajax(
@@ -93,7 +93,7 @@ class Main {
                 )
             },
             5000
-        )
+        )*/
         
 
         let lon: number = Tools.XToLon(0);
