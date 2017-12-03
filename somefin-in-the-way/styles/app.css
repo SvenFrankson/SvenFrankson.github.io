@@ -1,0 +1,102 @@
+html, body {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#render-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    touch-action: none;
+    z-index: 1;
+}
+
+#gui {
+    position: absolute;
+    font-family: "Raleway";
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    top: 0px;
+    left: 0px;
+    z-index: 2;
+}
+
+#main-title {
+    margin-top: 10%;
+    font-size: 80px;
+    color: white;
+    text-align: center;
+}
+
+#credit {
+    margin-top: 2%;
+    font-size: 24px;
+    color: white;
+    margin-left: auto;
+    text-align: right;
+}
+
+#play-button {
+    margin-top: 7%;
+    font-size: 90px;
+    color: white;
+    text-align: center;
+    border-bottom: 3px solid white;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+#debug-gui {
+    position: absolute;
+    font-family: "Raleway";
+    width: 10%;
+    height: 20%;
+    margin: 0px;
+    top: 0px;
+    left: 0px;
+    z-index: 2;
+}
+
+#game-over-menu {
+    position: absolute;
+    font-family: "Raleway";
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    top: 0px;
+    left: 0px;
+    z-index: 2;
+    color: white;
+}
+
+#in-game {
+    position: absolute;
+    font-family: "Raleway";
+    width: 100%;
+    height: 5%;
+    margin: 0px;
+    top: 0px;
+    left: 0px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.in-game-info {
+    font-size: 30px;
+    color: white;
+    margin-top: 1%;
+    margin-left: 5%;
+}
+
+.debug-panel {
+    font-size: 16px;
+    color: white;
+    margin-top: 5%;
+    margin-left: 5%;
+}
