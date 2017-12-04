@@ -315,12 +315,11 @@ class FishNet {
                     instance: this.ropeRight,
                 }, this.instance.getScene());
                 if (Main.instance.playing) {
-                    let r = 3;
                     let p = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(0, 0, -2.5), this.instance.getWorldMatrix());
                     for (let i = 0; i < this.manager.animals.length; i++) {
                         let a = this.manager.animals[i];
                         if (a.instance) {
-                            if (BABYLON.Vector3.DistanceSquared(p, a.instance.position) < 9) {
+                            if (BABYLON.Vector3.DistanceSquared(p, a.instance.position) < 14) {
                                 this.protectedCaught += a.catch(this);
                             }
                         }
@@ -494,7 +493,7 @@ window.addEventListener("DOMContentLoaded", () => {
         location.reload();
     });
     $("#share-button").on("click", () => {
-        let tweet = "I just scored " + game.score + " on 'SomeFin In The Way' ! Try to beat me here https://goo.gl/GKC4KA #LDJAM";
+        let tweet = "#LDJAM I just scored " + game.score + " on 'SomeFin In The Way' ! Try to beat me here https://goo.gl/GKC4KA";
         window.open("https://twitter.com/intent/tweet?text=" + tweet);
     });
     game.canvas.addEventListener("pointerdown", () => {
