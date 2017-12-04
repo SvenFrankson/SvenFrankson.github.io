@@ -111,6 +111,7 @@ class Herring extends Fishable {
     }
     catch(fishnet) {
         Main.instance.score += 25;
+        Main.instance.timer += 3;
         Main.instance.herrings++;
         setTimeout(() => {
             this.dispose();
@@ -137,6 +138,7 @@ class Cod extends Fishable {
     }
     catch(fishnet) {
         Main.instance.score += 50;
+        Main.instance.timer += 5;
         Main.instance.cods++;
         setTimeout(() => {
             this.dispose();
@@ -213,9 +215,6 @@ class AnimalManager {
         else {
             this.fishable.push(animal);
         }
-        $("#animal-count").text(this.animals.length + "");
-        $("#protected-count").text(this.protected.length + "");
-        $("#fishable-count").text(this.fishable.length + "");
     }
     removeAnimal(animal) {
         let index = this.animals.indexOf(animal);
@@ -234,9 +233,6 @@ class AnimalManager {
                 this.fishable.splice(index, 1);
             }
         }
-        $("#animal-count").text(this.animals.length + "");
-        $("#protected-count").text(this.protected.length + "");
-        $("#fishable-count").text(this.fishable.length + "");
     }
     _createAnimal() {
         let ratioProtected = this.protected.length / this.animals.length;
