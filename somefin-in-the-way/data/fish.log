@@ -1,0 +1,327 @@
+Exporter version: 5.4.2, Blender version: 2.78 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used:
+		selected layers only:  true
+		flat shading entire scene:  false
+		inline textures:  false
+		texture directory:  C:\Users\Sven\Documents\SvenFrankson\ludum-dare-40\data\
+	Python World class constructor completed
+	WARNING: No active camera has been assigned, or is not in a currently selected Blender layer
+	WARNING: The following armature not visible in scene thus ignored: FishArmature
+	WARNING: The following armature not visible in scene thus ignored: Armature
+	processing begun of mesh:  Cabin.008
+		animation processing begun
+			processing action ArmatureAction:  in[1 - 120], out[0 - 120]
+			processing action Cabin.002Action:  in[2 - 2], out[130 - 132]
+			processing action Cabin.003Action:  in[2 - 2], out[140 - 142]
+			processing action Cabin.003Action.001:  in[2 - 2], out[150 - 152]
+			processing action Cabin.003Action.002:  in[2 - 2], out[160 - 162]
+			processing action Cabin.006Action:  in[2 - 2], out[170 - 172]
+			processing action Cabin.007Action:  in[2 - 2], out[180 - 182]
+			processing action Cabin.008Action:  in[2 - 2], out[190 - 192]
+			processing action CabinAction:  in[2 - 2], out[200 - 202]
+			processing action CircleAction:  in[2 - 2], out[210 - 212]
+			processing action FishArmatureAction:  in[1 - 20], out[220 - 240]
+			processing action Shell.001Action:  in[2 - 2], out[250 - 252]
+			processing action Shell.002Action:  in[2 - 2], out[260 - 262]
+			processing action Shell.003Action:  in[2 - 2], out[270 - 272]
+			processing action ShellAction:  in[2 - 2], out[280 - 282]
+		WARNING: No materials have been assigned: 
+		num positions      :  112
+		num normals        :  112
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  648
+	processing begun of mesh:  Cabin.007
+		animation processing begun
+			processing action ArmatureAction:  in[1 - 120], out[0 - 120]
+			processing action Cabin.002Action:  in[2 - 2], out[130 - 132]
+			processing action Cabin.003Action:  in[2 - 2], out[140 - 142]
+			processing action Cabin.003Action.001:  in[2 - 2], out[150 - 152]
+			processing action Cabin.003Action.002:  in[2 - 2], out[160 - 162]
+			processing action Cabin.006Action:  in[2 - 2], out[170 - 172]
+			processing action Cabin.007Action:  in[2 - 2], out[180 - 182]
+			processing action Cabin.008Action:  in[2 - 2], out[190 - 192]
+			processing action CabinAction:  in[2 - 2], out[200 - 202]
+			processing action CircleAction:  in[2 - 2], out[210 - 212]
+			processing action FishArmatureAction:  in[1 - 20], out[220 - 240]
+			processing action Shell.001Action:  in[2 - 2], out[250 - 252]
+			processing action Shell.002Action:  in[2 - 2], out[260 - 262]
+			processing action Shell.003Action:  in[2 - 2], out[270 - 272]
+			processing action ShellAction:  in[2 - 2], out[280 - 282]
+		WARNING: No materials have been assigned: 
+		num positions      :  40
+		num normals        :  40
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  198
+	processing begun of mesh:  Cabin.006
+		animation processing begun
+			processing action ArmatureAction:  in[1 - 120], out[0 - 120]
+			processing action Cabin.002Action:  in[2 - 2], out[130 - 132]
+			processing action Cabin.003Action:  in[2 - 2], out[140 - 142]
+			processing action Cabin.003Action.001:  in[2 - 2], out[150 - 152]
+			processing action Cabin.003Action.002:  in[2 - 2], out[160 - 162]
+			processing action Cabin.006Action:  in[2 - 2], out[170 - 172]
+			processing action Cabin.007Action:  in[2 - 2], out[180 - 182]
+			processing action Cabin.008Action:  in[2 - 2], out[190 - 192]
+			processing action CabinAction:  in[2 - 2], out[200 - 202]
+			processing action CircleAction:  in[2 - 2], out[210 - 212]
+			processing action FishArmatureAction:  in[1 - 20], out[220 - 240]
+			processing action Shell.001Action:  in[2 - 2], out[250 - 252]
+			processing action Shell.002Action:  in[2 - 2], out[260 - 262]
+			processing action Shell.003Action:  in[2 - 2], out[270 - 272]
+			processing action ShellAction:  in[2 - 2], out[280 - 282]
+		WARNING: No materials have been assigned: 
+		num positions      :  112
+		num normals        :  112
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  648
+	processing begun of mesh:  Cabin.005
+		animation processing begun
+			processing action ArmatureAction:  in[1 - 120], out[0 - 120]
+			processing action Cabin.002Action:  in[2 - 2], out[130 - 132]
+			processing action Cabin.003Action:  in[2 - 2], out[140 - 142]
+			processing action Cabin.003Action.001:  in[2 - 2], out[150 - 152]
+			processing action Cabin.003Action.002:  in[2 - 2], out[160 - 162]
+			processing action Cabin.006Action:  in[2 - 2], out[170 - 172]
+			processing action Cabin.007Action:  in[2 - 2], out[180 - 182]
+			processing action Cabin.008Action:  in[2 - 2], out[190 - 192]
+			processing action CabinAction:  in[2 - 2], out[200 - 202]
+			processing action CircleAction:  in[2 - 2], out[210 - 212]
+			processing action FishArmatureAction:  in[1 - 20], out[220 - 240]
+			processing action Shell.001Action:  in[2 - 2], out[250 - 252]
+			processing action Shell.002Action:  in[2 - 2], out[260 - 262]
+			processing action Shell.003Action:  in[2 - 2], out[270 - 272]
+			processing action ShellAction:  in[2 - 2], out[280 - 282]
+		WARNING: No materials have been assigned: 
+		num positions      :  56
+		num normals        :  56
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  324
+	processing begun of mesh:  Cabin.004
+		animation processing begun
+			processing action ArmatureAction:  in[1 - 120], out[0 - 120]
+			processing action Cabin.002Action:  in[2 - 2], out[130 - 132]
+			processing action Cabin.003Action:  in[2 - 2], out[140 - 142]
+			processing action Cabin.003Action.001:  in[2 - 2], out[150 - 152]
+			processing action Cabin.003Action.002:  in[2 - 2], out[160 - 162]
+			processing action Cabin.006Action:  in[2 - 2], out[170 - 172]
+			processing action Cabin.007Action:  in[2 - 2], out[180 - 182]
+			processing action Cabin.008Action:  in[2 - 2], out[190 - 192]
+			processing action CabinAction:  in[2 - 2], out[200 - 202]
+			processing action CircleAction:  in[2 - 2], out[210 - 212]
+			processing action FishArmatureAction:  in[1 - 20], out[220 - 240]
+			processing action Shell.001Action:  in[2 - 2], out[250 - 252]
+			processing action Shell.002Action:  in[2 - 2], out[260 - 262]
+			processing action Shell.003Action:  in[2 - 2], out[270 - 272]
+			processing action ShellAction:  in[2 - 2], out[280 - 282]
+		WARNING: No materials have been assigned: 
+		num positions      :  56
+		num normals        :  56
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  324
+	processing begun of mesh:  Cabin.003
+		animation processing begun
+			processing action ArmatureAction:  in[1 - 120], out[0 - 120]
+			processing action Cabin.002Action:  in[2 - 2], out[130 - 132]
+			processing action Cabin.003Action:  in[2 - 2], out[140 - 142]
+			processing action Cabin.003Action.001:  in[2 - 2], out[150 - 152]
+			processing action Cabin.003Action.002:  in[2 - 2], out[160 - 162]
+			processing action Cabin.006Action:  in[2 - 2], out[170 - 172]
+			processing action Cabin.007Action:  in[2 - 2], out[180 - 182]
+			processing action Cabin.008Action:  in[2 - 2], out[190 - 192]
+			processing action CabinAction:  in[2 - 2], out[200 - 202]
+			processing action CircleAction:  in[2 - 2], out[210 - 212]
+			processing action FishArmatureAction:  in[1 - 20], out[220 - 240]
+			processing action Shell.001Action:  in[2 - 2], out[250 - 252]
+			processing action Shell.002Action:  in[2 - 2], out[260 - 262]
+			processing action Shell.003Action:  in[2 - 2], out[270 - 272]
+			processing action ShellAction:  in[2 - 2], out[280 - 282]
+		WARNING: No materials have been assigned: 
+		num positions      :  56
+		num normals        :  56
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  324
+	processing begun of mesh:  Cabin.002
+		animation processing begun
+			processing action ArmatureAction:  in[1 - 120], out[0 - 120]
+			processing action Cabin.002Action:  in[2 - 2], out[130 - 132]
+			processing action Cabin.003Action:  in[2 - 2], out[140 - 142]
+			processing action Cabin.003Action.001:  in[2 - 2], out[150 - 152]
+			processing action Cabin.003Action.002:  in[2 - 2], out[160 - 162]
+			processing action Cabin.006Action:  in[2 - 2], out[170 - 172]
+			processing action Cabin.007Action:  in[2 - 2], out[180 - 182]
+			processing action Cabin.008Action:  in[2 - 2], out[190 - 192]
+			processing action CabinAction:  in[2 - 2], out[200 - 202]
+			processing action CircleAction:  in[2 - 2], out[210 - 212]
+			processing action FishArmatureAction:  in[1 - 20], out[220 - 240]
+			processing action Shell.001Action:  in[2 - 2], out[250 - 252]
+			processing action Shell.002Action:  in[2 - 2], out[260 - 262]
+			processing action Shell.003Action:  in[2 - 2], out[270 - 272]
+			processing action ShellAction:  in[2 - 2], out[280 - 282]
+		WARNING: No materials have been assigned: 
+		num positions      :  40
+		num normals        :  40
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  198
+	processing begun of mesh:  Shell.003
+		animation processing begun
+			processing action ArmatureAction:  in[1 - 120], out[0 - 120]
+			processing action Cabin.002Action:  in[2 - 2], out[130 - 132]
+			processing action Cabin.003Action:  in[2 - 2], out[140 - 142]
+			processing action Cabin.003Action.001:  in[2 - 2], out[150 - 152]
+			processing action Cabin.003Action.002:  in[2 - 2], out[160 - 162]
+			processing action Cabin.006Action:  in[2 - 2], out[170 - 172]
+			processing action Cabin.007Action:  in[2 - 2], out[180 - 182]
+			processing action Cabin.008Action:  in[2 - 2], out[190 - 192]
+			processing action CabinAction:  in[2 - 2], out[200 - 202]
+			processing action CircleAction:  in[2 - 2], out[210 - 212]
+			processing action FishArmatureAction:  in[1 - 20], out[220 - 240]
+			processing action Shell.001Action:  in[2 - 2], out[250 - 252]
+			processing action Shell.002Action:  in[2 - 2], out[260 - 262]
+			processing action Shell.003Action:  in[2 - 2], out[270 - 272]
+			processing action ShellAction:  in[2 - 2], out[280 - 282]
+		WARNING: No materials have been assigned: 
+		num positions      :  60
+		num normals        :  60
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  348
+	processing begun of mesh:  Circle
+		animation processing begun
+			processing action ArmatureAction:  in[1 - 120], out[0 - 120]
+			processing action Cabin.002Action:  in[2 - 2], out[130 - 132]
+			processing action Cabin.003Action:  in[2 - 2], out[140 - 142]
+			processing action Cabin.003Action.001:  in[2 - 2], out[150 - 152]
+			processing action Cabin.003Action.002:  in[2 - 2], out[160 - 162]
+			processing action Cabin.006Action:  in[2 - 2], out[170 - 172]
+			processing action Cabin.007Action:  in[2 - 2], out[180 - 182]
+			processing action Cabin.008Action:  in[2 - 2], out[190 - 192]
+			processing action CabinAction:  in[2 - 2], out[200 - 202]
+			processing action CircleAction:  in[2 - 2], out[210 - 212]
+			processing action FishArmatureAction:  in[1 - 20], out[220 - 240]
+			processing action Shell.001Action:  in[2 - 2], out[250 - 252]
+			processing action Shell.002Action:  in[2 - 2], out[260 - 262]
+			processing action Shell.003Action:  in[2 - 2], out[270 - 272]
+			processing action ShellAction:  in[2 - 2], out[280 - 282]
+		WARNING: No materials have been assigned: 
+		num positions      :  384
+		num normals        :  384
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  2304
+	processing begun of mesh:  Shell.002
+		animation processing begun
+			processing action ArmatureAction:  in[1 - 120], out[0 - 120]
+			processing action Cabin.002Action:  in[2 - 2], out[130 - 132]
+			processing action Cabin.003Action:  in[2 - 2], out[140 - 142]
+			processing action Cabin.003Action.001:  in[2 - 2], out[150 - 152]
+			processing action Cabin.003Action.002:  in[2 - 2], out[160 - 162]
+			processing action Cabin.006Action:  in[2 - 2], out[170 - 172]
+			processing action Cabin.007Action:  in[2 - 2], out[180 - 182]
+			processing action Cabin.008Action:  in[2 - 2], out[190 - 192]
+			processing action CabinAction:  in[2 - 2], out[200 - 202]
+			processing action CircleAction:  in[2 - 2], out[210 - 212]
+			processing action FishArmatureAction:  in[1 - 20], out[220 - 240]
+			processing action Shell.001Action:  in[2 - 2], out[250 - 252]
+			processing action Shell.002Action:  in[2 - 2], out[260 - 262]
+			processing action Shell.003Action:  in[2 - 2], out[270 - 272]
+			processing action ShellAction:  in[2 - 2], out[280 - 282]
+		WARNING: No materials have been assigned: 
+		num positions      :  68
+		num normals        :  68
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  396
+	processing begun of mesh:  Shell.001
+		animation processing begun
+			processing action ArmatureAction:  in[1 - 120], out[0 - 120]
+			processing action Cabin.002Action:  in[2 - 2], out[130 - 132]
+			processing action Cabin.003Action:  in[2 - 2], out[140 - 142]
+			processing action Cabin.003Action.001:  in[2 - 2], out[150 - 152]
+			processing action Cabin.003Action.002:  in[2 - 2], out[160 - 162]
+			processing action Cabin.006Action:  in[2 - 2], out[170 - 172]
+			processing action Cabin.007Action:  in[2 - 2], out[180 - 182]
+			processing action Cabin.008Action:  in[2 - 2], out[190 - 192]
+			processing action CabinAction:  in[2 - 2], out[200 - 202]
+			processing action CircleAction:  in[2 - 2], out[210 - 212]
+			processing action FishArmatureAction:  in[1 - 20], out[220 - 240]
+			processing action Shell.001Action:  in[2 - 2], out[250 - 252]
+			processing action Shell.002Action:  in[2 - 2], out[260 - 262]
+			processing action Shell.003Action:  in[2 - 2], out[270 - 272]
+			processing action ShellAction:  in[2 - 2], out[280 - 282]
+		WARNING: No materials have been assigned: 
+		num positions      :  216
+		num normals        :  216
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  648
+	processing begun of mesh:  Cabin
+		animation processing begun
+			processing action ArmatureAction:  in[1 - 120], out[0 - 120]
+			processing action Cabin.002Action:  in[2 - 2], out[130 - 132]
+			processing action Cabin.003Action:  in[2 - 2], out[140 - 142]
+			processing action Cabin.003Action.001:  in[2 - 2], out[150 - 152]
+			processing action Cabin.003Action.002:  in[2 - 2], out[160 - 162]
+			processing action Cabin.006Action:  in[2 - 2], out[170 - 172]
+			processing action Cabin.007Action:  in[2 - 2], out[180 - 182]
+			processing action Cabin.008Action:  in[2 - 2], out[190 - 192]
+			processing action CabinAction:  in[2 - 2], out[200 - 202]
+			processing action CircleAction:  in[2 - 2], out[210 - 212]
+			processing action FishArmatureAction:  in[1 - 20], out[220 - 240]
+			processing action Shell.001Action:  in[2 - 2], out[250 - 252]
+			processing action Shell.002Action:  in[2 - 2], out[260 - 262]
+			processing action Shell.003Action:  in[2 - 2], out[270 - 272]
+			processing action ShellAction:  in[2 - 2], out[280 - 282]
+		WARNING: No materials have been assigned: 
+		num positions      :  248
+		num normals        :  248
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  1452
+	processing begun of mesh:  Shell
+		animation processing begun
+			processing action ArmatureAction:  in[1 - 120], out[0 - 120]
+			processing action Cabin.002Action:  in[2 - 2], out[130 - 132]
+			processing action Cabin.003Action:  in[2 - 2], out[140 - 142]
+			processing action Cabin.003Action.001:  in[2 - 2], out[150 - 152]
+			processing action Cabin.003Action.002:  in[2 - 2], out[160 - 162]
+			processing action Cabin.006Action:  in[2 - 2], out[170 - 172]
+			processing action Cabin.007Action:  in[2 - 2], out[180 - 182]
+			processing action Cabin.008Action:  in[2 - 2], out[190 - 192]
+			processing action CabinAction:  in[2 - 2], out[200 - 202]
+			processing action CircleAction:  in[2 - 2], out[210 - 212]
+			processing action FishArmatureAction:  in[1 - 20], out[220 - 240]
+			processing action Shell.001Action:  in[2 - 2], out[250 - 252]
+			processing action Shell.002Action:  in[2 - 2], out[260 - 262]
+			processing action Shell.003Action:  in[2 - 2], out[270 - 272]
+			processing action ShellAction:  in[2 - 2], out[280 - 282]
+		WARNING: No materials have been assigned: 
+		num positions      :  66
+		num normals        :  66
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  336
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========
+elapsed time:  0 min, 2.2702 secs

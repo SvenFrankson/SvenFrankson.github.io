@@ -3,11 +3,12 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
-    <title>SpaceScout</title>
+    <title>SomeFin In The Way</title>
     <script src="./lib/jquery.min.js"></script>
     <script src="./lib/bootstrap.min.js"></script>
     <script src="./lib/babylon.js"></script>
     <script src="./scripts/app.js"></script>
+    <script src="https://use.fontawesome.com/19e166aa3f.js"></script>
     <link rel="stylesheet" type="text/css" href="./styles/app.css">
     <link rel="stylesheet" type="text/css" href="./styles/bootstrap.css">
     <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
@@ -15,6 +16,11 @@
 
 <body>
     <canvas id="render-canvas"></canvas>
+    <div id="messages">
+        <span id="message-1" style="background-color: rgba(0, 0, 0, 0.3);" hidden>Catch as many fishes as you can !</span><br/>
+        <span id="message-2" style="background-color: rgba(0, 0, 0, 0.3);" hidden>But beware, Red Tuna and Turtles are endangered species,</span><br/>
+        <span id="message-3" style="background-color: rgba(0, 0, 0, 0.3);" hidden>You should leave them alone !</span>
+    </div>
     <div id="debug-gui">
         <div class="debug-panel">
             <span>Animals </span><span id="animal-count"></span>
@@ -46,7 +52,7 @@
             <div class="col-xs-1 col-sm-2 col-md-3">
                 
             </div>
-            <div id="menu" class="col-xs-10 col-sm-8 col-md-6">
+            <div id="menu" class="col-xs-10 col-sm-8 col-md-6" style="background-color: rgba(0, 0, 0, 0.5);">
                 <h1 id="main-title">Some fin in the way</h1>
                 <div id="credit">
                         <div>
@@ -56,7 +62,7 @@
                             made with BabylonJS
                         </div>
                     </div>
-                <div id="play-button">Play</div>
+                <div id="play-button" style="margin-bottom: 10%">Play</div>
             </div>
         </div>
     </div>
@@ -66,7 +72,7 @@
             <div class="col-xs-1 col-sm-2 col-md-3">
                 
             </div>
-            <div class="col-xs-10 col-sm-8 col-md-6" style="text-align: center">
+            <div class="col-xs-10 col-sm-8 col-md-6" style="background-color: rgba(0, 0, 0, 0.5); text-align: center">
                 <h1 id="main-title">Some fin in the way</h1>
                 <div id="credit">
                     <div>
@@ -81,20 +87,52 @@
                     <div class="col-xs-3">
                     </div>
                     <div class="col-xs-3" style="text-align: left">
-                        Turtles
+                        Herrings
                     </div>
-                    <div class="col-xs-3">
-                        <span id="turtles-count">-200</span>
+                    <div class="col-xs-2">
+                        x <span id="herrings-count">0</span>
+                    </div>
+                    <div class="col-xs-2">
+                        <span id="herrings-score">0</span>
                     </div>
                 </div>
                 <div class="row" style="font-size: 20px; margin-bottom: 2%">
                     <div class="col-xs-3">
                     </div>
                     <div class="col-xs-3" style="text-align: left">
-                        Fishes
+                        Cods
                     </div>
+                    <div class="col-xs-2">
+                        x <span id="cods-count">0</span>
+                    </div>
+                    <div class="col-xs-2">
+                        <span id="cods-score">0</span>
+                    </div>
+                </div>
+                <div class="row" style="font-size: 20px; margin-bottom: 2%">
                     <div class="col-xs-3">
-                        <span id="fishes-count">400</span>
+                    </div>
+                    <div class="col-xs-3" style="text-align: left">
+                        Tunas
+                    </div>
+                    <div class="col-xs-2">
+                        x <span id="tunas-count">0</span>
+                    </div>
+                    <div class="col-xs-2">
+                        <span id="tunas-score">0</span>
+                    </div>
+                </div>
+                <div class="row" style="font-size: 20px; margin-bottom: 2%">
+                    <div class="col-xs-3">
+                    </div>
+                    <div class="col-xs-3" style="text-align: left">
+                        Turtles
+                    </div>
+                    <div class="col-xs-2">
+                        x <span id="turtles-count">0</span>
+                    </div>
+                    <div class="col-xs-2">
+                        <span id="turtles-score">0</span>
                     </div>
                 </div>
                 <div class="row" style="font-size: 35px; border-top: 2px solid white">
@@ -107,8 +145,8 @@
                         <span id="score-count">200</span>
                     </div>
                 </div>
-                <div style="text-align: right; font-size: 16px; margin-top: 2%">Overfishing, the more you fish'em, the worst it gets.</div>
-                <div class="row" style="font-size: 70px; margin-top: 10%">
+                <div style="text-align: right; font-size: 16px; margin-top: 2%">Overfishing, the more you fish'em, the worse it gets.</div>
+                <div class="row" style="font-size: 70px; margin-top: 10%; margin-bottom: 2%">
                     <div id="replay-button" class="col-xs-5" style="text-align: center; border-bottom: 2px solid white">
                         Replay
                     </div>
@@ -116,7 +154,7 @@
                         
                     </div>
                     <div id="share-button" class="col-xs-5" style="text-align: center; border-bottom: 2px solid white">
-                        Share on Twitter
+                        Share <i class="fa fa-twitter fa-lg"></i>
                     </div>
                 </div>
             </div>

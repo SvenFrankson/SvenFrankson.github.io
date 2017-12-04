@@ -1,0 +1,36 @@
+Exporter version: 5.4.2, Blender version: 2.78 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used:
+		selected layers only:  true
+		flat shading entire scene:  false
+		inline textures:  false
+		texture directory:  C:\Users\Sven\Documents\SvenFrankson\ludum-dare-40\data\
+	Python World class constructor completed
+	WARNING: No active camera has been assigned, or is not in a currently selected Blender layer
+	processing begun of skeleton:  CodArmature, id:  0
+		processing begun of bone:  Bone, index:  0
+		processing begun of bone:  Bone.001, index:  1
+		processing begun of bone:  Bone.005, index:  2
+		processing begun of bone:  Bone.006, index:  3
+		processing begun of bone:  Bone.002, index:  4
+		processing begun of bone:  Bone.003, index:  5
+		processing begun of bone:  Bone.004, index:  6
+		processing action CodArmatureAction:  in[1 - 60], out[0 - 60]
+	processing begun of mesh:  Cod
+		WARNING: No materials have been assigned: 
+		num positions      :  522
+		num normals        :  522
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  3120
+		Skeleton stats:  
+			Total Influencers:  1407
+			Avg # of influencers per vertex:  2.6954
+			Highest # of influencers observed:  6, num vertices with this:  3
+			exported as 6 influencers
+			num skeletonWeights and skeletonIndices:  4176
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========
+elapsed time:  0 min, 0.5617 secs
