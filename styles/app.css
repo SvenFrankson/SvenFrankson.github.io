@@ -1,0 +1,106 @@
+html, body {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.title {
+    font-family: 'Raleway', Arial, Helvetica, sans-serif;
+    font-weight: Lighter;
+    font-size: 80px;
+    color: white;
+    border-bottom: 1px solid;
+    border-color: white;
+}
+
+.subtitle {
+    font-family: 'Raleway', Arial, Helvetica, sans-serif;
+    font-weight: Lighter;
+    font-size: 26px;
+    color: rgb(240, 240, 240);
+    text-align: right;
+    margin-bottom: 5%;
+}
+
+.medium-title {
+    font-family: 'Raleway', Arial, Helvetica, sans-serif;
+    font-weight: Lighter;
+    font-size: 50px;
+    color: white;
+    margin-bottom: 5%;
+}
+
+.smedium-title {
+    font-family: 'Raleway', Arial, Helvetica, sans-serif;
+    font-weight: Lighter;
+    font-size: 35px;
+    color: white;
+    margin-bottom: 3%;
+}
+
+#render-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    touch-action: none;
+    z-index: 1;
+}
+
+#main-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    top: 0px;
+    left: 0px;
+    z-index: 2;
+    color: white;
+    font-size: 18px;
+}
+
+.menu-item {
+    padding: 2%;
+    border-bottom: white solid 1px;
+    border-right: white solid 1px;
+    margin-bottom: 5%;
+}
+
+#project-title {
+    padding: 2%;
+    z-index: 3;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+#project-image {
+    margin-left: 10%;
+    width: 85%;
+}
+
+#project-links {
+    width: 100%;
+    text-align: justify;
+    margin: 5%;
+}
+
+.btn.btn-default.project-link {
+    font-size: 25px;
+    color: rgb(240, 240, 240);
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+}
+
+.btn.btn-default.project-link:hover {
+    color: white;
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+}
+
+.btn.btn-default.project-link:active {
+    color: white;
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+}
