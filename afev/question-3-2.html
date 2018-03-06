@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="styles/afev.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="//cdn.jsdelivr.net/jquery.color-animation/1/mainfile"></script>
+    <script src="./scripts/question-2-1.js"></script>
+    <title>Question 3-1</title>
+</head>
+
+<body>
+    <img id="banner" src="img/28449979_1938418979504703_226042539_n.jpg"/>
+    <h1 class="afev-title">Question 3-1</h1>
+    <div class="afev-question-desc">Le 17 mars de 14h  à 17h, vous pourrez jouer aux jeux vidéos, apprendre à faire marcher un robot ou faire un montage vidéo.</div>
+    <div class="afev-question">Tout ça dans un seul lieu, mais où se trouve-t-il ?</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-2">
+                <button type="button" class="btn btn-secondary afev-answer">A</button>
+            </div>
+            <div class="col-10">
+                <button id="afev-answer-1" type="button" class="btn btn-secondary afev-answer">Le Petit Amis<br/>(2 rue Paul Chevreux)</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <button type="button" class="btn btn-secondary afev-answer">B</button>
+            </div>
+            <div class="col-10">
+                <button id="afev-answer-2" type="button" class="btn btn-secondary afev-answer">Le gymnase Théodore de Gargan<br/>(5 rue Théodore de Gargan)</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <button type="button" class="btn btn-secondary afev-answer">C</button>
+            </div>
+            <div class="col-10">
+                <button id="afev-answer-3" type="button" class="btn btn-secondary afev-answer">La Mairie de quartier Metz Nord / Patrotte<br/>(76 avenue de Thionville 57050 Metz)</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <button type="button" class="btn btn-secondary afev-answer">D</button>
+            </div>
+            <div class="col-10">
+                <button id="afev-answer-4" type="button" class="btn btn-secondary afev-answer">Le CACS Lacour<br/>(6, rue Yvan Goll BP 52018 57050 METZ)</button>
+            </div>
+        </div>
+    </div>
+    <div>
+        <button id="afev-validate" type="button" class="btn btn-secondary">Valider</button>
+    </div>
+    <div id="afev-secret-right" class="afev-secret">
+        Bonne Réponse !
+    </div>
+    <div id="afev-secret-wrong" class="afev-secret">
+        Mauvaise Réponse :(
+    </div>
+    <div id="afev-secret-response" class="afev-secret">
+        Le Graoulab et M'Design sont les deux Fab Lab de Metz.
+    </div>
+</body>
+
+</html>
