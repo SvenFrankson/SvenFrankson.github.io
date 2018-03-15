@@ -12,7 +12,6 @@ body {
 .afev-title {
     font-size: 46px;
     color: lightgray;
-    color:black;
     margin-bottom: 2%;
 }
 
@@ -21,7 +20,6 @@ body {
     padding-right: 5%;
     font-size: 42px;
     color: white;
-    color:black;
     margin-bottom: 2%;
 }
 
@@ -30,20 +28,18 @@ body {
     padding-right: 5%;
     font-size: 28px;
     color: white;
-    color:black;
     margin-bottom: 2%;
 }
 
 .btn.btn-secondary.afev-answer {
     white-space: normal;
-    padding-top: 6px;
-    padding-bottom: 6px;
+    padding-top: 4px;
+    padding-bottom: 4px;
     margin-top: 2px;
     margin-bottom: 2px;
     width: 100%;
     background-color: rgba(0,0, 0, 0.1);
-    font-size: 36px;
-    color:black;
+    font-size: 32px;
 }
 
 #afev-validate {
@@ -51,15 +47,13 @@ body {
     margin-bottom: 2%;
     padding-top: 6px;
     padding-bottom: 6px;
-    width: 80%;
+    width: 50%;
     background-color: rgba(0,0, 0, 0.1);
     font-size: 42px;
-    color:black;
 }
 
 .afev-secret {
-    font-size: 42px;
+    font-size: 36px;
     color: white;
-    color:black;
     margin-bottom: 2%;
 }
