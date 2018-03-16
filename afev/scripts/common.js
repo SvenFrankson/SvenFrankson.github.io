@@ -1,4 +1,7 @@
 var initLayout = () => {
+    $("#banner").on("click", () => {
+        window.location = "https://www.facebook.com/events/2062683530644188/";
+    })
     var score = localStorage.getItem("afev-score");
     if (score !== null) {
         if (score[0] === '1') {
