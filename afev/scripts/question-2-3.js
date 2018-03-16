@@ -46,8 +46,5 @@ window.onload = () => {
             );
         })
     }
-    $(".afev-secret").hide();
-    $("#afev-validate").on("click", () => {
-        validate();
-    });
+    initLayout();
 };

@@ -6,7 +6,6 @@ body {
 #banner {
     width: 100%;
     border-bottom: 1px solid white;
-    margin-bottom: 2%;
 }
 
 .afev-title {
@@ -33,13 +32,23 @@ body {
 
 .btn.btn-secondary.afev-answer {
     white-space: normal;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-top: 6px;
+    padding-bottom: 6px;
     margin-top: 2px;
     margin-bottom: 2px;
     width: 100%;
     background-color: rgba(0,0, 0, 0.1);
     font-size: 32px;
+}
+
+#next-question {
+    margin-top: 2%;
+    margin-bottom: 2%;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    width: 70%;
+    background-color: rgba(0,0, 0, 0.1);
+    font-size: 50px;
 }
 
 #afev-validate {
@@ -56,4 +65,24 @@ body {
     font-size: 36px;
     color: white;
     margin-bottom: 2%;
+}
+
+#afev-secret-right {
+    margin-top: 2%;
+}
+
+#afev-secret-wrong {
+    margin-top: 2%;
+}
+
+#afev-ariane {
+    width: 80%;
+}
+
+.afev-ariane-letter {
+    width: 120px;
+    font-size: 36px;
+    margin-top: 0px;
+    margin-bottom: 4%;
+    background-color: rgba(0,0, 0, 0.1);
 }

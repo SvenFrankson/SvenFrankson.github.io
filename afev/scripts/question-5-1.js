@@ -1,11 +1,11 @@
 var answers = [];
 
 var validate = () => {
-    $("#afev-answer-4").animate(
+    $("#afev-answer-3").animate(
         { backgroundColor: "green"}
     );
     var good = true;
-    if (answers.indexOf(4) === -1) {
+    if (answers.indexOf(3) === -1) {
         good = false;
     }
     if (answers.indexOf(1) !== -1) {
@@ -16,12 +16,6 @@ var validate = () => {
     }
     if (answers.indexOf(2) !== -1) {
         $("#afev-answer-2").animate(
-            { backgroundColor: "red"}
-        );
-        good = false;
-    }
-    if (answers.indexOf(3) !== -1) {
-        $("#afev-answer-3").animate(
             { backgroundColor: "red"}
         );
         good = false;
@@ -48,7 +42,7 @@ window.onload = () => {
     var score = localStorage.getItem("afev-score");
     if (score !== null) {
         console.log(score);
-        score = score.substring(0, 2) + '1' + score.substring(3, 5);
+        score = score.substring(0, 4) + '1';
         console.log(score);
         localStorage.setItem("afev-score", score);
     } else {

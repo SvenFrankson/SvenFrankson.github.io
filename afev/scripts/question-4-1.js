@@ -39,8 +39,14 @@ window.onload = () => {
             );
         })
     }
-    $(".afev-secret").hide();
-    $("#afev-validate").on("click", () => {
-        validate();
-    });
+    var score = localStorage.getItem("afev-score");
+    if (score !== null) {
+        console.log(score);
+        score = score.substring(0, 3) + '1' + score.substring(4, 5);
+        console.log(score);
+        localStorage.setItem("afev-score", score);
+    } else {
+        localStorage.setItem("afev-score", "10000");
+    }
+    initLayout();
 };
