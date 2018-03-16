@@ -23,7 +23,6 @@ var initLayout = () => {
         }
     }
     else {
-        alert("NULL");
         localStorage.setItem("afev-score", "00000");
     }
     $(".afev-secret").hide();

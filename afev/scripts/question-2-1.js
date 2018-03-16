@@ -47,9 +47,7 @@ window.onload = () => {
     }
     var score = localStorage.getItem("afev-score");
     if (score !== null) {
-        console.log(score);
         score = score[0] + '1' + score.substring(2, 5);
-        console.log(score);
         localStorage.setItem("afev-score", score);
     } else {
         localStorage.setItem("afev-score", "10000");
