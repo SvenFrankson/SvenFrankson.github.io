@@ -1,0 +1,11 @@
+<p>Hammurabi is a Unity3D to BabylonJS exporter.</p>
+
+<p>When creating a game with Unity3D, most of the game logic is written with CSharp scripts, called MonoBehaviour. MonoBehaviours rely on Unity's classes (Transform, MeshFilter, MeshRenderer...), and are tied to these classes interface.</p>
+
+<p>A typical Unity to BabylonJS exporter will convert the Unity's classes instances to their equivalent in BabylonJS.</p>
+
+<p>example : a UnityEngine.GameObject, its Transform, MeshFilter and MeshRenderer, are packed into a BABYLON.Mesh object.</p>
+
+<p>But it will then require some extensive MonoBehaviour rewritting, as BabylonJS's classes interfaces differ from Unity's classes interface.</p>
+
+<p>Hammurabi provides BabylonJS based classes sharing the same interfaces as Unitys, as well as a CSharp to Typescript converter to transpose Unity's MonoBehaviours.</p>

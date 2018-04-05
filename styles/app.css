@@ -143,6 +143,11 @@ html, body {
     margin: 5%;
 }
 
+.project-page {
+    background-color: #22724bd0;
+    padding: 2%;
+}
+
 .btn.btn-default.project-link {
     font-size: 25px;
     color: rgb(240, 240, 240);
