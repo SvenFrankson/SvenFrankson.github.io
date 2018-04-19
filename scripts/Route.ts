@@ -38,6 +38,28 @@ class Route {
         )
     }
 
+    public contact(): void {
+        console.log("!");
+        $.ajax(
+            {
+                url: "./contact.html",
+                success: (data) => {
+                    document.getElementById("page").innerHTML = data;
+                    NavTree.Update([
+                        {
+                            name: "home",
+                            url: "#"
+                        },
+                        {
+                            name: "contact",
+                            url: "#contact"
+                        }
+                    ]);
+                }
+            }
+        )
+    }
+
     public project(projectId: string): void {
         $.ajax(
             {
@@ -110,6 +132,8 @@ class Route {
         } else if (url.startsWith("project/")) {
             let projectId = url.split("/")[1];
             this.project(projectId);
+        } else if (url === "contact") {
+            this.contact();
         } else if (url === "about") {
             this.about();
         } else {

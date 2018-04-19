@@ -5,8 +5,20 @@ html, body {
     padding: 0;
 }
 
-#page {
-    
+a:link {
+    color: white;
+}
+
+a:visited {
+    color: white;
+}
+
+a:hover {
+    color: white;
+}
+
+a:active {
+    color: white;
 }
 
 .title {
