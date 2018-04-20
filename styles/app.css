@@ -21,6 +21,10 @@ a:active {
     color: white;
 }
 
+#page {
+    width: 100%;
+}
+
 .title {
     font-family: 'Raleway', Arial, Helvetica, sans-serif;
     font-weight: Lighter;
@@ -44,7 +48,8 @@ a:active {
     font-weight: Lighter;
     font-size: 50px;
     color: white;
-    margin-bottom: 5%;
+    margin-top: 2%;
+    margin-bottom: 2%;
 }
 
 .smedium-title {
@@ -82,6 +87,13 @@ a:active {
     padding: 2% 2% 2% 2%;
     margin-bottom: 5%;
     background-color: #22724bdd;
+    border-radius: 10px;
+}
+
+.menu-label {
+    padding: 2% 2% 2% 2%;
+    margin-bottom: 5%;
+    background-color: #22724b25;
     border-radius: 10px;
 }
 
