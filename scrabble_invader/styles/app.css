@@ -187,3 +187,7 @@ html, body {
     text-align: right;
     font-family: "Helvetica";
 }
+
+a:visited {
+    color: white;
+}
