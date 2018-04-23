@@ -384,7 +384,9 @@ class Main {
         this.bonusGenerator = new BonusGenerator(this);
         this.bonusGenerator.start();
         this.invaderGenerator = new InvaderGenerator(this);
-        this.invaderGenerator.start();
+        setTimeout(() => {
+            this.invaderGenerator.start();
+        }, 5000);
     }
     animate() {
         this.engine.runRenderLoop(() => {
@@ -400,6 +402,9 @@ class Main {
         let game = new Main("render-canvas");
         game.createScene();
         game.animate();
+        setTimeout(() => {
+            TipsGenerator.ShowRandomTips();
+        }, 1000);
     }
     static GameOver() {
         Main.instance.invaderGenerator.invaders.forEach((i) => {
@@ -1032,8 +1037,14 @@ class TipsGenerator {
         }, 4000);
     }
     static ShowRandomTips() {
-        let r = Math.floor(Math.random() * 6 + 1);
-        TipsGenerator.Show("tips-" + r);
+        if (TipsGenerator.index > 10) {
+            let r = Math.floor(Math.random() * 6 + 1);
+            TipsGenerator.Show("tips-" + r);
+        }
+        else {
+            TipsGenerator.Show("tips-" + TipsGenerator.index);
+            TipsGenerator.index++;
+        }
     }
     static ShowRandomGood() {
         let r = Math.floor(Math.random() * 4 + 1);
@@ -1044,6 +1055,7 @@ class TipsGenerator {
         TipsGenerator.Show("bad-" + r);
     }
 }
+TipsGenerator.index = 1;
 class WordValidator {
     constructor() {
         this._words = [];

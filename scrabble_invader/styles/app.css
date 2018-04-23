@@ -33,7 +33,7 @@ html, body {
     text-align: center;
     bottom: 3%;
     width: 100%;
-    font-size: 50px;
+    font-size: 40px;
     font-family: "Helvetica";
 }
 
@@ -42,7 +42,7 @@ html, body {
     top: 0%;
     width: 100%;
     text-align: center;
-    font-size: 80px;
+    font-size: 70px;
     font-family: "Komikax";
 }
 
@@ -51,7 +51,7 @@ html, body {
     top: 10%;
     width: 100%;
     text-align: center;
-    font-size: 80px;
+    font-size: 70px;
     font-family: "Komikax";
 }
 
@@ -63,7 +63,7 @@ html, body {
     position: absolute;
     width: 100%;
     text-align: center;
-    font-size: 40px;
+    font-size: 30px;
     font-family: "Komikax";
 }
 
@@ -91,7 +91,7 @@ html, body {
     position: absolute;
     width: 100%;
     text-align: center;
-    font-size: 30px;
+    font-size: 25px;
     font-family: "Helvetica";
     top: 55%;
 }
@@ -101,7 +101,7 @@ html, body {
     top: 20%;
     width: 10%;
     text-align: center;
-    font-size: 80px;
+    font-size: 60px;
     font-family: "Komikax";
     border: solid 2px white;
 }
@@ -111,7 +111,7 @@ html, body {
     top: 35%;
     width: 10%;
     text-align: center;
-    font-size: 40px;
+    font-size: 35px;
     font-family: "Komikax";
     border: solid 2px white;
 }
@@ -181,8 +181,8 @@ html, body {
 
 #foot {
     position: absolute;
-    bottom: 5%;
-    right: 5%;
+    bottom: 1%;
+    right: 1%;
     width: 40%;
     text-align: right;
     font-family: "Helvetica";
