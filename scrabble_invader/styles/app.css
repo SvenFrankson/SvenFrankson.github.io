@@ -1,0 +1,171 @@
+@font-face {
+	font-family: "Komikax";
+	src: url('KOMIKAX.ttf');
+}
+
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    background-image: url("../textures/stars.png");
+    background-size: cover;
+    color: white;
+}
+
+#render-canvas {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    z-index: 1;
+}
+
+.main-menu {
+    z-index: 2;
+}
+
+.tips {
+    z-index: 2;
+    position: absolute;
+    text-align: center;
+    bottom: 3%;
+    width: 100%;
+    font-size: 50px;
+    font-family: "Helvetica";
+}
+
+#title {
+    position: absolute;
+    top: 0%;
+    width: 100%;
+    text-align: center;
+    font-size: 80px;
+    font-family: "Komikax";
+}
+
+#game-over {
+    position: absolute;
+    top: 10%;
+    width: 100%;
+    text-align: center;
+    font-size: 80px;
+    font-family: "Komikax";
+}
+
+.game-over {
+    z-index: 3;
+}
+
+.score {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 40px;
+    font-family: "Komikax";
+}
+
+#replay {
+    border-bottom: solid 4px white;
+}
+
+#score {
+    top: 30%;
+}
+
+#kills {
+    top: 35%;
+}
+
+#words {
+    top: 40%;
+}
+
+#experience {
+    top: 45%;
+}
+
+#thank {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 30px;
+    font-family: "Helvetica";
+    top: 55%;
+}
+
+.play-button {
+    position: absolute;
+    top: 20%;
+    width: 10%;
+    text-align: center;
+    font-size: 80px;
+    font-family: "Komikax";
+    border: solid 2px white;
+}
+
+.level {
+    position: absolute;
+    top: 35%;
+    width: 10%;
+    text-align: center;
+    font-size: 40px;
+    font-family: "Komikax";
+    border: solid 2px white;
+}
+
+#easy {
+    left: 35%;
+    color: grey;
+}
+
+#medium {
+    left: 45%;
+    background: white;
+    color: black;
+}
+
+#hard {
+    left: 55%;
+    color: grey;
+}
+
+#play-en {
+    left: 35%;
+    color: white;
+    -webkit-text-fill-color: white;
+    -webkit-text-stroke-width: 3px;
+    -webkit-text-stroke-color: black;
+    background-image: url("../textures/en.png");
+    background-size: cover;
+}
+
+#play-fr {
+    left: 55%;
+    -webkit-text-fill-color: white;
+    -webkit-text-stroke-width: 3px;
+    -webkit-text-stroke-color:black;
+    background-image: url("../textures/fr.svg");
+    background-size: cover;
+}
+
+#background {
+    position: absolute;
+    top: 45%;
+    left: 35%;
+    width: 30%;
+    text-align: center;
+    font-size: 80px;
+    border: solid 2px white;
+}
+
+#foot {
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+    width: 40%;
+    text-align: right;
+    font-family: "Helvetica";
+}

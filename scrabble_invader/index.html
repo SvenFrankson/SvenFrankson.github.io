@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+    <title>Scrabble Invaders</title>
+    <script src="./javascript/jquery-3.3.1.js"></script>
+    <script src="./javascript/babylon.js"></script>
+    <script src="./javascript/babylon.gui.js"></script>
+    <script src="./javascript/app.js"></script>
+    <link rel="stylesheet" type="text/css" href="./styles/app.css">
+</head>
+
+<body>
+    <h1 id="title" class="main-menu game-over">Scrabble Invaders</h1>
+    <div id="play-en" class="main-menu play-button">PLAY</div>
+    <div id="play-fr" class="main-menu play-button">PLAY</div>
+    <div id="easy" class="main-menu level">easy</div>
+    <div id="medium" class="main-menu level">medium</div>
+    <div id="hard" class="main-menu level">hard</div>
+    <img id="background" class="main-menu" src="textures/main-title.png"/>
+    <div id="foot" class="main-menu">
+        <p>Scrabble Invaders by Sven Frankson for Ludum Dare 41, April 2018.</p>
+        <p>Code released under the terms of the MIT Licence.</p>
+        <p>Assets released under the terms of the CC-BY Licence unless specified otherwise.</p>
+        <p>Code and assets can be downloaded here.</p>
+        <p>Thanks for playing ! Feel free to rate and share !</p>
+    </div>
+    <h2 id="game-over" class="game-over" onclick="location.reload()" hidden>GAME OVER... <span id="replay">Replay</span> ?</h2>
+    <div id="score" class="score game-over" hidden>SCORE : </div>
+    <div id="kills" class="score game-over" hidden>KILLS : </div>
+    <div id="words" class="score game-over" hidden>WORDS : </div>
+    <div id="experience" class="score game-over" hidden>TOKENS : </div>
+    <div id="thank" class="game-over" hidden>
+        <p>Well done ! Thanks for playing Scrabble Invader.</p>
+        <p>Wanna share on Twitter ?</p>
+        <p>Have a nice day !</p>
+        <p><i>- Sven</i></p>
+    </div>
+    <canvas id="render-canvas" hidden></canvas>
+    <div id="tips-move" class="tips" hidden>
+        Lesson 1 - Move using keyboard arrows.
+    </div>
+    <div id="tips-look" class="tips" hidden>
+        Lesson 2 - Look around with your mouse...
+    </div>
+    <div id="tips-shoot" class="tips" hidden>
+        Lesson 3 - Clic to shoot a laser !
+    </div>
+    <div id="tips-word" class="tips" hidden>
+        Lesson 4 - Harder now... Drag and drop letters to write a word.
+    </div>
+    <div id="tips-1" class="tips" hidden>
+        Need more letters ? Kill an invader !
+    </div>
+    <div id="tips-2" class="tips" hidden>
+        Write a long word to get more XP tokens !
+    </div>
+    <div id="tips-3" class="tips" hidden>
+        Stamina improves you maximum hitpoints...
+    </div>
+    <div id="tips-4" class="tips" hidden>
+        A good Shield level will make you more likely to absorb shots.
+    </div>
+    <div id="tips-5" class="tips" hidden>
+        Power determines the amount of damage of your blasters.
+    </div>
+    <div id="tips-6" class="tips" hidden>
+        Firerate is the rate at which you fires. Unbelievable !
+    </div>
+    <div id="good-1" class="tips" hidden>
+        Bravo ! I did not even knew this word...
+    </div>
+    <div id="good-2" class="tips" hidden>
+        Hey hey hey, more than 3 syllables... Take a shot !
+    </div>
+    <div id="good-3" class="tips" hidden>
+        It's raining tokens ! Well done !
+    </div>
+    <div id="good-4" class="tips" hidden>
+        Good job, I did not had a better one.
+    </div>
+    <div id="bad-1" class="tips" hidden>
+        Mmm... Have you considered playing UNO ?
+    </div>
+    <div id="bad-2" class="tips" hidden>
+        Let's spell it together : L-O-O-S-E-R, with an 'L', like in 'LAME'.
+    </div>
+    <div id="bad-3" class="tips" hidden>
+        It's ok, maybe you're good with Math...
+    </div>
+    <div id="bad-4" class="tips" hidden>
+        I sincerely hope it's a typo...
+    </div>
+</body>
+
+</html>
