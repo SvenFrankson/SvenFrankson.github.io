@@ -419,6 +419,10 @@ Main.LANGUAGE = "en";
 Main.MOUSE_ONLY_CONTROL = false;
 Main.KEYBOARD_LOCAL_CONTROL = true;
 window.addEventListener("DOMContentLoaded", () => {
+    Main.musicSound = new Audio();
+    Main.musicSound.src = "sounds/music.wav";
+    Main.musicSound.play();
+    Main.musicSound.loop = true;
     $("#play-fr").on("click", () => {
         Main.LANGUAGE = "fr";
         Main.Play();
@@ -450,6 +454,16 @@ window.addEventListener("DOMContentLoaded", () => {
         $(".level").css("background", "none");
         $("#hard").css("color", "black");
         $("#hard").css("background", "white");
+    });
+    $("#stfu").on("click", () => {
+        Main.musicSound.pause();
+        $("#stfu").hide();
+        $("#kill-my-ears").show();
+    });
+    $("#kill-my-ears").on("click", () => {
+        Main.musicSound.play();
+        $("#stfu").show();
+        $("#kill-my-ears").hide();
     });
 });
 class Spaceship extends BABYLON.Mesh {
@@ -970,6 +984,29 @@ class SpaceshipMouseInput {
                         }
                     }
                     this.currentDragNDropIndex = -1;
+                    this.tmpLetterInstance.dispose();
+                    this.tmpLetterInstance = undefined;
+                }
+            }
+            if (eventData.type === BABYLON.PointerEventTypes._POINTERMOVE) {
+                if (this.currentDragNDropIndex !== -1) {
+                    if (!this.tmpLetterInstance) {
+                        this.tmpLetterInstance = BABYLON.MeshBuilder.CreateGround("tmpLetterInstance", {
+                            width: LetterGrid.GRID_SIZE * 0.9,
+                            height: LetterGrid.GRID_SIZE * 0.9
+                        }, Main.instance.scene);
+                        let texture = BABYLON.GUI.AdvancedDynamicTexture.CreateForMesh(this.tmpLetterInstance);
+                        let textBlock = new BABYLON.GUI.TextBlock("l", this.spaceship.letterStack.letters[this.currentDragNDropIndex]);
+                        textBlock.fontSize = 1000;
+                        textBlock.color = "grey";
+                        texture.addControl(textBlock);
+                    }
+                    let pick = this.scene.pick(this.scene.pointerX, this.scene.pointerY, (m) => { return m === this.ground; });
+                    if (pick && pick.hit) {
+                        let gridPos = Main.instance.grid.worldToGrid(pick.pickedPoint);
+                        this.tmpLetterInstance.position.x = (gridPos.x + 0.5) * LetterGrid.GRID_SIZE;
+                        this.tmpLetterInstance.position.z = (gridPos.y + 0.5) * LetterGrid.GRID_SIZE;
+                    }
                 }
             }
         });
