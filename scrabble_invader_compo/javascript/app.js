@@ -423,7 +423,7 @@ class Main {
 }
 Main.LANGUAGE = "en";
 Main.MOUSE_ONLY_CONTROL = false;
-Main.KEYBOARD_LOCAL_CONTROL = false;
+Main.KEYBOARD_LOCAL_CONTROL = true;
 window.addEventListener("DOMContentLoaded", () => {
     Main.musicSound = new Audio();
     Main.musicSound.src = "sounds/music.wav";
@@ -460,22 +460,6 @@ window.addEventListener("DOMContentLoaded", () => {
         $(".level").css("background", "none");
         $("#hard").css("color", "black");
         $("#hard").css("background", "white");
-    });
-    $("#control-world").on("click", () => {
-        Main.KEYBOARD_LOCAL_CONTROL = false;
-        $("#control-mask").css("left", "192px");
-        $("#control-world").css("z-index", "12");
-        $("#control-world").css("border", "solid 2px white");
-        $("#control-local").css("z-index", "10");
-        $("#control-local").css("border", "");
-    });
-    $("#control-local").on("click", () => {
-        Main.KEYBOARD_LOCAL_CONTROL = true;
-        $("#control-mask").css("left", "64px");
-        $("#control-world").css("z-index", "10");
-        $("#control-world").css("border", "");
-        $("#control-local").css("z-index", "12");
-        $("#control-local").css("border", "solid 2px white");
     });
     $("#stfu").on("click", () => {
         Main.musicSound.pause();
@@ -528,7 +512,7 @@ class Spaceship extends BABYLON.Mesh {
                 }
             }
             let deltaTime = this.getEngine().getDeltaTime() / 1000;
-            if (Main.MOUSE_ONLY_CONTROL || Main.KEYBOARD_LOCAL_CONTROL) {
+            if (Main.MOUSE_ONLY_CONTROL || Main.instance) {
                 this.velocity.addInPlace(this.getDirection(BABYLON.Axis.Z).scale(this.thrust * deltaTime));
                 this.velocity.addInPlace(this.getDirection(BABYLON.Axis.X).scale(this.straff * deltaTime));
             }
@@ -539,11 +523,11 @@ class Spaceship extends BABYLON.Mesh {
             let dragX = this.getDirection(BABYLON.Axis.X);
             let dragXComp = BABYLON.Vector3.Dot(this.velocity, dragX);
             dragXComp *= Math.abs(dragXComp);
-            dragX.scaleInPlace(dragXComp * deltaTime * 0.1);
+            dragX.scaleInPlace(dragXComp * deltaTime * 0.2);
             let dragZ = this.getDirection(BABYLON.Axis.Z);
             let dragZComp = BABYLON.Vector3.Dot(this.velocity, dragZ);
             if (dragZComp < 0) {
-                dragZComp *= 5;
+                dragZComp *= 10;
             }
             dragZComp *= Math.abs(dragZComp);
             dragZ.scaleInPlace(dragZComp * deltaTime * 0.02);
@@ -917,16 +901,16 @@ class SpaceshipKeyboardInput {
             if (e.keyCode === 32) {
                 this.spacekeyDown = false;
             }
-            if (e.keyCode === 37 || e.key === "a") {
+            if (e.keyCode === 37) {
                 this.leftKeyDown = false;
             }
-            if (e.keyCode === 38 || e.key === "w") {
+            if (e.keyCode === 38) {
                 this.upKeyDown = false;
             }
-            if (e.keyCode === 39 || e.key === "d") {
+            if (e.keyCode === 39) {
                 this.rightKeyDown = false;
             }
-            if (e.keyCode === 40 || e.key === "s") {
+            if (e.keyCode === 40) {
                 this.downKeyDown = false;
             }
         });
@@ -934,16 +918,16 @@ class SpaceshipKeyboardInput {
             if (e.keyCode === 32) {
                 this.spacekeyDown = true;
             }
-            if (e.keyCode === 37 || e.key === "a") {
+            if (e.keyCode === 37) {
                 this.leftKeyDown = true;
             }
-            if (e.keyCode === 38 || e.key === "w") {
+            if (e.keyCode === 38) {
                 this.upKeyDown = true;
             }
-            if (e.keyCode === 39 || e.key === "d") {
+            if (e.keyCode === 39) {
                 this.rightKeyDown = true;
             }
-            if (e.keyCode === 40 || e.key === "s") {
+            if (e.keyCode === 40) {
                 this.downKeyDown = true;
             }
         });

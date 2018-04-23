@@ -1,0 +1,30 @@
+Exporter version: 5.4.2, Blender version: 2.78 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used:
+		selected layers only:  true
+		flat shading entire scene:  false
+		inline textures:  false
+		texture directory:  C:\Users\Sven\Documents\SvenFrankson\didactic-couscous\models\
+	Python World class constructor completed
+	WARNING: No active camera has been assigned, or is not in a currently selected Blender layer
+	processing begun of mesh:  Invader-4-Light
+		processing begun of Standard material:  PurpleLight
+		num positions      :  296
+		num normals        :  296
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  1704
+	processing begun of mesh:  Invader-4
+		processing begun of Standard material:  Purple
+		num positions      :  584
+		num normals        :  584
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  3459
+		WARNING: # of 0 area faces found:  3
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========
+elapsed time:  0 min, 0.2927 secs

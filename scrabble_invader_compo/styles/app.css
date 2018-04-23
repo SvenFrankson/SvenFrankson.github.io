@@ -27,59 +27,6 @@ html, body {
     z-index: 2;
 }
 
-#second-title {
-    position: absolute;
-    left: 2%;
-    top: 20%;
-    width: 100%;
-    font-size: 30px;
-    font-family: "Komikax";
-}
-
-#control-world {
-    position: absolute;
-    top: 30%;
-    left: 64px;
-    width: 128px;
-    height: 128px;
-    text-align: center;
-    font-size: 60px;
-    font-family: "Komikax";
-    border: solid 2px white;
-    background-image: url("../textures/control-world.png");
-    background-size: cover;
-    z-index: 12;
-}
-
-#control-local {
-    position: absolute;
-    top: 30%;
-    left: 192px;
-    width: 128px;
-    height: 128px;
-    text-align: center;
-    font-size: 60px;
-    font-family: "Komikax";
-    background-image: url("../textures/control-local.png");
-    background-size: cover;
-    z-index: 10;
-}
-
-#control-mask {
-    position: absolute;
-    top: 30%;
-    left: 192px;
-    width: 128px;
-    height: 128px;
-    text-align: center;
-    font-size: 60px;
-    font-family: "Komikax";
-    background-color: rgba(0, 0, 0, 0.75);
-    background-size: cover;
-    z-index: 11;
-    pointer-events: none;
-}
-
 .tips {
     z-index: 2;
     position: absolute;
@@ -157,7 +104,6 @@ html, body {
     font-size: 60px;
     font-family: "Komikax";
     border: solid 2px white;
-    
 }
 
 .level {
