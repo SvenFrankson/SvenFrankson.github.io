@@ -152,9 +152,6 @@ class LetterGrid {
     }
     _validatePendingCells() {
         // Check for pendingCells alignment.
-        if (this.pendingCells.length === 1) {
-            return this._rejectPendingCells();
-        }
         let deltaI = 0;
         let deltaJ = 0;
         for (let i = 0; i < this.pendingCells.length; i++) {
@@ -181,6 +178,9 @@ class LetterGrid {
                 wordsToCheck.push(word);
             }
         });
+        if (wordsToCheck.length === 0) {
+            return this._rejectPendingCells();
+        }
         let valid = true;
         wordsToCheck.forEach((word) => {
             valid = valid && this.wordValidator.isValid(word);
