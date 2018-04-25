@@ -9,18 +9,110 @@
     <script src="./javascript/babylon.gui.js"></script>
     <script src="./javascript/app.js"></script>
     <link rel="stylesheet" type="text/css" href="./styles/app.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 </head>
 
 <body>
-    <div id="stfu">MUTE</div>
-    <div id="kill-my-ears" hidden>UNMUTE</div>
-    <h1 id="title" class="main-menu game-over">Scrabble Invaders</h1>
-    <div id="play-en" class="main-menu play-button">PLAY</div>
-    <div id="play-fr" class="main-menu play-button">PLAY</div>
-    <div id="easy" class="main-menu level">easy</div>
-    <div id="medium" class="main-menu level">medium</div>
-    <div id="hard" class="main-menu level">hard</div>
-    <img id="background" class="main-menu" src="textures/main-title.png"/>
+    <div class="main-menu">
+        <div class="row main">
+            <div class="col-3">
+                <div class="empty-quar-col"></div>
+                <div class="row">
+                    <div class="col-1"></div>
+                    <div class="col-11">
+                        <h2 class="subtitle">Options</h2>
+                        <h3 class="subsubtitle">Control mode</h3>
+                        <div id="control-mode">
+                            <img id="control-world" class="control active" src="textures/control-world.png"></img>
+                            <img id="control-local" class="control" src="textures/control-local.png"></img>
+                        </div>
+                        <h3 class="subsubtitle">Keyboard</h3>
+                        <div class="toggle-wrap">
+                            <span id="keyboard-qwerty" class="toggle-button  keyboard-button active">QWERTY</span>
+                            <span id="keyboard-azerty" class="toggle-button keyboard-button">AZERTY</span>
+                        </div>
+                        <h3 class="subsubtitle">Music</h3>
+                        <div class="toggle-wrap">
+                            <span id="music-on" class="toggle-button  music-button active">ON</span>
+                            <span id="music-off" class="toggle-button music-button">OFF</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <h1 class="title">SCRABBLE INVADER</h1>
+                <div class="row language">
+                    <div id="lang-en" class="lang-button english active">
+                        <div class="lang-label">EN</div>
+                        <img class="flag-icon" src="textures/united-kingdom-flag-square-icon-128.png"/>
+                    </div>
+                    <div id="lang-fr" class="lang-button french">
+                        <div class="lang-label">FR</div>
+                        <img class="flag-icon" src="textures/france-flag-square-icon-128.png"/>
+                    </div>
+                    <div id="lang-es" class="lang-button spanish">
+                        <div class="lang-label">ES</div>
+                        <img class="flag-icon" src="textures/spain-flag-square-icon-128.png"/>
+                    </div>
+                    <div id="lang-ge" class="lang-button german">
+                        <div class="lang-label">DE</div>
+                        <img class="flag-icon" src="textures/germany-flag-square-icon-128.png"/>
+                    </div>
+                </div>
+                <div class="row difficulty">
+                    <input id="difficulty-baby" class="difficulty-button english" type="button" value="BABY"></input>
+                    <input id="difficulty-easy" class="difficulty-button english" type="button" value="EASY"></input>
+                    <input id="difficulty-medium" class="difficulty-button english active" type="button" value="MEDIUM"></input>
+                    <input id="difficulty-hard" class="difficulty-button english" type="button" value="HARD"></input>
+                </div>
+                <div class="row play">
+                    <input id="play-button" class="play-button" type="button" value="> PLAY <"></input>
+                </div>
+                <div class="row picture">
+                    <img id="main-picture" src="textures/main-title.png"/>
+                </div>
+                <div class="row foot">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container game-over">
+        <div class="row main">
+            <div class="col-2">
+
+            </div>
+            <div class="col-8">
+                <h1 class="title">SCRABBLE INVADER</h1>
+                <div class="row subhead">
+                    <h2 class="subtitle">Game. Over.</h1>
+                </div>
+                <div class="row game-over">
+                    <div id="score" class="score">SCORE : </div>
+                </div>
+                <div class="row game-over">
+                    <div id="kills" class="score">KILLS : </div>
+                </div>
+                <div class="row game-over">
+                    <div id="words" class="score">WORDS : </div>
+                </div>
+                <div class="row game-over">
+                    <div id="experience" class="score">TOKENS : </div>
+                </div>
+                <div class="row play">
+                    <input class="play-button" value="> RE-PLAY <" onclick="location.reload()"></input>
+                </div>
+                <div class="foot">
+                    <p>Well done ! Thanks for playing Scrabble Invader.</p>
+                    <p>Wanna share on Twitter ? Click here !</p>
+                    <p>Have a nice day !</p>
+                    <p><i>- Sven</i></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <canvas id="render-canvas"></canvas>
+
     <div id="foot" class="main-menu">
         <p>Scrabble Invaders by <a href="http://svenfrankson.github.io/">Sven Frankson</a> for Ludum Dare 41, April 2018.</p>
         <p>Code released under the terms of the <a href="https://github.com/SvenFrankson/didactic-couscous/blob/master/LICENSE">MIT Licence</a>.</p>
@@ -28,24 +120,6 @@
         <p>Code and assets can be <a href="https://github.com/SvenFrankson/didactic-couscous">downloaded here</a>.</p>
         <p>Thanks for playing ! Feel free to rate and share !</p>
     </div>
-    <h2 id="game-over" class="game-over" onclick="location.reload()" hidden>GAME OVER... <span id="replay">Replay</span> ?</h2>
-    <div id="score" class="score game-over" hidden>SCORE : </div>
-    <div id="kills" class="score game-over" hidden>KILLS : </div>
-    <div id="words" class="score game-over" hidden>WORDS : </div>
-    <div id="experience" class="score game-over" hidden>TOKENS : </div>
-    <div id="thank" class="game-over" hidden>
-        <p>Well done ! Thanks for playing Scrabble Invader.</p>
-        <p>Wanna share on Twitter ?</p>
-        <p>Have a nice day !</p>
-        <p><i>- Sven</i></p>
-    </div>
-    <div id="left-ui" class="main-menu">
-        <h3 id="second-title">Control Mode</h3>
-        <div id="control-world"></div>
-        <div id="control-local"></div>
-        <div id="control-mask"></div>
-    </div> 
-    <canvas id="render-canvas" hidden></canvas>
     <div id="tips-1" class="tips" hidden>
         Lesson 1 - Move using keyboard arrows.
     </div>

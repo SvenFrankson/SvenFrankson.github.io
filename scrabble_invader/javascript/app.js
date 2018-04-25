@@ -419,73 +419,91 @@ class Main {
         $("#experience").text("EXPERIENCE " + Main.instance.spaceship.xp);
         $(".main-menu").hide();
         $(".game-over").show();
+        $("#render-canvas").hide();
     }
 }
 Main.LANGUAGE = "en";
 Main.MOUSE_ONLY_CONTROL = false;
 Main.KEYBOARD_LOCAL_CONTROL = false;
 window.addEventListener("DOMContentLoaded", () => {
+    $(".main-menu").show();
+    $(".game-over").hide();
+    $("#render-canvas").hide();
     Main.musicSound = new Audio();
     Main.musicSound.src = "sounds/music.wav";
     Main.musicSound.play();
     Main.musicSound.loop = true;
-    $("#play-fr").on("click", () => {
-        Main.LANGUAGE = "fr";
+    $("#play-button").on("click", () => {
+        $("#render-canvas").show();
         Main.Play();
     });
-    $("#play-en").on("click", () => {
+    $("#lang-en").on("click", () => {
         Main.LANGUAGE = "en";
-        Main.Play();
+        $(".lang-button").removeClass("active");
+        $("#lang-en").addClass("active");
     });
-    $("#easy").on("click", () => {
+    $("#lang-fr").on("click", () => {
+        Main.LANGUAGE = "fr";
+        $(".lang-button").removeClass("active");
+        $("#lang-fr").addClass("active");
+    });
+    $("#lang-es").on("click", () => {
+    });
+    $("#lang-ge").on("click", () => {
+    });
+    $("#difficulty-baby").on("click", () => {
+        InvaderGenerator.invaderLevelTime = 80;
+        InvaderGenerator.invaderRate = 12000;
+        $(".difficulty-button").removeClass("active");
+        $("#difficulty-baby").addClass("active");
+    });
+    $("#difficulty-easy").on("click", () => {
         InvaderGenerator.invaderLevelTime = 70;
         InvaderGenerator.invaderRate = 10000;
-        $(".level").css("color", "grey");
-        $(".level").css("background", "none");
-        $("#easy").css("color", "black");
-        $("#easy").css("background", "white");
+        $(".difficulty-button").removeClass("active");
+        $("#difficulty-easy").addClass("active");
     });
-    $("#medium").on("click", () => {
+    $("#difficulty-medium").on("click", () => {
         InvaderGenerator.invaderLevelTime = 60;
         InvaderGenerator.invaderRate = 8000;
-        $(".level").css("color", "grey");
-        $(".level").css("background", "none");
-        $("#medium").css("color", "black");
-        $("#medium").css("background", "white");
+        $(".difficulty-button").removeClass("active");
+        $("#difficulty-medium").addClass("active");
     });
-    $("#hard").on("click", () => {
+    $("#difficulty-hard").on("click", () => {
         InvaderGenerator.invaderLevelTime = 50;
         InvaderGenerator.invaderRate = 6000;
-        $(".level").css("color", "grey");
-        $(".level").css("background", "none");
-        $("#hard").css("color", "black");
-        $("#hard").css("background", "white");
+        $(".difficulty-button").removeClass("active");
+        $("#difficulty-hard").addClass("active");
     });
     $("#control-world").on("click", () => {
         Main.KEYBOARD_LOCAL_CONTROL = false;
-        $("#control-mask").css("left", "192px");
-        $("#control-world").css("z-index", "12");
-        $("#control-world").css("border", "solid 2px white");
-        $("#control-local").css("z-index", "10");
-        $("#control-local").css("border", "");
+        $(".control").removeClass("active");
+        $("#control-world").addClass("active");
     });
     $("#control-local").on("click", () => {
         Main.KEYBOARD_LOCAL_CONTROL = true;
-        $("#control-mask").css("left", "64px");
-        $("#control-world").css("z-index", "10");
-        $("#control-world").css("border", "");
-        $("#control-local").css("z-index", "12");
-        $("#control-local").css("border", "solid 2px white");
+        $(".control").removeClass("active");
+        $("#control-local").addClass("active");
     });
-    $("#stfu").on("click", () => {
-        Main.musicSound.pause();
-        $("#stfu").hide();
-        $("#kill-my-ears").show();
+    $("#keyboard-qwerty").on("click", () => {
+        SpaceshipKeyboardInput.QwertyMode();
+        $(".keyboard-button").removeClass("active");
+        $("#keyboard-qwerty").addClass("active");
     });
-    $("#kill-my-ears").on("click", () => {
+    $("#keyboard-azerty").on("click", () => {
+        SpaceshipKeyboardInput.AzertyMode();
+        $(".keyboard-button").removeClass("active");
+        $("#keyboard-azerty").addClass("active");
+    });
+    $("#music-on").on("click", () => {
         Main.musicSound.play();
-        $("#stfu").show();
-        $("#kill-my-ears").hide();
+        $(".music-button").removeClass("active");
+        $("#music-on").addClass("active");
+    });
+    $("#music-off").on("click", () => {
+        Main.musicSound.pause();
+        $(".music-button").removeClass("active");
+        $("#music-off").addClass("active");
     });
 });
 class Spaceship extends BABYLON.Mesh {
@@ -917,16 +935,16 @@ class SpaceshipKeyboardInput {
             if (e.keyCode === 32) {
                 this.spacekeyDown = false;
             }
-            if (e.keyCode === 37 || e.key === "a") {
+            if (e.keyCode === 37 || e.key === SpaceshipKeyboardInput.leftKey) {
                 this.leftKeyDown = false;
             }
-            if (e.keyCode === 38 || e.key === "w") {
+            if (e.keyCode === 38 || e.key === SpaceshipKeyboardInput.forwardKey) {
                 this.upKeyDown = false;
             }
-            if (e.keyCode === 39 || e.key === "d") {
+            if (e.keyCode === 39 || e.key === SpaceshipKeyboardInput.rightKey) {
                 this.rightKeyDown = false;
             }
-            if (e.keyCode === 40 || e.key === "s") {
+            if (e.keyCode === 40 || e.key === SpaceshipKeyboardInput.backKey) {
                 this.downKeyDown = false;
             }
         });
@@ -934,16 +952,16 @@ class SpaceshipKeyboardInput {
             if (e.keyCode === 32) {
                 this.spacekeyDown = true;
             }
-            if (e.keyCode === 37 || e.key === "a") {
+            if (e.keyCode === 37 || e.key === SpaceshipKeyboardInput.leftKey) {
                 this.leftKeyDown = true;
             }
-            if (e.keyCode === 38 || e.key === "w") {
+            if (e.keyCode === 38 || e.key === SpaceshipKeyboardInput.forwardKey) {
                 this.upKeyDown = true;
             }
-            if (e.keyCode === 39 || e.key === "d") {
+            if (e.keyCode === 39 || e.key === SpaceshipKeyboardInput.rightKey) {
                 this.rightKeyDown = true;
             }
-            if (e.keyCode === 40 || e.key === "s") {
+            if (e.keyCode === 40 || e.key === SpaceshipKeyboardInput.backKey) {
                 this.downKeyDown = true;
             }
         });
@@ -957,6 +975,18 @@ class SpaceshipKeyboardInput {
         });
         this.scene.onBeforeRenderObservable.add(this._checkInput);
     }
+    static AzertyMode() {
+        SpaceshipKeyboardInput.forwardKey = "z";
+        SpaceshipKeyboardInput.backKey = "s";
+        SpaceshipKeyboardInput.leftKey = "q";
+        SpaceshipKeyboardInput.rightKey = "d";
+    }
+    static QwertyMode() {
+        SpaceshipKeyboardInput.forwardKey = "w";
+        SpaceshipKeyboardInput.backKey = "s";
+        SpaceshipKeyboardInput.leftKey = "a";
+        SpaceshipKeyboardInput.rightKey = "d";
+    }
     get scene() {
         return this.spaceship.main.scene;
     }
@@ -964,6 +994,10 @@ class SpaceshipKeyboardInput {
         return this.spaceship.main.canvas;
     }
 }
+SpaceshipKeyboardInput.forwardKey = "w";
+SpaceshipKeyboardInput.backKey = "s";
+SpaceshipKeyboardInput.leftKey = "a";
+SpaceshipKeyboardInput.rightKey = "d";
 class SpaceshipMouseInput {
     constructor(spaceship) {
         this.spaceship = spaceship;
