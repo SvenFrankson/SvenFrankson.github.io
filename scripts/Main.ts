@@ -12,7 +12,7 @@ class Main {
 		Main.Engine = new BABYLON.Engine(Main.Canvas, true);
 	}
 	
-	createScene(): void {
+	async createScene() {
 		Main.Scene = new BABYLON.Scene(Main.Engine);
 		this.resize();
 
@@ -59,6 +59,7 @@ class Main {
 		planeTop.rotation.x = - Math.PI / 2;
 		planeTop.material = mat;
 
+		/*
 		for (let i: number = 0; i < 50; i++) {
 			let m = this.createCube();
 			m.position.x = (Math.random() - 0.5) * 2 * width;
@@ -78,10 +79,21 @@ class Main {
 				}
 			)
 		}
+		*/
 
 		let route = new Route();
 		window.addEventListener('hashchange', route.route);
 		route.route();
+
+		for (let i = 0; i < 5; i++) {
+			let x = width / 2 * (Math.random() - 0.5) * 2;
+			let z = depth / 2 * (Math.random() - 0.5) * 2;
+			await VoxelToy.start(
+				new BABYLON.Vector3(x, - height, z)
+			);
+			await VoxelToy.wait(1.5);
+			await VoxelToy.end();
+		}
 	}
 
 	public animate(): void {
@@ -103,6 +115,31 @@ class Main {
 		let lum = 3;
 		mesh.edgesColor = Main.Color4.scale(lum);
 		return mesh;
+	}
+
+	public static StartCoroutine(coroutine: Iterator<void>): void {
+        let observer = Main.Scene.onBeforeRenderObservable.add(
+            () => {
+                if (coroutine.next().done) {
+                    Main.Scene.onBeforeRenderObservable.remove(observer);
+                }
+            }
+        );
+	}
+	
+	public static async RunCoroutine(coroutine: Iterator<void>): Promise<void> {
+		return new Promise<void>(
+			(resolve) => {
+				let observer = Main.Scene.onBeforeRenderObservable.add(
+					() => {
+						if (coroutine.next().done) {
+							Main.Scene.onBeforeRenderObservable.remove(observer);
+							resolve();
+						}
+					}
+				);
+			}
+		)
 	}
 }
 
