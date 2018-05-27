@@ -4,7 +4,7 @@ class Main {
 	public static Engine: BABYLON.Engine;
 	public static Scene: BABYLON.Scene;
 	public static Light: BABYLON.HemisphericLight;
-	public static Color: BABYLON.Color3 = BABYLON.Color3.FromHexString("#22724b");
+	public static Color: BABYLON.Color3 = BABYLON.Color3.FromHexString("#226372");
 	public static Color4: BABYLON.Color4 = new BABYLON.Color4(Main.Color.r, Main.Color.g, Main.Color.b, 1);
 
 	constructor(canvasElement: string) {
@@ -87,20 +87,19 @@ class Main {
 
 		while (true) {
 			if (Math.random() < 0.5) {
-				for (let i = 0; i < 6; i++) {
+				for (let i = 0; i < 3; i++) {
 					let x = width / 2 * (Math.random() - 0.5) * 2;
 					let z = depth / 2 * (Math.random() - 0.5) * 2;
-					await VoxelToy.start(
-						new BABYLON.Vector3(x, - height, z)
-					);
-					await VoxelToy.wait(1.5);
-					await VoxelToy.end();
+					let voxelToy = new VoxelToy(new BABYLON.Vector3(x, - height, z), Main.Scene);
+					await voxelToy.start();
+					await voxelToy.wait(1.5);
+					await voxelToy.end();
 				}
 			}
 			else {
 				let solarToy = new SolarToy(new BABYLON.Vector3(0, - height * 0.3, 0), new BABYLON.Vector3(- Math.PI / 8, 0, 0), width * 0.9, Main.Scene);
 				await solarToy.start();
-				await solarToy.wait(2);
+				await solarToy.wait(4);
 				await solarToy.end();
 			}
 		}

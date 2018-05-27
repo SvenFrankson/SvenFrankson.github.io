@@ -1,9 +1,6 @@
-class SolarToy extends BABYLON.TransformNode {
+/// <reference path="./BaseToy.ts" />
 
-    public static easeOutElastic(t) {
-        var p = 0.3;
-        return Math.pow(2,-10*t) * Math.sin((t-p/4)*(2*Math.PI)/p) + 1;
-    }
+class SolarToy extends BaseToy {
 
     private earthDiameter: number = 0.1;
     private radius: number = 1;
@@ -23,24 +20,13 @@ class SolarToy extends BABYLON.TransformNode {
     public speeds: number[] = [];
 
     constructor(position: BABYLON.Vector3, rotation: BABYLON.Vector3, radius: number, scene: BABYLON.Scene) {
-        super("solarToy", scene);
+        super("SolarToy", scene);
         this.position = position;
         this.rotation = rotation;
         this.radius = radius;
     }
 
     public destroy(): void {
-        this.sun.dispose();
-        this.mercury.dispose();
-        this.venus.dispose();
-        this.earth.dispose();
-        this.mars.dispose();
-        this.jupiter.dispose();
-        this.saturn.dispose();
-        this.uranus.dispose();
-        this.neptune.dispose();
-        this.pluto.dispose();
-        this.orbitLines.dispose();
         this.dispose();
     }
 
@@ -127,19 +113,6 @@ class SolarToy extends BABYLON.TransformNode {
         this.getScene().onBeforeRenderObservable.add(this._update);
 
         return Main.RunCoroutine(this.unfold(120));
-    }
-
-    public async wait(seconds: number): Promise<void> {
-        return new Promise<void>(
-            (resolve) => {
-                setTimeout(
-                    () => {
-                        resolve();
-                    },
-                    1000 * seconds
-                );
-            }
-        )
     }
 
     public async end(): Promise<void> {

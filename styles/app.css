@@ -86,14 +86,14 @@ a:active {
 .menu-item {
     padding: 2% 2% 2% 2%;
     margin-bottom: 5%;
-    background-color: #22724bdd;
+    background-color: #226372dd;
     border-radius: 10px;
 }
 
 .menu-label {
     padding: 2% 2% 2% 2%;
     margin-bottom: 5%;
-    background-color: #22724b25;
+    background-color: #22637225;
     border-radius: 10px;
 }
 
@@ -136,7 +136,7 @@ a:active {
 
 .menu-item-tag {
     font-size: 12px;
-    background-color: #22724b;
+    background-color: #226372;
     padding: 1% 4% 1% 4%;
     border-radius: 5px;
 }
@@ -168,7 +168,7 @@ a:active {
 }
 
 .project-page {
-    background-color: #22724bd0;
+    background-color: #226372d0;
     padding: 2%;
 }
 
