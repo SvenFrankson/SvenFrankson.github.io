@@ -92,14 +92,14 @@ class Main {
 					let z = depth / 2 * (Math.random() - 0.5) * 2;
 					let voxelToy = new VoxelToy(new BABYLON.Vector3(x, - height, z), Main.Scene);
 					await voxelToy.start();
-					await voxelToy.wait(1.5);
+					await voxelToy.wait(2.5);
 					await voxelToy.end();
 				}
 			}
 			else {
 				let solarToy = new SolarToy(new BABYLON.Vector3(0, - height * 0.3, 0), new BABYLON.Vector3(- Math.PI / 8, 0, 0), width * 0.9, Main.Scene);
 				await solarToy.start();
-				await solarToy.wait(4);
+				await solarToy.wait(8);
 				await solarToy.end();
 			}
 		}

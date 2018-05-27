@@ -38,7 +38,7 @@ class VoxelToy extends BaseToy {
     }
 
     private rotateContainer = () => {
-        this.rotation.y += 0.005;
+        this.rotation.y += 0.0025;
     }
 
     public * create(data: number[][][]): IterableIterator<void> {

@@ -288,14 +288,14 @@ class Main {
                     let z = depth / 2 * (Math.random() - 0.5) * 2;
                     let voxelToy = new VoxelToy(new BABYLON.Vector3(x, -height, z), Main.Scene);
                     await voxelToy.start();
-                    await voxelToy.wait(1.5);
+                    await voxelToy.wait(2.5);
                     await voxelToy.end();
                 }
             }
             else {
                 let solarToy = new SolarToy(new BABYLON.Vector3(0, -height * 0.3, 0), new BABYLON.Vector3(-Math.PI / 8, 0, 0), width * 0.9, Main.Scene);
                 await solarToy.start();
-                await solarToy.wait(4);
+                await solarToy.wait(8);
                 await solarToy.end();
             }
         }
@@ -595,7 +595,7 @@ class SolarToy extends BaseToy {
         this.speeds = [];
         this._update = () => {
             for (let i = 0; i < this.planets.length; i++) {
-                this.alphas[i] += 0.002 * this.speeds[i];
+                this.alphas[i] += 0.001 * this.speeds[i];
                 let r = i / (this.planets.length - 1) * this.radius;
                 this.planets[i].position.x = r * Math.cos(this.alphas[i]);
                 this.planets[i].position.z = r * Math.sin(this.alphas[i]);
@@ -672,7 +672,7 @@ class SolarToy extends BaseToy {
         }, this.getScene());
         this.orbitLines.parent = this;
         this.getScene().onBeforeRenderObservable.add(this._update);
-        return Main.RunCoroutine(this.unfold(120));
+        return Main.RunCoroutine(this.unfold(240));
     }
     async end() {
         await Main.RunCoroutine(this.fold(120));
@@ -714,7 +714,7 @@ class VoxelToy extends BaseToy {
         super("VoxelToy", scene);
         this.meshes = [];
         this.rotateContainer = () => {
-            this.rotation.y += 0.005;
+            this.rotation.y += 0.0025;
         };
         this.position = position;
     }

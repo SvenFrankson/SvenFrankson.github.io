@@ -112,7 +112,7 @@ class SolarToy extends BaseToy {
 
         this.getScene().onBeforeRenderObservable.add(this._update);
 
-        return Main.RunCoroutine(this.unfold(120));
+        return Main.RunCoroutine(this.unfold(240));
     }
 
     public async end(): Promise<void> {
@@ -154,7 +154,7 @@ class SolarToy extends BaseToy {
 
     private _update = () => {
         for (let i = 0; i < this.planets.length; i++) {
-            this.alphas[i] += 0.002 * this.speeds[i];
+            this.alphas[i] += 0.001 * this.speeds[i];
             let r = i / (this.planets.length - 1) * this.radius;
             this.planets[i].position.x = r * Math.cos(this.alphas[i]);
             this.planets[i].position.z = r * Math.sin(this.alphas[i]);
