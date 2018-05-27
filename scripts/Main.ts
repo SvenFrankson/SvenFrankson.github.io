@@ -85,15 +85,26 @@ class Main {
 		window.addEventListener('hashchange', route.route);
 		route.route();
 
-		for (let i = 0; i < 5; i++) {
-			let x = width / 2 * (Math.random() - 0.5) * 2;
-			let z = depth / 2 * (Math.random() - 0.5) * 2;
-			await VoxelToy.start(
-				new BABYLON.Vector3(x, - height, z)
-			);
-			await VoxelToy.wait(1.5);
-			await VoxelToy.end();
+		while (true) {
+			if (Math.random() < 0.5) {
+				for (let i = 0; i < 6; i++) {
+					let x = width / 2 * (Math.random() - 0.5) * 2;
+					let z = depth / 2 * (Math.random() - 0.5) * 2;
+					await VoxelToy.start(
+						new BABYLON.Vector3(x, - height, z)
+					);
+					await VoxelToy.wait(1.5);
+					await VoxelToy.end();
+				}
+			}
+			else {
+				let solarToy = new SolarToy(new BABYLON.Vector3(0, - height * 0.3, 0), new BABYLON.Vector3(- Math.PI / 8, 0, 0), width * 0.9, Main.Scene);
+				await solarToy.start();
+				await solarToy.wait(2);
+				await solarToy.end();
+			}
 		}
+
 	}
 
 	public animate(): void {
