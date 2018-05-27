@@ -97,7 +97,7 @@ class Main {
 				}
 			}
 			else {
-				let solarToy = new SolarToy(new BABYLON.Vector3(0, - height * 0.3, 0), new BABYLON.Vector3(- Math.PI / 8, 0, 0), width * 0.9, Main.Scene);
+				let solarToy = new SolarToy(new BABYLON.Vector3(0, - height * 0.3, 0), new BABYLON.Vector3(- Math.PI / 8, 0, Math.PI / 16), width * 0.9, Main.Scene);
 				await solarToy.start();
 				await solarToy.wait(8);
 				await solarToy.end();
