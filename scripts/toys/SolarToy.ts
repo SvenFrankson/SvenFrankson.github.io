@@ -18,6 +18,7 @@ class SolarToy extends BaseToy {
     public planets: BABYLON.Mesh[] = [];
     public alphas: number[] = [];
     public speeds: number[] = [];
+    public offsets: BABYLON.Vector3[] = [];
 
     constructor(position: BABYLON.Vector3, rotation: BABYLON.Vector3, radius: number, scene: BABYLON.Scene) {
         super("SolarToy", scene);
@@ -67,6 +68,19 @@ class SolarToy extends BaseToy {
             3,
             4
         ];
+        
+        this.offsets = [
+            new BABYLON.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).scaleInPlace(this.radius / this.planets.length * 0.75),
+            new BABYLON.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).scaleInPlace(this.radius / this.planets.length * 0.75),
+            new BABYLON.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).scaleInPlace(this.radius / this.planets.length * 0.75),
+            new BABYLON.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).scaleInPlace(this.radius / this.planets.length * 0.75),
+            new BABYLON.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).scaleInPlace(this.radius / this.planets.length * 0.75),
+            new BABYLON.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).scaleInPlace(this.radius / this.planets.length * 0.75),
+            new BABYLON.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).scaleInPlace(this.radius / this.planets.length * 0.75),
+            new BABYLON.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).scaleInPlace(this.radius / this.planets.length * 0.75),
+            new BABYLON.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).scaleInPlace(this.radius / this.planets.length * 0.75),
+            new BABYLON.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).scaleInPlace(this.radius / this.planets.length * 0.75)
+        ];
                         
         let orbitPoints: BABYLON.Vector3[][] = [];
         let orbitColors: BABYLON.Color4[][] = [];
@@ -92,7 +106,7 @@ class SolarToy extends BaseToy {
                         r * Math.cos(j / 64 * Math.PI * 2),
                         0,
                         r * Math.sin(j / 64 * Math.PI * 2)
-                    )
+                    ).addInPlace(this.offsets[i])
                 )
                 orbitColors[i].push(Main.Color4.scale(lum * 0.75 * (1 - i / this.planets.length)));
             }
@@ -158,6 +172,7 @@ class SolarToy extends BaseToy {
             let r = i / (this.planets.length - 1) * this.radius;
             this.planets[i].position.x = r * Math.cos(this.alphas[i]);
             this.planets[i].position.z = r * Math.sin(this.alphas[i]);
+            this.planets[i].position.addInPlace(this.offsets[i]);
             this.planets[i].rotation.y -= 0.003 * this.speeds[i]
         }
     }
