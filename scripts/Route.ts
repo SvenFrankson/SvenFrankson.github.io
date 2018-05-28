@@ -38,8 +38,28 @@ class Route {
         )
     }
 
+    public about(): void {
+        $.ajax(
+            {
+                url: "./about.html",
+                success: (data) => {
+                    document.getElementById("page").innerHTML = data;
+                    NavTree.Update([
+                        {
+                            name: "home",
+                            url: "#"
+                        },
+                        {
+                            name: "about",
+                            url: "#about"
+                        }
+                    ]);
+                }
+            }
+        )
+    }
+
     public contact(): void {
-        console.log("!");
         $.ajax(
             {
                 url: "./contact.html",
@@ -114,10 +134,6 @@ class Route {
                 }
             }
         );
-    }
-    
-    public about(): void {
-        document.getElementById("page").innerText = "ABOUT";
     }
 
     public route = () => {

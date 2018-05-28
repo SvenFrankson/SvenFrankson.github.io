@@ -426,8 +426,25 @@ class Route {
             }
         });
     }
+    about() {
+        $.ajax({
+            url: "./about.html",
+            success: (data) => {
+                document.getElementById("page").innerHTML = data;
+                NavTree.Update([
+                    {
+                        name: "home",
+                        url: "#"
+                    },
+                    {
+                        name: "about",
+                        url: "#about"
+                    }
+                ]);
+            }
+        });
+    }
     contact() {
-        console.log("!");
         $.ajax({
             url: "./contact.html",
             success: (data) => {
@@ -494,9 +511,6 @@ class Route {
                 });
             }
         });
-    }
-    about() {
-        document.getElementById("page").innerText = "ABOUT";
     }
 }
 class Sounds {
