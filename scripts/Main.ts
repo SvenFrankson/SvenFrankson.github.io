@@ -87,7 +87,8 @@ class Main {
 
 		while (true) {
 			let r = Math.random();
-			if (r < 1 / 3) {
+			if (r < 1 / 4) {
+			//if (r < 0) {
 				for (let i = 0; i < 2; i++) {
 					let x = width / 2 * (Math.random() - 0.5) * 2;
 					let z = depth / 2 * (Math.random() - 0.5) * 2;
@@ -97,13 +98,25 @@ class Main {
 					await voxelToy.end();
 				}
 			}
-			else if (r < 2 / 3) {
+			else if (r < 2 / 4) {
+			//else if (0) {
 				let lifeToy = new LifeToy(new BABYLON.Vector3(0, - height, 0), Math.floor(width * Math.SQRT1_2) - 1, Main.Scene);
 				await lifeToy.start();
 				for (let i = 0; i < 10; i++) {
 					await Main.RunCoroutine(lifeToy.update(120));
 				}
 				await lifeToy.end();
+			}
+			else if (r < 3 / 4) {
+			//else if (r < 1) {
+				let treeToy = new TreeToy(
+					new BABYLON.Vector3(0, - height * 0.9, 0),
+					new BABYLON.Vector3(- width, - height, - depth / 2).scaleInPlace(0.9),
+					new BABYLON.Vector3(width, height, depth / 2).scaleInPlace(0.9),
+					Main.Scene);
+				await treeToy.start();
+				await Main.RunCoroutine(treeToy.update());
+				await treeToy.end();
 			}
 			else {
 				let solarToy = new SolarToy(new BABYLON.Vector3(0, - height * 0.3, 0), new BABYLON.Vector3(- Math.PI / 8, 0, Math.PI / 16), width * 0.9, Main.Scene);

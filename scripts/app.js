@@ -283,7 +283,8 @@ class Main {
         route.route();
         while (true) {
             let r = Math.random();
-            if (r < 1 / 3) {
+            if (r < 1 / 4) {
+                //if (r < 0) {
                 for (let i = 0; i < 2; i++) {
                     let x = width / 2 * (Math.random() - 0.5) * 2;
                     let z = depth / 2 * (Math.random() - 0.5) * 2;
@@ -293,13 +294,21 @@ class Main {
                     await voxelToy.end();
                 }
             }
-            else if (r < 2 / 3) {
+            else if (r < 2 / 4) {
+                //else if (0) {
                 let lifeToy = new LifeToy(new BABYLON.Vector3(0, -height, 0), Math.floor(width * Math.SQRT1_2) - 1, Main.Scene);
                 await lifeToy.start();
                 for (let i = 0; i < 10; i++) {
                     await Main.RunCoroutine(lifeToy.update(120));
                 }
                 await lifeToy.end();
+            }
+            else if (r < 3 / 4) {
+                //else if (r < 1) {
+                let treeToy = new TreeToy(new BABYLON.Vector3(0, -height * 0.9, 0), new BABYLON.Vector3(-width, -height, -depth / 2).scaleInPlace(0.9), new BABYLON.Vector3(width, height, depth / 2).scaleInPlace(0.9), Main.Scene);
+                await treeToy.start();
+                await Main.RunCoroutine(treeToy.update());
+                await treeToy.end();
             }
             else {
                 let solarToy = new SolarToy(new BABYLON.Vector3(0, -height * 0.3, 0), new BABYLON.Vector3(-Math.PI / 8, 0, Math.PI / 16), width * 0.9, Main.Scene);
@@ -595,6 +604,15 @@ class BaseToy extends BABYLON.TransformNode {
     static easeOutElastic(t) {
         var p = 0.3;
         return Math.pow(2, -10 * t) * Math.sin((t - p / 4) * (2 * Math.PI) / p) + 1;
+    }
+    static CreateCircle(r, tesselation, color, updatable = false, instance = undefined) {
+        let points = [];
+        let colors = [];
+        for (let i = 0; i <= tesselation; i++) {
+            points.push(new BABYLON.Vector3(Math.cos(i / tesselation * Math.PI * 2) * r, 0, Math.sin(i / tesselation * Math.PI * 2) * r));
+            colors.push(color);
+        }
+        return BABYLON.MeshBuilder.CreateLines("circle", { points: points, colors: colors, updatable: updatable, instance: instance });
     }
     constructor(name, scene) {
         super(name, scene);
@@ -915,6 +933,207 @@ class SolarToy extends BaseToy {
         }
         this.position.copyFrom(foldedPosition);
         this.scaling.copyFromFloats(0, 0, 0);
+    }
+}
+/// <reference path="./BaseToy.ts" />
+class TreeNode {
+    constructor() {
+        this.depth = 0;
+        this.children = [];
+        this._edgeMeshes = [];
+    }
+    getDirection() {
+        if (this.parent) {
+            return this.position.subtract(this.parent.position).normalize();
+        }
+        return new BABYLON.Vector3(0, 1, 0);
+    }
+    dispose() {
+        if (this._nodeMesh) {
+            this._nodeMesh.dispose();
+        }
+        while (this._edgeMeshes.length > 0) {
+            this._edgeMeshes.pop().dispose();
+        }
+        this.children.forEach((c) => {
+            c.dispose();
+        });
+    }
+    randomize(direction) {
+        let randomized = direction.clone();
+        randomized.x += (Math.random() - 0.5) * 1.5;
+        randomized.y += (Math.random() - 0.5) * 1.5;
+        randomized.z += (Math.random() - 0.5) * 1.5;
+        return randomized;
+    }
+    grow(distance, min, max) {
+        let c1 = new TreeNode();
+        c1.position = this.randomize(this.getDirection());
+        c1.position.scaleInPlace(distance);
+        c1.position.addInPlace(this.position);
+        if (c1.position.x < min.x) {
+            c1.position.x += 3 * Math.abs(min.x - c1.position.x);
+        }
+        if (c1.position.y < min.y) {
+            c1.position.y += 3 * Math.abs(min.y - c1.position.y);
+        }
+        if (c1.position.z < min.z) {
+            c1.position.z += 3 * Math.abs(min.z - c1.position.z);
+        }
+        if (c1.position.x > max.x) {
+            c1.position.x -= 3 * Math.abs(max.x - c1.position.x);
+        }
+        if (c1.position.y > max.y) {
+            c1.position.y -= 3 * Math.abs(max.y - c1.position.y);
+        }
+        if (c1.position.z > max.z) {
+            c1.position.z -= 3 * Math.abs(max.z - c1.position.z);
+        }
+        c1.depth = this.depth + BABYLON.Vector3.Distance(this.position, c1.position);
+        c1.parent = this;
+        this.children.push(c1);
+        if (Math.random() > 0.7) {
+            let c2 = new TreeNode();
+            c2.position = this.randomize(this.getDirection());
+            c2.position.scaleInPlace(distance);
+            c2.position.addInPlace(this.position);
+            if (c2.position.x < min.x) {
+                c2.position.x += 3 * Math.abs(min.x - c2.position.x);
+            }
+            if (c2.position.y < min.y) {
+                c2.position.y += 3 * Math.abs(min.y - c2.position.y);
+            }
+            if (c2.position.z < min.z) {
+                c2.position.z += 3 * Math.abs(min.z - c2.position.z);
+            }
+            if (c2.position.x > max.x) {
+                c2.position.x -= 3 * Math.abs(max.x - c2.position.x);
+            }
+            if (c2.position.y > max.y) {
+                c2.position.y -= 3 * Math.abs(max.y - c2.position.y);
+            }
+            if (c2.position.z > max.z) {
+                c2.position.z -= 3 * Math.abs(max.z - c2.position.z);
+            }
+            c2.depth = this.depth + BABYLON.Vector3.Distance(this.position, c2.position);
+            c2.parent = this;
+            this.children.push(c2);
+        }
+        return this.children;
+    }
+    *popInNodeMesh() {
+        for (let i = 0; i < 120; i++) {
+            let s = BaseToy.easeOutElastic(i / 120);
+            this._nodeMesh.scaling.copyFromFloats(s, s, s);
+            yield;
+        }
+        this._nodeMesh.scaling.copyFromFloats(1, 1, 1);
+    }
+    *popOutNodeMesh(duration = 60) {
+        if (this._nodeMesh) {
+            for (let i = 0; i < duration; i++) {
+                let s = 1 - i / duration;
+                s = s * s;
+                this._nodeMesh.scaling.copyFromFloats(s, s, s);
+                yield;
+            }
+            this._nodeMesh.scaling.copyFromFloats(0, 0, 0);
+        }
+    }
+    show(depth, scene) {
+        if (!this._nodeMesh) {
+            let mat = new BABYLON.StandardMaterial("Test", Main.Scene);
+            mat.alpha = 0;
+            let lum = 3;
+            this._nodeMesh = BaseToy.CreateCircle(0.15, 24, Main.Color4.scale(lum));
+            this._nodeMesh.position = this.position;
+            this._nodeMesh.rotation.x = Math.PI / 2;
+            Main.StartCoroutine(this.popInNodeMesh());
+        }
+        this.children.forEach((c, i) => {
+            if (depth > this.depth && depth < c.depth) {
+                if (this._edgeMeshes[i]) {
+                    this._edgeMeshes[i].dispose();
+                }
+                let lum = 2;
+                let delta = c.position.subtract(this.position);
+                let ratio = (depth - this.depth) / (c.depth - this.depth);
+                delta.scaleInPlace(ratio);
+                this._edgeMeshes[i] = BABYLON.MeshBuilder.CreateLines("l", {
+                    points: [
+                        this.position,
+                        this.position.add(delta)
+                    ],
+                    colors: [
+                        Main.Color4.scale(lum),
+                        Main.Color4.scale(lum)
+                    ],
+                    updatable: false,
+                    instance: undefined
+                }, scene);
+            }
+            if (c.depth < depth) {
+                c.show(depth, scene);
+            }
+        });
+    }
+    setEdgeVisibility(v) {
+        for (let i = 0; i < this._edgeMeshes.length; i++) {
+            this._edgeMeshes[i].visibility = v;
+        }
+        for (let i = 0; i < this.children.length; i++) {
+            this.children[i].setEdgeVisibility(v);
+        }
+    }
+}
+class TreeToy extends BaseToy {
+    constructor(position, min, max, scene) {
+        super("SolarToy", scene);
+        this.nodesCount = 11;
+        this.distance = 2;
+        this.min = min;
+        this.max = max;
+        this.tree = new TreeNode();
+        this.tree.position = position;
+    }
+    destroy() {
+        this.dispose();
+        this.tree.dispose();
+    }
+    async start() {
+        let leaves = [this.tree];
+        this.nodes = [this.tree];
+        for (let i = 0; i < this.nodesCount; i++) {
+            let newLeaves = [];
+            for (let j = 0; j < leaves.length; j++) {
+                newLeaves.push(...leaves[j].grow(this.distance, this.min, this.max));
+            }
+            leaves = newLeaves;
+            this.nodes.push(...newLeaves);
+        }
+    }
+    async end() {
+        await Main.RunCoroutine(this.fadeTree());
+        await this.destroy();
+    }
+    *update() {
+        for (let i = 0; i < this.nodesCount * this.distance * 1.5; i += 0.01) {
+            this.tree.show(i, Main.Scene);
+            yield;
+        }
+    }
+    *fadeTree() {
+        this.tree.setEdgeVisibility(0);
+        while (this.nodes.length > 0) {
+            let i = Math.floor(Math.random() * this.nodes.length);
+            let node = this.nodes.splice(i, 1)[0];
+            Main.StartCoroutine(node.popOutNodeMesh(60));
+            let d = Math.random() * 10;
+            yield;
+        }
+        for (let i = 0; i < 60; i++) {
+            yield;
+        }
     }
 }
 /// <reference path="./BaseToy.ts" />
