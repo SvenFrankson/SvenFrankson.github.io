@@ -88,11 +88,11 @@ class SolarToy extends BaseToy {
         let mat = new BABYLON.StandardMaterial("Test", Main.Scene);
         mat.alpha = 0;
 
+        let lum = 3;
         for (let i = 0; i < this.planets.length; i++) {
             this.planets[i].parent = this;
             this.alphas.push(Math.random() * 2 * Math.PI);
             this.alphas.push(Math.random() * 2 * Math.PI);
-            let lum = 3;
             this.planets[i].material = mat;
             this.planets[i].enableEdgesRendering();
             this.planets[i].edgesColor = Main.Color4.scale(lum);
@@ -123,6 +123,30 @@ class SolarToy extends BaseToy {
             this.getScene()
         );
         this.orbitLines.parent = this;
+
+        let ringPoints: BABYLON.Vector3[] = [];
+        let ringColors: BABYLON.Color4[] = [];
+        for (let i = 0; i <= 16; i++) {
+            ringPoints.push(
+                new BABYLON.Vector3(
+                    Math.sqrt(9.4) * this.earthDiameter * Math.cos(i / 16 * Math.PI * 2),
+                    0,
+                    Math.sqrt(9.4) * this.earthDiameter * Math.sin(i / 16 * Math.PI * 2),
+                )
+            )
+            ringColors.push(Main.Color4.scale(lum * 0.75));
+        }
+        let saturnRing = BABYLON.MeshBuilder.CreateLines(
+            "saturnRing",
+            {
+                points: ringPoints,
+                colors: ringColors,
+                updatable: false,
+                instance: undefined
+            },
+            this.getScene()
+        );
+        saturnRing.parent = this.saturn;
 
         this.getScene().onBeforeRenderObservable.add(this._update);
 

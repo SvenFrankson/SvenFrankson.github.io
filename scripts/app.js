@@ -282,8 +282,9 @@ class Main {
         window.addEventListener('hashchange', route.route);
         route.route();
         while (true) {
-            if (Math.random() < 0.5) {
-                for (let i = 0; i < 3; i++) {
+            let r = Math.random();
+            if (r < 1 / 3) {
+                for (let i = 0; i < 2; i++) {
                     let x = width / 2 * (Math.random() - 0.5) * 2;
                     let z = depth / 2 * (Math.random() - 0.5) * 2;
                     let voxelToy = new VoxelToy(new BABYLON.Vector3(x, -height, z), Main.Scene);
@@ -291,6 +292,14 @@ class Main {
                     await voxelToy.wait(2.5);
                     await voxelToy.end();
                 }
+            }
+            else if (r < 2 / 3) {
+                let lifeToy = new LifeToy(new BABYLON.Vector3(0, -height, 0), Math.floor(width * Math.SQRT1_2) - 1, Main.Scene);
+                await lifeToy.start();
+                for (let i = 0; i < 10; i++) {
+                    await Main.RunCoroutine(lifeToy.update(120));
+                }
+                await lifeToy.end();
             }
             else {
                 let solarToy = new SolarToy(new BABYLON.Vector3(0, -height * 0.3, 0), new BABYLON.Vector3(-Math.PI / 8, 0, Math.PI / 16), width * 0.9, Main.Scene);
@@ -599,6 +608,165 @@ class BaseToy extends BABYLON.TransformNode {
     }
 }
 /// <reference path="./BaseToy.ts" />
+class LifeToy extends BaseToy {
+    constructor(position, radius, scene) {
+        super("SolarToy", scene);
+        this.lum = 3;
+        this.radius = 0;
+        this.position = position;
+        this.radius = Math.round(radius);
+        this.meshes = [];
+        this.states = [];
+        let mat = new BABYLON.StandardMaterial("Test", Main.Scene);
+        mat.alpha = 0;
+        for (let i = 0; i < 2 * this.radius + 1; i++) {
+            this.meshes[i] = [];
+            this.states[i] = [];
+            for (let j = 0; j < 2 * this.radius + 1; j++) {
+                this.meshes[i][j] = BABYLON.MeshBuilder.CreateSphere("s", { diameter: 0.75 + (Math.random() - 0.5) * 0.5, segments: 6 }, this.getScene());
+                this.meshes[i][j].position.x = i - this.radius;
+                this.meshes[i][j].position.z = j - this.radius;
+                let max = Math.max(Math.abs(i - this.radius), Math.abs(j - this.radius));
+                let r = Math.sqrt(2 * max * max) / this.meshes[i][j].position.length();
+                this.meshes[i][j].position.scaleInPlace(r);
+                this.meshes[i][j].scaling.copyFromFloats(0, 0, 0);
+                this.meshes[i][j].parent = this;
+                this.states[i][j] = Math.random() > 0.75;
+                this.meshes[i][j].material = mat;
+                this.meshes[i][j].enableEdgesRendering();
+                this.meshes[i][j].edgesColor = Main.Color4.scale(this.lum);
+            }
+        }
+    }
+    destroy() {
+        this.dispose();
+    }
+    async start() {
+        for (let i = 0; i < 2 * this.radius + 1; i++) {
+            for (let j = 0; j < 2 * this.radius + 1; j++) {
+                if (this.states[i][j]) {
+                    Main.StartCoroutine(this.unfold(this.meshes[i][j], 0, 120, 0));
+                }
+            }
+        }
+        return Main.RunCoroutine(this.idle(undefined, 120));
+    }
+    async end() {
+        for (let i = 0; i < 2 * this.radius + 1; i++) {
+            for (let j = 0; j < 2 * this.radius + 1; j++) {
+                if (this.states[i][j]) {
+                    Main.StartCoroutine(this.fold(this.meshes[i][j], 0, 120, 0));
+                }
+            }
+        }
+        await Main.RunCoroutine(this.idle(undefined, 120));
+        this.destroy();
+    }
+    *update(duration) {
+        let newStates = [];
+        for (let i = 0; i < 2 * this.radius + 1; i++) {
+            newStates[i] = [];
+            for (let j = 0; j < 2 * this.radius + 1; j++) {
+                let n = 0;
+                if (this.states[i - 1]) {
+                    if (this.states[i - 1][j - 1]) {
+                        n++;
+                    }
+                    if (this.states[i - 1][j]) {
+                        n++;
+                    }
+                    if (this.states[i - 1][j + 1]) {
+                        n++;
+                    }
+                }
+                if (this.states[i][j - 1]) {
+                    n++;
+                }
+                if (this.states[i][j + 1]) {
+                    n++;
+                }
+                if (this.states[i + 1]) {
+                    if (this.states[i + 1][j - 1]) {
+                        n++;
+                    }
+                    if (this.states[i + 1][j]) {
+                        n++;
+                    }
+                    if (this.states[i + 1][j + 1]) {
+                        n++;
+                    }
+                }
+                if (n === 3) {
+                    newStates[i][j] = true;
+                    if (this.states[i][j]) {
+                        //Main.StartCoroutine(this.idle(this.meshes[i][j], duration));
+                    }
+                    else {
+                        let delay = Math.round(Math.random() * duration / 4);
+                        let cooldown = Math.round(Math.random() * duration / 4);
+                        Main.StartCoroutine(this.unfold(this.meshes[i][j], delay, duration - delay - cooldown, cooldown));
+                    }
+                }
+                else if (n < 2 || n > 3) {
+                    newStates[i][j] = false;
+                    if (this.states[i][j]) {
+                        let delay = Math.round(Math.random() * duration / 8);
+                        let cooldown = Math.round(Math.random() * duration / 2);
+                        Main.StartCoroutine(this.fold(this.meshes[i][j], delay, duration - delay - cooldown, cooldown));
+                    }
+                }
+                else {
+                    newStates[i][j] = this.states[i][j];
+                    if (this.states[i][j]) {
+                        //Main.StartCoroutine(this.idle(this.meshes[i][j], duration));
+                    }
+                }
+            }
+        }
+        this.states = newStates;
+        for (let i = 0; i < duration; i++) {
+            yield;
+        }
+    }
+    *unfold(mesh, delay, duration, cooldown) {
+        mesh.scaling.copyFromFloats(0, 0, 0);
+        for (let i = 0; i < delay; i++) {
+            yield;
+        }
+        for (let i = 0; i < duration; i++) {
+            let s = i / duration;
+            s = BaseToy.easeOutElastic(s);
+            mesh.scaling.copyFromFloats(s, s, s);
+            yield;
+        }
+        for (let i = 0; i < cooldown; i++) {
+            yield;
+        }
+        mesh.scaling.copyFromFloats(1, 1, 1);
+    }
+    *idle(mesh, duration) {
+        for (let i = 0; i < duration; i++) {
+            yield;
+        }
+    }
+    *fold(mesh, delay, duration, cooldown) {
+        mesh.scaling.copyFromFloats(1, 1, 1);
+        for (let i = 0; i < delay; i++) {
+            yield;
+        }
+        for (let i = 0; i < duration; i++) {
+            let s = 1 - i / duration;
+            s *= s;
+            mesh.scaling.copyFromFloats(s, s, s);
+            yield;
+        }
+        for (let i = 0; i < cooldown; i++) {
+            yield;
+        }
+        mesh.scaling.copyFromFloats(0, 0, 0);
+    }
+}
+/// <reference path="./BaseToy.ts" />
 class SolarToy extends BaseToy {
     constructor(position, rotation, radius, scene) {
         super("SolarToy", scene);
@@ -676,11 +844,11 @@ class SolarToy extends BaseToy {
         let orbitColors = [];
         let mat = new BABYLON.StandardMaterial("Test", Main.Scene);
         mat.alpha = 0;
+        let lum = 3;
         for (let i = 0; i < this.planets.length; i++) {
             this.planets[i].parent = this;
             this.alphas.push(Math.random() * 2 * Math.PI);
             this.alphas.push(Math.random() * 2 * Math.PI);
-            let lum = 3;
             this.planets[i].material = mat;
             this.planets[i].enableEdgesRendering();
             this.planets[i].edgesColor = Main.Color4.scale(lum);
@@ -699,6 +867,19 @@ class SolarToy extends BaseToy {
             instance: undefined
         }, this.getScene());
         this.orbitLines.parent = this;
+        let ringPoints = [];
+        let ringColors = [];
+        for (let i = 0; i <= 16; i++) {
+            ringPoints.push(new BABYLON.Vector3(Math.sqrt(9.4) * this.earthDiameter * Math.cos(i / 16 * Math.PI * 2), 0, Math.sqrt(9.4) * this.earthDiameter * Math.sin(i / 16 * Math.PI * 2)));
+            ringColors.push(Main.Color4.scale(lum * 0.75));
+        }
+        let saturnRing = BABYLON.MeshBuilder.CreateLines("saturnRing", {
+            points: ringPoints,
+            colors: ringColors,
+            updatable: false,
+            instance: undefined
+        }, this.getScene());
+        saturnRing.parent = this.saturn;
         this.getScene().onBeforeRenderObservable.add(this._update);
         return Main.RunCoroutine(this.unfold(240));
     }
@@ -771,8 +952,9 @@ class VoxelToy extends BaseToy {
             for (let k = 0; k < data[j].length; k++) {
                 for (let i = 0; i < data[j][k].length; i++) {
                     if (data[j][k][i]) {
-                        let cube = BABYLON.MeshBuilder.CreateBox("cube", { size: 0.8 }, Main.Scene);
+                        let cube = BABYLON.MeshBuilder.CreateBox("cube", { size: 0.7 }, Main.Scene);
                         cube.position.copyFromFloats(i + offsetX, j, k + offsetZ);
+                        cube.position.scaleInPlace(0.8);
                         let mat = new BABYLON.StandardMaterial("Test", Main.Scene);
                         mat.alpha = 0;
                         cube.material = mat;

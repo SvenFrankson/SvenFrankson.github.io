@@ -48,8 +48,9 @@ class VoxelToy extends BaseToy {
             for (let k = 0; k < data[j].length; k++) {
                 for (let i = 0; i < data[j][k].length; i++) {
                     if (data[j][k][i]) {
-                        let cube = BABYLON.MeshBuilder.CreateBox("cube", {size: 0.8}, Main.Scene);
+                        let cube = BABYLON.MeshBuilder.CreateBox("cube", {size: 0.7}, Main.Scene);
                         cube.position.copyFromFloats(i + offsetX, j, k + offsetZ);
+                        cube.position.scaleInPlace(0.8);
                         
                         let mat = new BABYLON.StandardMaterial("Test", Main.Scene);
                         mat.alpha = 0;
