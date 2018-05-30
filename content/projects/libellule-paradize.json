@@ -1,4 +1,5 @@
 {
     "name": "Libellule Paradize",
-    "img": "./data/img/libellule-paradize.png"
+    "img": "./data/img/libellule-paradize.png",
+    "source": "https://github.com/SvenFrankson/LibeLudumDare"
 }

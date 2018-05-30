@@ -1,4 +1,5 @@
 {
     "name": "Popolina",
-    "img": "./data/img/code.png"
+    "img": "./data/img/code.png",
+    "source": "https://github.com/SvenFrankson/PopolinaClient"
 }

@@ -1,4 +1,5 @@
 {
     "name": "Tabuz",
-    "img": "./data/img/tabuz.png"
+    "img": "./data/img/tabuz.png",
+    "source": "https://github.com/SvenFrankson/tabuz"
 }

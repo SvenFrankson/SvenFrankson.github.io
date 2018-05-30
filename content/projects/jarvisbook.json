@@ -1,4 +1,5 @@
 {
     "name": "JarvisBook",
-    "img": "./data/img/jarvisbook.png"
+    "img": "./data/img/jarvisbook.png",
+    "source": "https://github.com/SvenFrankson/JarvisBook"
 }

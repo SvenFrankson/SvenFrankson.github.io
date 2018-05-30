@@ -1,4 +1,5 @@
 {
     "name": "World Maker",
-    "img": "./data/img/world-maker.png"
+    "img": "./data/img/world-maker.png",
+    "source": "https://github.com/SvenFrankson/WorldMaker"
 }

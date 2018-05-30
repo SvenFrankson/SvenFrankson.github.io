@@ -1,4 +1,5 @@
 {
     "name": "Planet Builder",
-    "img": "./data/img/planet-builder.png"
+    "img": "./data/img/planet-builder.png",
+    "source": "https://github.com/SvenFrankson/PlanetBuilder"
 }
