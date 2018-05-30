@@ -1,5 +1,6 @@
 {
     "name": "Lego Builder",
     "img": "./data/img/lego-builder.png",
-    "source": "https://github.com/SvenFrankson/babylon-demo"
+    "source": "https://github.com/SvenFrankson/babylon-demo",
+    "play": "./BabylonDemoWeb/"
 }

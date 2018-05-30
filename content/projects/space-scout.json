@@ -1,5 +1,6 @@
 {
     "name": "Space Scout",
     "img": "./data/img/space-scout.png",
-    "source": "https://github.com/SvenFrankson/space-scout"
+    "source": "https://github.com/SvenFrankson/space-scout",
+    "play": "./space-scout/"
 }

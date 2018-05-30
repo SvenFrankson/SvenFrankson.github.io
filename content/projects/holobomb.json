@@ -1,5 +1,6 @@
 {
     "name": "HoloBomb",
     "img": "./data/img/holobomb.png",
-    "source": "https://github.com/SvenFrankson/HoloBomb"
+    "source": "https://github.com/SvenFrankson/HoloBomb",
+    "play": "./HoloBomb/"
 }

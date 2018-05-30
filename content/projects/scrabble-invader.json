@@ -1,7 +1,7 @@
 {
     "name": "Scrabble Invader",
     "img": "./data/img/scrabble-invader.png",
-    "play": "http://svenfrankson.github.io/scrabble_invader/",
+    "play": "./scrabble_invader/",
     "link": "https://ldjam.com/events/ludum-dare/41/scrabble-invader",
     "source": "https://github.com/SvenFrankson/didactic-couscous"
 }

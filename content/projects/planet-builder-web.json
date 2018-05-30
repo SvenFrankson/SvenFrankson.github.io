@@ -1,5 +1,6 @@
 {
     "name": "Planet Builder Web",
     "img": "./data/img/planet-builder-web.png",
-    "source": "https://github.com/SvenFrankson/planet-builder-web"
+    "source": "https://github.com/SvenFrankson/planet-builder-web",
+    "play": "./PlanetBuilderWeb/"
 }
