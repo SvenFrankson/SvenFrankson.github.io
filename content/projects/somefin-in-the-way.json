@@ -1,6 +1,13 @@
 {
     "name": "Somefin In The Way",
-    "img": "./data/img/somefin-in-the-way.png",
+    "imgs": [
+        {
+            "src": "./public/img/somefin-in-the-way-main-title.png"
+        },
+        {
+            "src": "./public/img/somefin-in-the-way-in-game.png"
+        }
+    ],
     "play": "./somefin-in-the-way/",
     "link": "https://ldjam.com/events/ludum-dare/40/somefin-in-the-way",
     "source": "https://github.com/SvenFrankson/ludum-dare-40"

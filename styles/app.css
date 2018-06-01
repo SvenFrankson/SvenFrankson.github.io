@@ -156,9 +156,15 @@ a:active {
     margin-bottom: 0px;
 }
 
-#project-image {
-    margin-left: 10%;
-    width: 85%;
+#carousel-inner {
+    height: 400px;
+    text-align: center;
+}
+
+.project-image {
+    width: auto;
+    max-height: 350px;
+    max-width: 100%;
 }
 
 #project-links {

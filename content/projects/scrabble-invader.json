@@ -1,6 +1,13 @@
 {
     "name": "Scrabble Invader",
-    "img": "./data/img/scrabble-invader.png",
+    "imgs": [
+        {
+            "src": "./public/img/scrabble-invader-main-title.png"
+        },
+        {
+            "src": "./public/img/scrabble-invader-in-game.png"
+        }
+    ],
     "play": "./scrabble_invader/",
     "link": "https://ldjam.com/events/ludum-dare/41/scrabble-invader",
     "source": "https://github.com/SvenFrankson/didactic-couscous"

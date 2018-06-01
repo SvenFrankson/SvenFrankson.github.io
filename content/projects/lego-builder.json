@@ -1,6 +1,29 @@
 {
     "name": "Lego Builder",
-    "img": "./data/img/lego-builder.png",
-    "source": "https://github.com/SvenFrankson/babylon-demo",
-    "play": "./BabylonDemoWeb/"
+    "imgs": [
+        {
+            "src": "./public/img/lego-builder-v1.png"
+        },
+        {
+            "src": "./public/img/lego-builder-vr.jpg"
+        }
+    ],
+    "links": [
+        {
+            "text": "Play V1",
+            "href": "./BabylonDemoWeb/"
+        },
+        {
+            "text": "Play VR",
+            "href": "./VRBlockBuilder/"
+        },
+        {
+            "text": "Source V1",
+            "href": "https://github.com/SvenFrankson/babylon-demo"
+        },
+        {
+            "text": "Source VR",
+            "href": "https://github.com/SvenFrankson/vr-demo"
+        }
+    ]
 }
