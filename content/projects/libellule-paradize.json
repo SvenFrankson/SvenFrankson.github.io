@@ -1,5 +1,27 @@
 {
     "name": "Libellule Paradize",
-    "img": "./data/img/libellule-paradize.png",
-    "source": "https://github.com/SvenFrankson/LibeLudumDare"
+    "imgs": [
+        {
+            "src": "./public/img/libellule-paradize.png"
+        },
+        {
+            "src": "./public/img/libellule-paradize-flowers.jpg"
+        },
+        {
+            "src": "./public/img/libellule-paradize-island.jpg"
+        },
+        {
+            "src": "./public/img/libellule-paradize-compo.jpg"
+        }
+    ],
+    "links": [
+        {
+            "text": "Source",
+            "href": "https://github.com/SvenFrankson/LibeLudumDare"
+        },
+        {
+            "text": "LDJAM",
+            "href": "http://legacy.ludumdare.com/compo/ludum-dare-34/?action=preview&uid=56473"
+        }
+    ]
 }

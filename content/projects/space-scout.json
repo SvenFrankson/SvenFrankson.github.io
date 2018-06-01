@@ -1,6 +1,13 @@
 {
     "name": "Space Scout",
-    "img": "./data/img/space-scout.png",
+    "imgs": [
+        {
+            "src": "./public/img/space-scout.png"
+        },
+        {
+            "src": "./public/img/space-scout-zoom.jpg"
+        }
+    ],
     "source": "https://github.com/SvenFrankson/space-scout",
     "play": "./space-scout/"
 }

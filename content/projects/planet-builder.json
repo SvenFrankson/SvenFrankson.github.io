@@ -1,5 +1,18 @@
 {
     "name": "Planet Builder",
-    "img": "./data/img/planet-builder.png",
+    "imgs": [
+        {
+            "src": "./public/img/planet-builder-main.png"
+        },
+        {
+            "src": "./public/img/planet-builder.png"
+        },
+        {
+            "src": "./public/img/planet-builder-whole.png"
+        },
+        {
+            "src": "./public/img/planet-builder-buildings.png"
+        }
+    ],
     "source": "https://github.com/SvenFrankson/PlanetBuilder"
 }
