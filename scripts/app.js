@@ -395,7 +395,7 @@ class Route {
                 this.home();
             }
             else if (url === "projects") {
-                this.projects();
+                Projects.open();
             }
             else if (url.startsWith("project/")) {
                 let projectId = url.split("/")[1];
@@ -416,31 +416,16 @@ class Route {
         $.ajax({
             url: "./home.html",
             success: (data) => {
-                document.getElementById("page").innerHTML = data;
-                NavTree.Update([
-                    {
-                        name: "home",
-                        url: "#"
-                    }
-                ]);
-            }
-        });
-    }
-    projects() {
-        $.ajax({
-            url: "./projects.html",
-            success: (data) => {
-                document.getElementById("page").innerHTML = data;
-                NavTree.Update([
-                    {
-                        name: "home",
-                        url: "#"
-                    },
-                    {
-                        name: "projects",
-                        url: "#projects"
-                    }
-                ]);
+                $("#page").fadeOut(500, () => {
+                    document.getElementById("page").innerHTML = data;
+                    NavTree.Update([
+                        {
+                            name: "home",
+                            url: "#"
+                        }
+                    ]);
+                    $("#page").fadeIn(500);
+                });
             }
         });
     }
@@ -448,17 +433,20 @@ class Route {
         $.ajax({
             url: "./about.html",
             success: (data) => {
-                document.getElementById("page").innerHTML = data;
-                NavTree.Update([
-                    {
-                        name: "home",
-                        url: "#"
-                    },
-                    {
-                        name: "about",
-                        url: "#about"
-                    }
-                ]);
+                $("#page").fadeOut(500, () => {
+                    document.getElementById("page").innerHTML = data;
+                    NavTree.Update([
+                        {
+                            name: "home",
+                            url: "#"
+                        },
+                        {
+                            name: "about",
+                            url: "#about"
+                        }
+                    ]);
+                    $("#page").fadeIn(500);
+                });
             }
         });
     }
@@ -466,17 +454,20 @@ class Route {
         $.ajax({
             url: "./contact.html",
             success: (data) => {
-                document.getElementById("page").innerHTML = data;
-                NavTree.Update([
-                    {
-                        name: "home",
-                        url: "#"
-                    },
-                    {
-                        name: "contact",
-                        url: "#contact"
-                    }
-                ]);
+                $("#page").fadeOut(500, () => {
+                    document.getElementById("page").innerHTML = data;
+                    NavTree.Update([
+                        {
+                            name: "home",
+                            url: "#"
+                        },
+                        {
+                            name: "contact",
+                            url: "#contact"
+                        }
+                    ]);
+                    $("#page").fadeIn(500);
+                });
             }
         });
     }
@@ -635,6 +626,36 @@ class Block {
         });
     }
 }
+class Projects {
+    static open() {
+        $.ajax({
+            url: "./projects.html",
+            success: (data) => {
+                $("#page").fadeOut("fast", () => {
+                    document.getElementById("page").innerHTML = data;
+                    NavTree.Update([
+                        {
+                            name: "home",
+                            url: "#"
+                        },
+                        {
+                            name: "projects",
+                            url: "#projects"
+                        }
+                    ]);
+                    $("#page").show(0);
+                    $(".menu-item").hide();
+                    $(".menu-item").each((i, e) => {
+                        setTimeout(() => {
+                            $(e).fadeIn(500);
+                        }, i * 150);
+                    });
+                });
+            }
+        });
+    }
+}
+Projects.filters = [];
 class BaseToy extends BABYLON.TransformNode {
     static easeOutElastic(t) {
         var p = 0.3;

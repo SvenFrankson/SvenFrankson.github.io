@@ -5,34 +5,19 @@ class Route {
             {
                 url: "./home.html",
                 success: (data) => {
-                    document.getElementById("page").innerHTML = data;
-                    NavTree.Update([
-                        {
-                            name: "home",
-                            url: "#"
+                    $("#page").fadeOut(
+                        500,
+                        () => {
+                            document.getElementById("page").innerHTML = data;
+                            NavTree.Update([
+                                {
+                                    name: "home",
+                                    url: "#"
+                                }
+                            ]);
+                            $("#page").fadeIn(500);
                         }
-                    ]);
-                }
-            }
-        )
-    }
-
-    public projects(): void {
-        $.ajax(
-            {
-                url: "./projects.html",
-                success: (data) => {
-                    document.getElementById("page").innerHTML = data;
-                    NavTree.Update([
-                        {
-                            name: "home",
-                            url: "#"
-                        },
-                        {
-                            name: "projects",
-                            url: "#projects"
-                        }
-                    ]);
+                    );
                 }
             }
         )
@@ -43,17 +28,23 @@ class Route {
             {
                 url: "./about.html",
                 success: (data) => {
-                    document.getElementById("page").innerHTML = data;
-                    NavTree.Update([
-                        {
-                            name: "home",
-                            url: "#"
-                        },
-                        {
-                            name: "about",
-                            url: "#about"
+                    $("#page").fadeOut(
+                        500,
+                        () => {
+                            document.getElementById("page").innerHTML = data;
+                            NavTree.Update([
+                                {
+                                    name: "home",
+                                    url: "#"
+                                },
+                                {
+                                    name: "about",
+                                    url: "#about"
+                                }
+                            ]);
+                            $("#page").fadeIn(500);
                         }
-                    ]);
+                    );
                 }
             }
         )
@@ -64,17 +55,23 @@ class Route {
             {
                 url: "./contact.html",
                 success: (data) => {
-                    document.getElementById("page").innerHTML = data;
-                    NavTree.Update([
-                        {
-                            name: "home",
-                            url: "#"
-                        },
-                        {
-                            name: "contact",
-                            url: "#contact"
+                    $("#page").fadeOut(
+                        500,
+                        () => {
+                            document.getElementById("page").innerHTML = data;
+                            NavTree.Update([
+                                {
+                                    name: "home",
+                                    url: "#"
+                                },
+                                {
+                                    name: "contact",
+                                    url: "#contact"
+                                }
+                            ]);
+                            $("#page").fadeIn(500);
                         }
-                    ]);
+                    );
                 }
             }
         )
@@ -180,7 +177,7 @@ class Route {
         if (url === "/") {
             this.home();
         } else if (url === "projects") {
-            this.projects();
+            Projects.open();
         } else if (url.startsWith("project/")) {
             let projectId = url.split("/")[1];
             this.project(projectId);
