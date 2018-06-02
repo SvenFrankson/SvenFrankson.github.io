@@ -1,6 +1,21 @@
 {
     "name": "HoloBomb",
-    "img": "./data/img/holobomb.png",
-    "source": "https://github.com/SvenFrankson/HoloBomb",
-    "play": "./HoloBomb/"
+    "imgs": [
+        {
+            "src": "./public/img/holobomb-main-title.jpg"
+        },
+        {
+            "src": "./public/img/holobomb.png"
+        }
+    ],
+    "links": [
+        {
+            "text": "Play",
+            "href": "./HoloBomb/"
+        },
+        {
+            "text": "Source",
+            "href": "https://github.com/SvenFrankson/HoloBomb"
+        }
+    ]
 }
