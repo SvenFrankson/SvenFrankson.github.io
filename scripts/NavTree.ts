@@ -16,7 +16,8 @@ class NavTree {
 		NavTree.Clear();
 		let navTree = document.getElementById("nav-tree");
 		for (let i: number = 0; i < treeNode.length; i++) {
-            let a = document.createElement("a");
+			let a = document.createElement("a");
+			a.setAttribute("class", "link");
             a.href = treeNode[i].url;
 			let e = document.createElement("span");
             e.textContent = treeNode[i].name;

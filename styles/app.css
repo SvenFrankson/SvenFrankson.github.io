@@ -5,20 +5,33 @@ html, body {
     padding: 0;
 }
 
-a:link {
-    color: white;
+.link {
+    color: inherit;
 }
 
-a:visited {
-    color: white;
+.bold {
+    font-weight: bold; 
 }
 
-a:hover {
-    color: white;
+.link:link {
+    color: inherit;
 }
 
-a:active {
-    color: white;
+.link:visited {
+    color: inherit;
+}
+
+.link:hover {
+    color: inherit;
+}
+
+.link.div:hover {
+    color: inherit;
+    text-decoration: none;
+}
+
+.link:active {
+    color: inherit;
 }
 
 #page {
