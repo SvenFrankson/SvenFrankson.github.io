@@ -1,0 +1,15 @@
+<p>During the <a class="link bold" href="http://www.hackingindustry.camp/">Hacking Industry Camp 2017</a> hackathon, <a class="link bold" href="https://www.versusmind.eu/">we at Versusmind</a> took part in <a class="link bold" href="https://hic2017.sparkboard.com/project/59b034ef9c32bb04003c9b52">SniffElec</a> project.</p>
+
+<p>SniffElec is a project of <a class="link bold" href="http://www.es.fr/">Electricité de Strabourg</a> (power supplier in Strasbourg, France), aiming at monitoring power network by analizing social medias activity.</p>
+
+<p>Example : Someone tweet about a power shortage in a neighborhood, which automatically triggers an alert while a chatbot starts engaging with the tweet author to gather more informations.</p>
+
+<p><i>(note : While high-voltage network is already monitored, once it get closer to the user in the low-voltage network, it is not)</i></p>
+
+<p>My input in the project was in the implementation of a 3D map of the city where alerts, tweets and power shortage were displayed in realtime.</p>
+
+<p>The map is created by extracting the city layout from <a class="link bold" href="https://www.openstreetmap.org/about"></a>OpenStreetMap database, then using BabylonJS for procedural generation of meshes and display.</p>
+
+<p>A simple API is also implemented so the bot watching social medias activity (or the chatbot gathering more details, or any additional source) are able to add informations on the map (power shortage related tweet, blackouted area...).</p>
+
+<p>Project received <strong>Prix Rhénatic</strong> for the solution.</p>

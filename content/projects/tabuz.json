@@ -1,5 +1,18 @@
 {
     "name": "Tabuz",
-    "img": "./data/img/tabuz.png",
-    "source": "https://github.com/SvenFrankson/tabuz"
+    "imgs": [
+        {
+            "src": "./public/img/tabuz.png"
+        }
+    ],
+    "links": [
+        {
+            "text": "Source",
+            "href": "https://github.com/SvenFrankson/tabuz"
+        },
+        {
+            "text": "LDJAM",
+            "href": "http://legacy.ludumdare.com/compo/ludum-dare-33/?action=preview&uid=56473"
+        }
+    ]
 }

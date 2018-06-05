@@ -1,5 +1,9 @@
 {
     "name": "Open Street 3D",
-    "img": "./data/img/open-street-3d.png",
+    "imgs":[
+        {
+            "src": "./public/img/open-street-3d.png"
+        }
+    ],
     "source": "https://github.com/SvenFrankson/openstreet3D"
 }
