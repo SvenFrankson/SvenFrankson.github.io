@@ -29,7 +29,7 @@ class Projects {
                                         () => {
                                             $(e).fadeIn(500);
                                         },
-                                        i * 150
+                                        i * 100
                                     )
                                 }
                             )
