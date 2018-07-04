@@ -6,8 +6,23 @@
         },
         {
             "src": "./public/img/space-scout-zoom.jpg"
+        },
+        {
+            "src": "./public/img/space-scout-toon-shading.png"
         }
     ],
-    "source": "https://github.com/SvenFrankson/space-scout",
-    "play": "./space-scout/"
+    "links": [
+        {
+            "text": "Play",
+            "href": "./space-scout"
+        },
+        {
+            "text": "Source",
+            "href": "https://github.com/SvenFrankson/space-scout"
+        },
+        {
+            "text": "Toon Shading",
+            "href": "./space-scout-demo#test"
+        }
+    ]
 }
