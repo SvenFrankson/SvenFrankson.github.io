@@ -3177,7 +3177,7 @@ class Main {
     static get groundMaterial() {
         if (!Main._groundMaterial) {
             Main._groundMaterial = new BABYLON.StandardMaterial("StandardMaterial", Main.Scene);
-            Main._groundMaterial.diffuseTexture = new BABYLON.Texture("/img/ground.jpg", Main.Scene);
+            Main._groundMaterial.diffuseTexture = new BABYLON.Texture("img/ground.jpg", Main.Scene);
             Main._groundMaterial.specularColor.copyFromFloats(0, 0, 0);
         }
         return Main._groundMaterial;

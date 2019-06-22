@@ -1,26 +1,26 @@
 @font-face {
     font-family: "Orbitron Black";
-    src:    url("/fonts/Orbitron\ Black.otf") format("opentype"),
-            url("/fonts/Orbitron\ Black.ttf") format("truetype");
+    src:    url("fonts/Orbitron\ Black.otf") format("opentype"),
+            url("fonts/Orbitron\ Black.ttf") format("truetype");
 }
 @font-face {
     font-family: "Orbitron Bold";
-    src:    url("/fonts/Orbitron\ Bold.otf") format("opentype"),
-            url("/fonts/Orbitron\ Bold.ttf") format("truetype");
+    src:    url("fonts/Orbitron\ Bold.otf") format("opentype"),
+            url("fonts/Orbitron\ Bold.ttf") format("truetype");
 }
 @font-face {
     font-family: "Orbitron Light";
-    src:    url("/fonts/Orbitron\ Light.otf") format("opentype"),
-            url("/fonts/Orbitron\ Light.ttf") format("truetype");
+    src:    url("fonts/Orbitron\ Light.otf") format("opentype"),
+            url("fonts/Orbitron\ Light.ttf") format("truetype");
 }
 @font-face {
     font-family: "Orbitron Medium";
-    src:    url("/fonts/Orbitron\ Medium.otf") format("opentype"),
-            url("/fonts/Orbitron\ Medium.ttf") format("truetype");
+    src:    url("fonts/Orbitron\ Medium.otf") format("opentype"),
+            url("fonts/Orbitron\ Medium.ttf") format("truetype");
 }
 @font-face {
     font-family: "Anurati";
-    src:    url("/fonts/Anurati-Regular.otf") format("opentype");
+    src:    url("fonts/Anurati-Regular.otf") format("opentype");
 }
 
 input[type=number]::-webkit-inner-spin-button, 
