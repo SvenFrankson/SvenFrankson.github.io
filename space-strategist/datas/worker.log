@@ -1,0 +1,46 @@
+Exporter version: 5.4.2, Blender version: 2.78 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used:
+		selected layers only:  true
+		flat shading entire scene:  false
+		inline textures:  false
+		texture directory:  C:\Users\Sven\Documents\SvenFrankson\space-strategist\datas\
+	Python World class constructor completed
+	WARNING: No active camera has been assigned, or is not in a currently selected Blender layer
+	processing begun of skeleton:  Armature.001, id:  0
+		processing begun of bone:  Base, index:  0
+		processing begun of bone:  Head, index:  1
+		processing begun of bone:  EyeTop, index:  2
+		processing begun of bone:  EyeBottom, index:  3
+		processing begun of bone:  UpArmL, index:  4
+		processing begun of bone:  ArmL, index:  5
+		processing begun of bone:  HandL, index:  6
+		processing begun of bone:  UpArmR, index:  7
+		processing begun of bone:  ArmR, index:  8
+		processing begun of bone:  HandR, index:  9
+		processing action ArmatureAction:  in[1 - 400], out[0 - 400]
+		processing action ArmatureAction.002:  in[1 - 400], out[410 - 810]
+	WARNING: The following armature not visible in scene thus ignored: Armature
+	processing begun of mesh:  wheels.001
+		processing begun of Standard material:  Color2
+		processing begun of Standard material:  Frame
+		processing begun of Standard material:  Base
+		processing begun of Standard material:  Color1
+		processing begun of Standard material:  Color3
+		processing begun of multimaterial:  worker.Multimaterial#0
+		num positions      :  1227
+		num normals        :  1227
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  4908
+		num indices        :  6450
+		Skeleton stats:  
+			Total Influencers:  2535
+			Avg # of influencers per vertex:  2.066
+			Highest # of influencers observed:  4, num vertices with this:  47
+			exported as 4 influencers
+			num skeletonWeights and skeletonIndices:  4908
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========
+elapsed time:  0 min, 2.7323 secs

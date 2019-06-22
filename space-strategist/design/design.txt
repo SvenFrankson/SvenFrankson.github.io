@@ -1,0 +1,52 @@
+# Resources
+
+## Found on Selenium
+
+Rock (Container)
+Cristal (Container)
+Artifacts (Vault)
+BioGoo (Tank)
+
+## Traded
+
+Steel
+Platinium
+Plutonium
+
+# Level 1 - Tutorial Basic
+
+## Plot
+
+Learn the basic for moving Drones, harvesting resources and building a base.
+
+## Start
+
+1 Spatioport
+3 Drones
+1 Container
+
+## Objectives
+
+[] Extract X Rock
+[] Build a Container
+[] Extract X Cristal
+[] Trade with Earth
+
+# Level 2 - Tutorial Fight
+
+## Plot
+
+Learn the basic for building walls and turrets and harvesting BioGoo.
+
+## Start
+
+1 Spatioport
+1 Drones
+
+## Objectives
+
+[] Build a wall.
+[] Build a turret.
+[] Kill a Fongus
+[] Build a Tank
+[] Harvest BioGoo.
