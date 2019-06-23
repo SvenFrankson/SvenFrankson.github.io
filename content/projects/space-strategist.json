@@ -1,0 +1,25 @@
+{
+    "name": "Space Strategist",
+    "imgs": [
+        {
+            "src": "./public/img/space-strategist-1.png"
+        },
+        {
+            "src": "./public/img/space-strategist-pathfinding-1.png"
+        }
+    ],
+    "links": [
+        {
+            "text": "Pathfinder",
+            "href": "http://svenfrankson.github.io/space-strategist/maze-1.html"
+        },
+        {
+            "text": "Editor",
+            "href": "http://svenfrankson.github.io/space-strategist/scene-editor.html"
+        },
+        {
+            "text": "Source",
+            "href": "https://github.com/SvenFrankson/space-strategist"
+        }
+    ]
+}
