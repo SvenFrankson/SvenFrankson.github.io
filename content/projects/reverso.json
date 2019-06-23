@@ -1,5 +1,9 @@
 {
     "name": "Reverso",
-    "img": "./data/img/reverso.png",
+    "imgs": [
+        {
+            "src": "./public/img/reverso.png"
+        }
+    ],
     "source": "https://github.com/SvenFrankson/potential-octo-waddle"
 }
