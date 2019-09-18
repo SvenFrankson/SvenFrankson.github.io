@@ -1,0 +1,18 @@
+{
+    "name": "Voxels",
+    "imgs": [
+        {
+            "src": "./public/img/voxels-skull.png"
+        }
+    ],
+    "links": [
+        {
+            "text": "Demo",
+            "href": "http://svenfrankson.github.io/voxels/index.html"
+        },
+        {
+            "text": "Source",
+            "href": "https://github.com/SvenFrankson/voxels"
+        }
+    ]
+}
