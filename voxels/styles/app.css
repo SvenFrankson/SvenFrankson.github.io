@@ -1,0 +1,119 @@
+html, body {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#render-canvas {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    touch-action: none;
+}
+
+#chunck-editor {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 30%);
+}
+
+.chunck-editor-button {
+    font-family: "Bangers";
+    display: block;
+    font-size: 20px;
+    margin: 0;
+    background: white;
+    border: none;
+    width: 150px;
+    padding-left: 15px;
+    padding-bottom: 7px;
+    text-align: left;
+    letter-spacing: 2px;
+}
+
+.chunck-editor-icon-button {
+    font-size: 32px;
+}
+
+#destroy-icon-button {
+    color: black;
+}
+
+#dirt-icon-button {
+    color: #47a632;
+}
+
+#rock-icon-button {
+    color: #8c8c89;
+}
+
+#sand-icon-button {
+    color: #dbc67b;
+}
+
+#save-icon-button {
+    color: #2097c9;
+}
+
+.editor-panel {
+    font-family: "Bangers";
+    display: block;
+    font-size: 20px;
+    margin-bottom: 5px;
+    background: white;
+    border: none;
+    width: 150px;
+    padding: 10px 0px 0px 0px;
+    text-align: left;
+    letter-spacing: 2px;
+}
+
+.editor-label {
+    margin-left: 15px;
+    margin-bottom: 10px;
+}
+
+.brush-size-button {
+    font-family: "Bangers";
+    display: inline-block;
+    font-size: 20px;
+    background: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    margin-right: -6px;
+    text-align: center;
+    letter-spacing:0px;
+}
+
+a {
+    color: white;
+    text-decoration: none; /* no underline */
+}
+
+#credit {
+    background-color: rgba(0, 0, 0, 30%);
+    text-align: right;
+    position: absolute;
+    width: 300px;
+    bottom: 10px;
+    right: 10px;
+    padding: 10px;
+    color: white;
+    font-family: "Arial";
+}
+
+#credit-dev {
+    font-size: 18px;
+    margin: 5px;
+}
+
+#credit-art {
+    font-style: italic;
+    font-size: 14px;
+    margin: 5px;
+}
