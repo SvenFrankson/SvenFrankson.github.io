@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+    <title>Galaxy</title>
+    <script src="https://cdn.babylonjs.com/babylon.max.js"></script>
+    <script src="./lib/babylon.gui.js"></script>
+    <script src="./lib/babylon.cellMaterial.js"></script>
+    <script src="./scripts/app.js"></script>
+    <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+    <link rel="stylesheet" type="text/css" href="./styles/app.css">
+</head>
+
+<body>
+  <canvas id="render-canvas"></canvas>
+  <div id="level-selection">
+    <button id="btn-level-1" class="level-btn">LEVEL 1</button>
+    <button id="btn-level-2" class="level-btn">LEVEL 2</button>
+    <button id="btn-level-2" class="level-btn">LEVEL ?</button>
+    <button id="btn-level-2" class="level-btn">LEVEL ?</button>
+    <button id="btn-level-2" class="level-btn">LEVEL ?</button>
+    <button id="btn-editor" class="level-btn">EDITOR</button>
+  </div>
+  <div id="ui">
+    <button id="btn-menu">MENU</button>
+    <div id="solve-status">NOT SOLVED</div>
+    <div id="editor-part">
+      <div>
+        <div id="width" class="editor-label">WIDTH</div>
+        <div id="width-value" class="editor-value">2</div>
+        <button id="btn-width-dec" class="editor-btn">-</button>
+        <button id="btn-width-inc" class="editor-btn">+</button>
+      </div>
+      <div>
+        <div id="height" class="editor-label">HEIGHT</div>
+        <div id="height-value" class="editor-value">2</div>
+        <button id="btn-height-dec" class="editor-btn">-</button>
+        <button id="btn-height-inc" class="editor-btn">+</button>
+      </div>
+      <div>
+        <div id="depth" class="editor-label">DEPTH</div>
+        <div id="depth-value" class="editor-value">2</div>
+        <button id="btn-depth-dec" class="editor-btn">-</button>
+        <button id="btn-depth-inc" class="editor-btn">+</button>
+      </div>
+      <button id="btn-download">DOWNLOAD</button>
+    </div>
+  </div>
+</body>
+
+</html>

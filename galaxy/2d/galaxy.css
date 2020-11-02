@@ -1,0 +1,29 @@
+#random {
+    position: fixed;
+    z-index: 1;
+    top: 10px;
+    left: 10px;
+}
+
+#random-solved {
+    position: fixed;
+    z-index: 1;
+    top: 10px;
+    left: 100px;
+}
+
+#density {
+    position: fixed;
+    z-index: 1;
+    top: 10px;
+    left: 300px;
+    color: white;
+}
+
+#bordered-orbs {
+    position: fixed;
+    z-index: 1;
+    top: 10px;
+    left: 500px;
+    color: white;
+}
