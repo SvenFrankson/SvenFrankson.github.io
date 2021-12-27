@@ -249,6 +249,7 @@ class Deck {
 var COS30 = Math.cos(Math.PI / 6);
 class Main {
     constructor(canvasElement) {
+        this.ratio = 1;
         this.canvas = document.getElementById(canvasElement);
         this.mainMenuContainer = document.getElementById("main-menu");
         this.engine = new BABYLON.Engine(this.canvas, true, { preserveDrawingBuffer: true, stencil: true });
@@ -258,23 +259,30 @@ class Main {
         this.initializeMainMenu();
     }
     resize() {
-        let ratio = this.canvas.clientWidth / this.canvas.clientHeight;
-        if (ratio >= 1) {
-            this.camera.orthoTop = -6 * 4;
-            this.camera.orthoRight = -6 * 4 * ratio;
-            this.camera.orthoLeft = 6 * 4 * ratio;
-            this.camera.orthoBottom = 6 * 4;
+        this.ratio = this.canvas.clientWidth / this.canvas.clientHeight;
+        let n = 6;
+        if (Math.abs(this.ratio - 1) < 1 / 6) {
+            n = 8;
+        }
+        else if (Math.abs(this.ratio - 1) < 1 / 3) {
+            n = 7;
+        }
+        if (this.ratio >= 1) {
+            this.camera.orthoTop = -n * 4;
+            this.camera.orthoRight = -n * 4 * this.ratio;
+            this.camera.orthoLeft = n * 4 * this.ratio;
+            this.camera.orthoBottom = n * 4;
         }
         else {
-            this.camera.orthoTop = -6 * 4 / ratio;
-            this.camera.orthoRight = -6 * 4;
-            this.camera.orthoLeft = 6 * 4;
-            this.camera.orthoBottom = 6 * 4 / ratio;
+            this.camera.orthoTop = -n * 4 / this.ratio;
+            this.camera.orthoRight = -n * 4;
+            this.camera.orthoLeft = n * 4;
+            this.camera.orthoBottom = n * 4 / this.ratio;
         }
         this.centerMainMenu();
     }
     centerMainMenu() {
-        let w = Math.max(this.canvas.clientWidth * 0.5, 600);
+        let w = Math.max(this.canvas.clientWidth * 0.5, 350);
         let left = (this.canvas.clientWidth - w) * 0.5;
         this.mainMenuContainer.style.width = w.toFixed(0) + "px";
         this.mainMenuContainer.style.left = left.toFixed(0) + "px";
@@ -892,8 +900,8 @@ class Tile {
             this.text = document.createElement("div");
             document.body.appendChild(this.text);
             this.text.classList.add("tile-text");
-            this.text.style.right = (this.board.main.xToRight(this.shape.position.x + 2.5) * 100).toFixed(1) + "%";
-            this.text.style.bottom = (this.board.main.yToBottom(this.shape.position.z - 3.5) * 100).toFixed(1) + "%";
+            this.text.style.right = (this.board.main.xToRight(this.shape.position.x) * 100).toFixed(1) + "%";
+            this.text.style.bottom = (this.board.main.yToBottom(this.shape.position.z - 1) * 100).toFixed(1) + "%";
         }
         if (this.value === 0) {
             this.text.innerText = "";
@@ -1203,18 +1211,28 @@ class LevelPlayer extends Level {
     constructor(main) {
         super(main);
         this.pickedCard = -1;
+        this.hand0I = 12;
+        this.hand0J = 0;
+        this.hand1I = 13;
+        this.hand1J = 0;
         this._pointerEvent = (eventData) => {
             return this.pointerEvent(eventData);
         };
     }
     initialize() {
         super.initialize();
+        if (this.main.ratio < 1) {
+            this.hand0I = 10;
+            this.hand0J = -2;
+            this.hand1I = 9;
+            this.hand1J = -2;
+        }
         this.deckPlayer = new Deck(this.main.board);
         this.makePlayerDeck();
-        this.deckPlayer.hand[0].i = 12;
-        this.deckPlayer.hand[0].j = 0;
-        this.deckPlayer.hand[1].i = 13;
-        this.deckPlayer.hand[1].j = 0;
+        this.deckPlayer.hand[0].i = this.hand0I;
+        this.deckPlayer.hand[0].j = this.hand0J;
+        this.deckPlayer.hand[1].i = this.hand1I;
+        this.deckPlayer.hand[1].j = this.hand1J;
         this.deckPlayer.shuffle();
         this.deckPlayer.draw();
         this.deckPlayer.updateShape();
@@ -1226,7 +1244,7 @@ class LevelPlayer extends Level {
             console.log("Alpha");
             if (eventData.pickInfo.pickedMesh) {
                 console.log("Bravo " + eventData.pickInfo.pickedMesh.name);
-                if (eventData.pickInfo.pickedMesh.name === "shape_12_0") {
+                if (eventData.pickInfo.pickedMesh.name === "shape_" + this.hand0I.toFixed(0) + "_" + this.hand0J.toFixed(0)) {
                     console.log("Charly");
                     this.pickedCard = 0;
                     this.deckPlayer.hand[0].selected = true;
@@ -1234,7 +1252,7 @@ class LevelPlayer extends Level {
                     this.deckPlayer.hand[1].selected = false;
                     this.deckPlayer.hand[1].updateShape();
                 }
-                else if (eventData.pickInfo.pickedMesh.name === "shape_13_0") {
+                else if (eventData.pickInfo.pickedMesh.name === "shape_" + this.hand1I.toFixed(0) + "_" + this.hand1J.toFixed(0)) {
                     this.pickedCard = 1;
                     this.deckPlayer.hand[0].selected = false;
                     this.deckPlayer.hand[0].updateShape();
@@ -1365,10 +1383,10 @@ class LevelHumanVsAI extends LevelPlayer {
         this.main.board.playerCount = 2;
         this.deckAI = new Deck(this.main.board);
         this.makeAIDeck();
-        this.deckAI.hand[0].i = -2;
-        this.deckAI.hand[0].j = 0;
-        this.deckAI.hand[1].i = -3;
-        this.deckAI.hand[1].j = 0;
+        this.deckAI.hand[0].i = -10;
+        this.deckAI.hand[0].j = 10;
+        this.deckAI.hand[1].i = -10;
+        this.deckAI.hand[1].j = 10;
         this.deckAI.shuffle();
         this.deckAI.draw();
         this.deckAI.updateShape();

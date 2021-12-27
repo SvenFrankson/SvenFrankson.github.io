@@ -115,9 +115,10 @@ h1 {
   position: fixed;
   z-index: 1;
   color: black;
-  font-size: 80px;
+  font-size: 9vmin;
   font-family: "Schoolwork";
   font-weight: bold;
   text-shadow: 2px 2px white, -2px 2px white, -2px -2px white, 2px -2px white;
   pointer-events: none;
+  transform: translateX(50px) translateY(4.5vmin);
 }
