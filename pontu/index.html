@@ -13,39 +13,20 @@
 
   <body>
     <canvas id="render-canvas"></canvas>
-    <div id="main-menu">
+    <div id="main-menu-panel">
       <h1>Pontu</h1>
       <div class="level-group">Play</div>
-      <div id="level-vs-ai" class="level">a - Play Vs CPU</div>
-      <div id="level-solo" class="level">b - Solo</div>
+      <div id="level-vs-ai" class="level">a - play vs AI</div>
+      <div id="level-solo" class="level">b - debug</div>
+      <div class="credit">
+        <p>code, design and AI by <span id="coder">Sven Frankson</span></p>
+        <p>based on <span id="author">Bernhard Weber</span>'s game punto</p>
+        <p>copyright 2018 <span id="owner">Game Factory</span></p>
+      </div>
     </div>
-    <div id="ui">
-      <div id="score-p0" class="score-info"></div>
-      <div id="score-p1" class="score-info"></div>
-      <div id="score-p2" class="score-info"></div>
-      <div id="cell-network-info">
-        
-      </div>
-      
-      <div id="fps-info"></div>
-      <div id="meshes-info">
-        <div>MESHES INFO</div>
-        <div><span>Total - </span><span id="meshes-info-total">432</span></div>
-        <div><span>Non-Static & Unique - </span><span id="meshes-info-nonstatic-unique">24</span></div>
-        <div><span>Static & Unique - </span><span id="meshes-info-static-unique">12</span></div>
-        <div><span>Non-Static & Instance - </span><span id="meshes-info-nonstatic-instance">124</span></div>
-        <div><span>Static & Instance - </span><span id="meshes-info-static-instance">212</span></div>
-        <div><span id="debug-1">-</span></div>
-        <div><span id="debug-2">-</span></div>
-        <div><span id="debug-3">-</span></div>
-        <div><span id="debug-4">-</span></div>
-        <div><span id="debug-5">-</span></div>
-        <div><span id="debug-6">-</span></div>
-        <div><span id="debug-7">-</span></div>
-        <div><span id="debug-8">-</span></div>
-        <div><span id="debug-9">-</span></div>
-        <div><span id="debug-10">-</span></div>
-      </div>
+    <div id="end-game-panel">
+      <h2 id="end-game-result">you win ! :)</h2>
+      <div id="end-game-back">back</div>
     </div>
   </body>
 </html>

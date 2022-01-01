@@ -95,15 +95,14 @@ class Board {
         }
         if (i >= 0 && i < 11 && j >= 0 && j < 11) {
             let tile = this.tiles[i][j];
-            if (tile.isInRange && tile.value < value) {
+            if (tile.isPlayable && tile.isInRange && tile.value < value) {
                 tile.color = color;
                 tile.value = value;
                 this.updateRangeAndPlayable();
                 this.updateShapes();
-                if (this.checkVictor()) {
-                    requestAnimationFrame(() => {
-                        this.main.currentLevel.dispose();
-                    });
+                let victor = this.checkVictor();
+                if (victor != -1) {
+                    this.main.showEndGame(victor);
                     return false;
                 }
                 this.activePlayer = (this.activePlayer + 1) % this.playerCount;
@@ -180,9 +179,8 @@ class Board {
                                     }
                                 }
                                 if (victory === true) {
-                                    alert("Color " + c + " wins");
                                     this.activePlayer = -1;
-                                    return true;
+                                    return Math.floor(c / 2);
                                 }
                             }
                         }
@@ -190,7 +188,7 @@ class Board {
                 }
             }
         }
-        return false;
+        return -1;
     }
 }
 class Card {
@@ -251,7 +249,8 @@ class Main {
     constructor(canvasElement) {
         this.ratio = 1;
         this.canvas = document.getElementById(canvasElement);
-        this.mainMenuContainer = document.getElementById("main-menu");
+        this.mainMenuContainer = document.getElementById("main-menu-panel");
+        this.endGamePanel = document.getElementById("end-game-panel");
         this.engine = new BABYLON.Engine(this.canvas, true, { preserveDrawingBuffer: true, stencil: true });
     }
     async initialize() {
@@ -282,16 +281,37 @@ class Main {
         this.centerMainMenu();
     }
     centerMainMenu() {
-        let w = Math.max(this.canvas.clientWidth * 0.5, 350);
+        let w = this.canvas.clientWidth * 0.6;
+        if (w < 400) {
+            w = this.canvas.clientWidth;
+        }
         let left = (this.canvas.clientWidth - w) * 0.5;
         this.mainMenuContainer.style.width = w.toFixed(0) + "px";
         this.mainMenuContainer.style.left = left.toFixed(0) + "px";
+        this.endGamePanel.style.width = w.toFixed(0) + "px";
+        this.endGamePanel.style.left = left.toFixed(0) + "px";
     }
     showMainMenu() {
         this.mainMenuContainer.style.display = "block";
+        this.hideEndGame();
     }
     hideMainMenu() {
         this.mainMenuContainer.style.display = "none";
+    }
+    showEndGame(result) {
+        if (result === 0) {
+            document.getElementById("end-game-result").innerText = "you win ! :)";
+        }
+        if (result === 1) {
+            document.getElementById("end-game-result").innerText = "you loose... :(";
+        }
+        if (result === 2) {
+            document.getElementById("end-game-result").innerText = "draw";
+        }
+        this.endGamePanel.style.display = "block";
+    }
+    hideEndGame() {
+        this.endGamePanel.style.display = "none";
     }
     xToLeft(x) {
         return 1 - (x - this.camera.orthoLeft) / this.sceneWidth;
@@ -390,28 +410,26 @@ class Main {
             this.currentLevel = new LevelHumanVsAI(this);
             this.currentLevel.initialize();
         });
+        document.getElementById("end-game-back").addEventListener("pointerup", () => {
+            if (this.currentLevel) {
+                this.currentLevel.dispose();
+            }
+            this.showMainMenu();
+        });
+        document.getElementById("coder").addEventListener("pointerup", () => {
+            window.open("https://svenfrankson.github.io/");
+        });
+        document.getElementById("author").addEventListener("pointerup", () => {
+            window.open("https://fr.wikipedia.org/wiki/Bernhard_Weber");
+        });
+        document.getElementById("owner").addEventListener("pointerup", () => {
+            window.open("https://www.gamefactory-spiele.com/punto");
+        });
+        this.showMainMenu();
     }
     animate() {
-        let fpsInfoElement = document.getElementById("fps-info");
-        let meshesInfoTotalElement = document.getElementById("meshes-info-total");
-        let meshesInfoNonStaticUniqueElement = document.getElementById("meshes-info-nonstatic-unique");
-        let meshesInfoStaticUniqueElement = document.getElementById("meshes-info-static-unique");
-        let meshesInfoNonStaticInstanceElement = document.getElementById("meshes-info-nonstatic-instance");
-        let meshesInfoStaticInstanceElement = document.getElementById("meshes-info-static-instance");
         this.engine.runRenderLoop(() => {
             this.scene.render();
-            fpsInfoElement.innerText = this.engine.getFps().toFixed(0) + " fps";
-            let uniques = this.scene.meshes.filter(m => { return !(m instanceof BABYLON.InstancedMesh); });
-            let uniquesNonStatic = uniques.filter(m => { return !m.isWorldMatrixFrozen; });
-            let uniquesStatic = uniques.filter(m => { return m.isWorldMatrixFrozen; });
-            let instances = this.scene.meshes.filter(m => { return m instanceof BABYLON.InstancedMesh; });
-            let instancesNonStatic = instances.filter(m => { return !m.isWorldMatrixFrozen; });
-            let instancesStatic = instances.filter(m => { return m.isWorldMatrixFrozen; });
-            meshesInfoTotalElement.innerText = this.scene.meshes.length.toFixed(0).padStart(4, "0");
-            meshesInfoNonStaticUniqueElement.innerText = uniquesNonStatic.length.toFixed(0).padStart(4, "0");
-            meshesInfoStaticUniqueElement.innerText = uniquesStatic.length.toFixed(0).padStart(4, "0");
-            meshesInfoNonStaticInstanceElement.innerText = instancesNonStatic.length.toFixed(0).padStart(4, "0");
-            meshesInfoStaticInstanceElement.innerText = instancesStatic.length.toFixed(0).padStart(4, "0");
         });
         window.addEventListener("resize", () => {
             this.engine.resize();
@@ -422,9 +440,6 @@ window.addEventListener("load", async () => {
     let main = new Main("render-canvas");
     await main.initialize();
     main.animate();
-    document.getElementById("cell-network-info").style.display = "none";
-    document.getElementById("meshes-info").style.display = "none";
-    //document.getElementById("debug-info").style.display = "none";
 });
 class Math2D {
     static AreEqualsCircular(a1, a2, epsilon = Math.PI / 60) {
