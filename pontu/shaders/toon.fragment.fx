@@ -19,7 +19,7 @@ void main(void) {
     float f = vNormalW.y;
     vec2 pencil = vec2(cos(positionS.x * 2. * 3.14), sin(positionS.y * 2. * 3.14));
     vec2 n2 = vec2(vNormalW.x, vNormalW.z);
-    float threshold = 0.05 + 0.95 * abs(dot(n2, pencil));
+    float threshold = 0.2 + 0.8 * abs(dot(n2, pencil));
     if (f < threshold) {
         color = vec4(vec3(0.1), 1.);
     }
