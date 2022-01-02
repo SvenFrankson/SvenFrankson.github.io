@@ -3,6 +3,8 @@ class Board {
         this.main = main;
         this.playerCount = 1;
         this.activePlayer = 0;
+        this.ICenter = 5;
+        this.JCenter = 5;
         this.tiles = [];
         for (let i = 0; i < 11; i++) {
             this.tiles[i] = [];
@@ -11,6 +13,11 @@ class Board {
             }
         }
         this.tiles[5][5].isPlayable = true;
+        for (let i = 4; i <= 6; i++) {
+            for (let j = 4; j <= 6; j++) {
+                this.tiles[i][j].isNextToPlayable = true;
+            }
+        }
     }
     cloneTiles() {
         let clonedTiles = [];
@@ -37,6 +44,13 @@ class Board {
                     jMin = Math.min(j, jMin);
                     iMax = Math.max(i, iMax);
                     jMax = Math.max(j, jMax);
+                    for (let ii = -2; ii <= 2; ii++) {
+                        for (let jj = -2; jj <= 2; jj++) {
+                            if (i + ii >= 0 && i + ii < 11 && j + jj >= 0 && j + jj < 11) {
+                                tiles[i + ii][j + jj].isNextToPlayable = true;
+                            }
+                        }
+                    }
                     for (let ii = -1; ii <= 1; ii++) {
                         for (let jj = -1; jj <= 1; jj++) {
                             if (i + ii >= 0 && i + ii < 11 && j + jj >= 0 && j + jj < 11) {
@@ -47,6 +61,8 @@ class Board {
                 }
             }
         }
+        this.ICenter = (iMin + iMax) * 0.5;
+        this.JCenter = (jMin + jMax) * 0.5;
         for (let i = 0; i < 11; i++) {
             for (let j = 0; j < 11; j++) {
                 if (i >= iMin + 6) {
@@ -65,10 +81,16 @@ class Board {
         }
     }
     updateShapes() {
-        console.log("Board Update Shape");
         for (let i = 0; i < 11; i++) {
             for (let j = 0; j < 11; j++) {
                 this.tiles[i][j].updateShape();
+            }
+        }
+    }
+    updateShapesTextPosition() {
+        for (let i = 0; i < 11; i++) {
+            for (let j = 0; j < 11; j++) {
+                this.tiles[i][j].updateTextPosition();
             }
         }
     }
@@ -79,7 +101,14 @@ class Board {
             }
         }
         this.tiles[5][5].isPlayable = true;
+        for (let i = 4; i <= 6; i++) {
+            for (let j = 4; j <= 6; j++) {
+                this.tiles[i][j].isNextToPlayable = true;
+            }
+        }
         this.activePlayer = 0;
+        this.ICenter = 5;
+        this.JCenter = 5;
         this.updateShapes();
     }
     hide() {
@@ -248,6 +277,7 @@ var COS30 = Math.cos(Math.PI / 6);
 class Main {
     constructor(canvasElement) {
         this.ratio = 1;
+        this.cameraOffset = BABYLON.Vector2.Zero();
         this.canvas = document.getElementById(canvasElement);
         this.mainMenuContainer = document.getElementById("main-menu-panel");
         this.endGamePanel = document.getElementById("end-game-panel");
@@ -258,27 +288,46 @@ class Main {
         this.initializeMainMenu();
     }
     resize() {
+        this.resizeCamera();
+        this.centerMainMenu();
+    }
+    resizeCamera() {
         this.ratio = this.canvas.clientWidth / this.canvas.clientHeight;
-        let n = 6;
+        let n = 4;
         if (Math.abs(this.ratio - 1) < 1 / 6) {
-            n = 8;
+            n = 6;
         }
         else if (Math.abs(this.ratio - 1) < 1 / 3) {
-            n = 7;
+            n = 5;
+        }
+        let targetOffset = BABYLON.Vector2.Zero();
+        if (this.board) {
+            targetOffset.x = (this.board.ICenter - 5) * 4;
+            targetOffset.y = (this.board.JCenter - 5) * 4;
+        }
+        let needLayoutUpdate = false;
+        if (BABYLON.Vector2.DistanceSquared(this.cameraOffset, targetOffset) > 0) {
+            let n = targetOffset.subtract(this.cameraOffset).normalize();
+            let d = Math.min(this.engine.getDeltaTime() / 1000 * 10, BABYLON.Vector2.Distance(this.cameraOffset, targetOffset));
+            n.scaleInPlace(d);
+            this.cameraOffset.addInPlace(n);
+            needLayoutUpdate = true;
         }
         if (this.ratio >= 1) {
-            this.camera.orthoTop = -n * 4;
-            this.camera.orthoRight = -n * 4 * this.ratio;
-            this.camera.orthoLeft = n * 4 * this.ratio;
-            this.camera.orthoBottom = n * 4;
+            this.camera.orthoTop = -n * 4 - this.cameraOffset.y;
+            this.camera.orthoRight = -n * 4 * this.ratio - this.cameraOffset.x;
+            this.camera.orthoLeft = n * 4 * this.ratio - this.cameraOffset.x;
+            this.camera.orthoBottom = n * 4 - this.cameraOffset.y;
         }
         else {
-            this.camera.orthoTop = -n * 4 / this.ratio;
-            this.camera.orthoRight = -n * 4;
-            this.camera.orthoLeft = n * 4;
-            this.camera.orthoBottom = n * 4 / this.ratio;
+            this.camera.orthoTop = -n * 4 / this.ratio - this.cameraOffset.y;
+            this.camera.orthoRight = -n * 4 - this.cameraOffset.x;
+            this.camera.orthoLeft = n * 4 - this.cameraOffset.x;
+            this.camera.orthoBottom = n * 4 / this.ratio - this.cameraOffset.y;
         }
-        this.centerMainMenu();
+        if (needLayoutUpdate) {
+            this.board.updateShapesTextPosition();
+        }
     }
     centerMainMenu() {
         let w = this.canvas.clientWidth * 0.6;
@@ -314,22 +363,16 @@ class Main {
         this.endGamePanel.style.display = "none";
     }
     xToLeft(x) {
-        return 1 - (x - this.camera.orthoLeft) / this.sceneWidth;
+        return (x + this.camera.orthoLeft) / this.sceneWidth;
     }
-    xToRight(x) {
-        return 1 + (x - this.camera.orthoRight) / this.sceneWidth;
-    }
-    yToTop(y) {
-        return 1 + (y - this.camera.orthoTop) / this.sceneHeight;
-    }
-    yToBottom(y) {
-        return 1 - (y - this.camera.orthoBottom) / this.sceneHeight;
+    zToBottom(z) {
+        return (z + this.camera.orthoBottom) / this.sceneHeight;
     }
     get sceneWidth() {
-        return this.camera.orthoRight - this.camera.orthoLeft;
+        return this.camera.orthoLeft - this.camera.orthoRight;
     }
     get sceneHeight() {
-        return this.camera.orthoTop - this.camera.orthoBottom;
+        return this.camera.orthoBottom - this.camera.orthoTop;
     }
     async initializeScene() {
         this.scene = new BABYLON.Scene(this.engine);
@@ -406,6 +449,10 @@ class Main {
             this.currentLevel = new LevelRandomSolo(this);
             this.currentLevel.initialize();
         });
+        document.getElementById("level-vs-ai-easy").addEventListener("pointerup", () => {
+            this.currentLevel = new LevelHumanVsAIEasy(this);
+            this.currentLevel.initialize();
+        });
         document.getElementById("level-vs-ai").addEventListener("pointerup", () => {
             this.currentLevel = new LevelHumanVsAI(this);
             this.currentLevel.initialize();
@@ -429,6 +476,7 @@ class Main {
     }
     animate() {
         this.engine.runRenderLoop(() => {
+            this.resizeCamera();
             this.scene.render();
         });
         window.addEventListener("resize", () => {
@@ -848,6 +896,7 @@ class Tile {
         this.value = 0;
         this.isInRange = true;
         this.isPlayable = false;
+        this.isNextToPlayable = false;
         this.selected = false;
         this.points = [
             new BABYLON.Vector2(-2, -2),
@@ -862,6 +911,7 @@ class Tile {
         clonedTile.value = this.value;
         clonedTile.isInRange = this.isInRange;
         clonedTile.isPlayable = this.isPlayable;
+        clonedTile.isNextToPlayable = this.isNextToPlayable;
         return clonedTile;
     }
     reset() {
@@ -869,6 +919,7 @@ class Tile {
         this.value = 0;
         this.isInRange = true;
         this.isPlayable = false;
+        this.isNextToPlayable = false;
         this.selected = false;
     }
     dispose() {
@@ -897,6 +948,12 @@ class Tile {
             this.shape.position.copyFromFloats((this.i - 5) * 4, 0, (this.j - 5) * 4);
         }
     }
+    updateTextPosition() {
+        if (this.shape && this.text) {
+            this.text.style.left = (this.board.main.xToLeft(this.shape.position.x) * 100).toFixed(2) + "%";
+            this.text.style.bottom = (this.board.main.zToBottom(this.shape.position.z - 2) * 100).toFixed(2) + "%";
+        }
+    }
     updateShape(points = this.points) {
         if (!this.shape) {
             this.shape = new BABYLON.Mesh("shape_" + this.i + "_" + this.j);
@@ -915,9 +972,8 @@ class Tile {
             this.text = document.createElement("div");
             document.body.appendChild(this.text);
             this.text.classList.add("tile-text");
-            this.text.style.right = (this.board.main.xToRight(this.shape.position.x) * 100).toFixed(1) + "%";
-            this.text.style.bottom = (this.board.main.yToBottom(this.shape.position.z - 1) * 100).toFixed(1) + "%";
         }
+        this.updateTextPosition();
         if (this.value === 0) {
             this.text.innerText = "";
         }
@@ -925,7 +981,7 @@ class Tile {
             this.text.innerText = this.value.toFixed(0);
         }
         if (true) {
-            if (!this.isInRange) {
+            if (!this.isInRange || (!this.isPlayable && !this.isNextToPlayable)) {
                 this.shape.isVisible = false;
                 return;
             }
@@ -994,9 +1050,9 @@ class Tile {
 }
 Tile.Colors = [
     BABYLON.Color4.FromHexString("#0ABB07FF"),
+    BABYLON.Color4.FromHexString("#070ABBFF"),
     BABYLON.Color4.FromHexString("#FFC800FF"),
-    BABYLON.Color4.FromHexString("#FF1900FF"),
-    BABYLON.Color4.FromHexString("#070ABBFF")
+    BABYLON.Color4.FromHexString("#FF1900FF")
 ];
 class UniqueList {
     constructor() {
@@ -1227,9 +1283,9 @@ class LevelPlayer extends Level {
         super(main);
         this.pickedCard = -1;
         this.hand0I = 12;
-        this.hand0J = 0;
+        this.hand0J = 5;
         this.hand1I = 13;
-        this.hand1J = 0;
+        this.hand1J = 5;
         this._pointerEvent = (eventData) => {
             return this.pointerEvent(eventData);
         };
@@ -1246,11 +1302,12 @@ class LevelPlayer extends Level {
         this.makePlayerDeck();
         this.deckPlayer.hand[0].i = this.hand0I;
         this.deckPlayer.hand[0].j = this.hand0J;
+        this.deckPlayer.hand[0].isPlayable = true;
         this.deckPlayer.hand[1].i = this.hand1I;
         this.deckPlayer.hand[1].j = this.hand1J;
+        this.deckPlayer.hand[1].isPlayable = true;
         this.deckPlayer.shuffle();
         this.deckPlayer.draw();
-        this.deckPlayer.updateShape();
         this.main.board.updateShapes();
         this.main.scene.onPointerObservable.add(this._pointerEvent);
     }
@@ -1277,14 +1334,12 @@ class LevelPlayer extends Level {
             }
         }
         else if (eventData.type === BABYLON.PointerEventTypes.POINTERUP) {
-            let ok = false;
             if (eventData.pickInfo.pickedMesh) {
                 let split = eventData.pickInfo.pickedMesh.name.split("_");
                 if (split.length === 3) {
                     let i = parseInt(split[1]);
                     let j = parseInt(split[2]);
                     if (isFinite(i) && isFinite(j)) {
-                        ok = true;
                         let value = 0;
                         let color = -1;
                         let pickedTile = this.deckPlayer.hand[this.pickedCard];
@@ -1294,19 +1349,21 @@ class LevelPlayer extends Level {
                         }
                         if (this.main.board.play(0, color, value, i, j)) {
                             pickedTile.reset();
+                            pickedTile.isPlayable = true;
                             this.pickedCard = -1;
                             this.deckPlayer.draw();
-                            this.deckPlayer.updateShape();
                         }
                     }
                 }
             }
-            if (!ok) {
-                this.pickedCard = -1;
-            }
         }
     }
     update() {
+        this.deckPlayer.hand[0].shapePosition.x = -this.main.camera.orthoRight - 4;
+        this.deckPlayer.hand[0].shapePosition.z = -this.main.camera.orthoBottom + 4;
+        this.deckPlayer.hand[1].shapePosition.x = -this.main.camera.orthoRight - 4;
+        this.deckPlayer.hand[1].shapePosition.z = -this.main.camera.orthoBottom + 8;
+        this.deckPlayer.updateShape();
     }
     dispose() {
         super.dispose();
@@ -1321,34 +1378,6 @@ class LevelPlayer extends Level {
 class LevelHumanVsAI extends LevelPlayer {
     constructor(main) {
         super(main);
-        /*
-        public update(): void {
-            if (this.main.board.activePlayer === 1) {
-                let ok = false;
-                for (let i = 0; i < 1000; i++) {
-                    let n = Math.floor(Math.random() * 2);
-                    let pickedCard = this.deckAI.hand[n];
-                    if (pickedCard.value > 0) {
-                        let I = Math.floor(Math.random() * 11);
-                        let J = Math.floor(Math.random() * 11);
-                        let currentBoardTile = this.main.board.tiles[I][J];
-                        if (currentBoardTile.isInRange && currentBoardTile.isPlayable) {
-                            if (currentBoardTile.color < 2) {
-                                ok = this.main.board.play(1, pickedCard.color, pickedCard.value, I, J);
-                                if (ok) {
-                                    pickedCard.color = - 1;
-                                    pickedCard.value = 0;
-                                    this.deckAI.draw();
-                                    this.deckAI.updateShape();
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        */
         /*
         public update(): void {
             if (this.main.board.activePlayer === 1) {
@@ -1400,8 +1429,10 @@ class LevelHumanVsAI extends LevelPlayer {
         this.makeAIDeck();
         this.deckAI.hand[0].i = -10;
         this.deckAI.hand[0].j = 10;
+        this.deckAI.hand[0].isPlayable = true;
         this.deckAI.hand[1].i = -10;
         this.deckAI.hand[1].j = 10;
+        this.deckAI.hand[1].isPlayable = true;
         this.deckAI.shuffle();
         this.deckAI.draw();
         this.deckAI.updateShape();
@@ -1427,6 +1458,7 @@ class LevelHumanVsAI extends LevelPlayer {
         }
     }
     update() {
+        super.update();
         if (this.main.board.activePlayer === 1 && !this.lock) {
             let cloneTiles = this.main.board.cloneTiles();
             let playableTiles = [];
@@ -1452,8 +1484,8 @@ class LevelHumanVsAI extends LevelPlayer {
                         playableTiles[i].value = card.value;
                         let value = this.main.board.computeBoardValueForColor(card.color, cloneTiles);
                         value += this.main.board.computeBoardValueForColor(card.color === 2 ? 3 : 2, cloneTiles) * 0.1;
-                        value -= this.main.board.computeBoardValueForColor(0, cloneTiles);
-                        value -= this.main.board.computeBoardValueForColor(1, cloneTiles);
+                        value -= this.main.board.computeBoardValueForColor(0, cloneTiles) * 1.5;
+                        value -= this.main.board.computeBoardValueForColor(1, cloneTiles) * 1.5;
                         if (value > bestValue) {
                             bestValue = value;
                             bestN = n;
@@ -1490,7 +1522,7 @@ class LevelHumanVsAI extends LevelPlayer {
         let p1 = this.main.board.tiles[targetI][targetJ].shapePosition.clone();
         p1.y += 0.5;
         let t = 0;
-        let duration = 1;
+        let duration = 0.8;
         let step = () => {
             t += this.main.engine.getDeltaTime() / 1000;
             let dt = t / duration;
@@ -1511,6 +1543,39 @@ class LevelHumanVsAI extends LevelPlayer {
             console.log("Deck AI Dispose Tile");
             t.dispose();
         });
+    }
+}
+class LevelHumanVsAIEasy extends LevelHumanVsAI {
+    constructor() {
+        super(...arguments);
+        this.lock = false;
+    }
+    update() {
+        if (this.main.board.activePlayer === 1 && !this.lock) {
+            for (let i = 0; i < 1000; i++) {
+                let n = Math.floor(Math.random() * 2);
+                let card = this.deckAI.hand[n];
+                if (card.value > 0) {
+                    let I = Math.floor(Math.random() * 11);
+                    let J = Math.floor(Math.random() * 11);
+                    let currentBoardTile = this.main.board.tiles[I][J];
+                    if (currentBoardTile.isInRange && currentBoardTile.isPlayable) {
+                        if (currentBoardTile.color < 2 && currentBoardTile.value < card.value) {
+                            this.lock = true;
+                            return this.aiPlayAnimation(n, I, J, () => {
+                                if (this.main.board.play(1, card.color, card.value, I, J)) {
+                                    this.lock = false;
+                                    card.color = -1;
+                                    card.value = 0;
+                                    this.deckAI.draw();
+                                    this.deckAI.updateShape();
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 class LevelRandomAIVsAI extends Level {
