@@ -327,6 +327,7 @@ class Main {
         this.canvas = document.getElementById(canvasElement);
         this.mainMenuContainer = document.getElementById("main-menu-panel");
         this.endGamePanel = document.getElementById("end-game-panel");
+        this.tutorialPanel = document.getElementById("tutorial-panel");
         this.engine = new BABYLON.Engine(this.canvas, true, { preserveDrawingBuffer: true, stencil: true });
     }
     async initialize() {
@@ -387,15 +388,19 @@ class Main {
         this.mainMenuContainer.style.left = left.toFixed(0) + "px";
         this.endGamePanel.style.width = w.toFixed(0) + "px";
         this.endGamePanel.style.left = left.toFixed(0) + "px";
+        this.tutorialPanel.style.width = w.toFixed(0) + "px";
+        this.tutorialPanel.style.left = left.toFixed(0) + "px";
     }
     showMainMenu() {
         this.mainMenuContainer.style.display = "block";
         this.hideEndGame();
+        this.hideTutorialPanel();
     }
     hideMainMenu() {
         this.mainMenuContainer.style.display = "none";
     }
     showEndGame(result, subvictory = false) {
+        this.hideTutorialPanel();
         if (result === 0) {
             document.getElementById("end-game-result").innerText = "you win ! :)";
             if (subvictory) {
@@ -422,6 +427,38 @@ class Main {
     }
     hideEndGame() {
         this.endGamePanel.style.display = "none";
+    }
+    showTutorialPanel(index = 0) {
+        this.tutorialPanel.style.display = "block";
+        for (let i = 0; i < 5; i++) {
+            document.getElementById("tutorial-img-" + i).style.display = i === index ? "inline" : "none";
+            document.getElementById("tutorial-txt-" + i).style.display = i === index ? "block" : "none";
+        }
+        if (index === 0) {
+            document.getElementById("tutorial-back").onpointerup = () => {
+                this.showMainMenu();
+            };
+        }
+        else {
+            document.getElementById("tutorial-back").onpointerup = () => {
+                this.showTutorialPanel(index - 1);
+            };
+        }
+        if (index === 4) {
+            document.getElementById("tutorial-next").onpointerup = () => {
+                this.showMainMenu();
+            };
+        }
+        else {
+            document.getElementById("tutorial-next").onpointerup = () => {
+                this.showTutorialPanel(index + 1);
+            };
+        }
+        this.hideMainMenu();
+        this.hideEndGame();
+    }
+    hideTutorialPanel() {
+        this.tutorialPanel.style.display = "none";
     }
     xToLeft(x) {
         return (x + this.camera.orthoLeft) / this.sceneWidth;
@@ -506,12 +543,20 @@ class Main {
         */
     }
     initializeMainMenu() {
+        document.getElementById("open-tutorial").addEventListener("pointerup", () => {
+            this.showTutorialPanel();
+        });
+        document.getElementById("level-solo").addEventListener("pointerup", () => {
+            this.currentLevel = new LevelRandomSolo(this);
+            this.currentLevel.initialize();
+        });
         document.getElementById("level-solo").addEventListener("pointerup", () => {
             this.currentLevel = new LevelRandomSolo(this);
             this.currentLevel.initialize();
         });
         document.getElementById("level-vs-ai-easy").addEventListener("pointerup", () => {
-            this.currentLevel = new LevelHumanVsAIEasy(this);
+            this.currentLevel = new LevelHumanVsAI(this);
+            this.currentLevel.aggroAI = 0;
             this.currentLevel.initialize();
         });
         document.getElementById("level-vs-ai").addEventListener("pointerup", () => {
@@ -1690,6 +1735,7 @@ class LevelRandomSolo extends LevelPlayer {
         }
     }
     update() {
+        super.update();
     }
     dispose() {
         super.dispose();

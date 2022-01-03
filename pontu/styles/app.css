@@ -88,6 +88,7 @@ h1 {
   font-size: 12vh;
   text-decoration: underline 3px red;
   text-align: center;
+  margin-bottom: 5%;
 }
 
 h2 {
@@ -127,14 +128,20 @@ h2 {
 }
 
 #coder {
+  cursor: pointer;
+  user-select: none;
   text-decoration: underline 2px #004CFF;
 }
 
 #author {
+  cursor: pointer;
+  user-select: none;
   text-decoration: underline 2px #004CFF;
 }
 
 #owner {
+  cursor: pointer;
+  user-select: none;
   text-decoration: underline 2px #004CFF;
 }
 
@@ -142,10 +149,10 @@ h2 {
   position: fixed;
   z-index: 2;
   height: 100%;
-  padding-top: 30%;
+  padding-top: 25%;
   color: black;
   font-family: "Schoolwork";
-  background: rgba(255, 255, 255, 60%);
+  background: rgba(255, 255, 255, 70%);
   display: none;
 }
 
@@ -168,6 +175,8 @@ h2 {
 }
 
 .level {
+  cursor: pointer;
+  user-select: none;
   margin-left: 10%;
   text-decoration: underline 2px #004CFF;
 }
@@ -185,4 +194,48 @@ h2 {
   text-shadow: 1px 1px white, -1px 1px white, -1px -1px white, 1px -1px white;
   pointer-events: none;
   transform: translateX(-50px) translateY(2.5vmin);
+}
+
+#tutorial-panel {
+  display: none;
+  position: fixed;
+  z-index: 2;
+  height: 100%;
+  color: black;
+  font-family: "Schoolwork";
+  text-align: center;
+}
+
+.tuto-img {
+  width: 70%;
+  border: 2px solid black;
+}
+
+.tuto-txt {
+  text-align: center;
+  font-style: italic;
+  margin-left: 5%;
+  font-size: 5vh;
+}
+
+#tutorial-back {
+  cursor: pointer;
+  user-select: none;
+  position: absolute;
+  left: 5%;
+  bottom: 10%;
+  text-align: left;
+  font-size: 9vh;
+  text-decoration: underline 2px #004CFF;
+}
+
+#tutorial-next {
+  cursor: pointer;
+  user-select: none;
+  position: absolute;
+  right: 5%;
+  bottom: 10%;
+  text-align: right;
+  font-size: 9vh;
+  text-decoration: underline 2px #004CFF;
 }
