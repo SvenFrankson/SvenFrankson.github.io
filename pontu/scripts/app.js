@@ -379,7 +379,7 @@ class Main {
         }
     }
     centerMainMenu() {
-        let w = this.canvas.clientWidth * 0.6;
+        let w = this.canvas.clientWidth * 0.5;
         if (w < 400) {
             w = this.canvas.clientWidth;
         }
@@ -1427,11 +1427,8 @@ class LevelPlayer extends Level {
     }
     pointerEvent(eventData) {
         if (eventData.type === BABYLON.PointerEventTypes.POINTERDOWN) {
-            console.log("Alpha");
             if (eventData.pickInfo.pickedMesh) {
-                console.log("Bravo " + eventData.pickInfo.pickedMesh.name);
                 if (eventData.pickInfo.pickedMesh.name === "shape_" + this.hand0I.toFixed(0) + "_" + this.hand0J.toFixed(0)) {
-                    console.log("Charly");
                     this.pickedCard = 0;
                     this.deckPlayer.hand[0].selected = true;
                     this.deckPlayer.hand[0].updateShape();
@@ -1621,7 +1618,6 @@ class LevelHumanVsAI extends LevelPlayer {
                 }
             }
             if (isFinite(bestValue)) {
-                console.log(bestValue);
                 let card = this.deckAI.hand[bestN];
                 this.lock = true;
                 this.aiPlayAnimation(bestN, bestTile.i, bestTile.j, () => {
@@ -1664,7 +1660,6 @@ class LevelHumanVsAI extends LevelPlayer {
     dispose() {
         super.dispose();
         this.deckAI.hand.forEach(t => {
-            console.log("Deck AI Dispose Tile");
             t.dispose();
         });
     }
