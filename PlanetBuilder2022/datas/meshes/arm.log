@@ -1,0 +1,123 @@
+Exporter version: 6.4.5, Blender version: 2.90.1
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used :
+		Inline textures     :  false
+		Material Type       :  PBR
+		Positions Precision :  4
+		Normals Precision   :  3
+		UVs Precision       :  3
+		Vert Color Precision:  3
+		Mat Weight Precision:  2
+		Keep Z-up r-handed  :  no
+		Texture directory   :  C:\Users\svent\Documents\Sven Frankson\planet-builder-web\datas\meshes\
+	Python World class constructor completed
+	WARNING: No active camera has been assigned, or is not in a currently selected Blender layer
+	processing begun of mesh:  0-arm
+		processing begun of material:  Steel
+		processing begun of material:  ColoredSteel
+		processing begun of multimaterial:  arm.Multimaterial#0
+		num positions      :  466
+		num normals        :  466
+		num tangents       :  0
+		num uvs            :  932
+		num uvs2           :  0
+		num colors         :  1864
+		num triangles      :  190
+	processing begun of mesh:  2-foreArm
+		processing begun of material:  Steel
+		processing begun of material:  ColoredSteel
+		processing begun of material:  DarkSteel
+		registered as also a user of material:  Steel
+		registered as also a user of material:  ColoredSteel
+		processing begun of multimaterial:  arm.Multimaterial#1
+		num positions      :  566
+		num normals        :  566
+		num tangents       :  0
+		num uvs            :  1132
+		num uvs2           :  0
+		num colors         :  2264
+		num triangles      :  230
+	processing begun of mesh:  1-elbow
+		processing begun of material:  Steel
+		processing begun of material:  ColoredSteel
+		registered as also a user of material:  Steel
+		registered as also a user of material:  ColoredSteel
+		processing begun of multimaterial:  arm.Multimaterial#2
+		num positions      :  320
+		num normals        :  320
+		num tangents       :  0
+		num uvs            :  640
+		num uvs2           :  0
+		num colors         :  1280
+		num triangles      :  122
+	processing begun of mesh:  3-wrist
+		processing begun of material:  Steel
+		processing begun of material:  ColoredSteel
+		registered as also a user of material:  Steel
+		registered as also a user of material:  ColoredSteel
+		processing begun of multimaterial:  arm.Multimaterial#3
+		num positions      :  294
+		num normals        :  294
+		num tangents       :  0
+		num uvs            :  588
+		num uvs2           :  0
+		num colors         :  1176
+		num triangles      :  116
+	processing begun of mesh:  4-hand
+		processing begun of material:  Steel
+		processing begun of material:  ColoredSteel
+		registered as also a user of material:  Steel
+		registered as also a user of material:  ColoredSteel
+		processing begun of multimaterial:  arm.Multimaterial#4
+		num positions      :  350
+		num normals        :  350
+		num tangents       :  0
+		num uvs            :  700
+		num uvs2           :  0
+		num colors         :  1400
+		num triangles      :  124
+	processing begun of mesh:  5-finger
+		processing begun of material:  Steel
+		processing begun of material:  ColoredSteel
+		registered as also a user of material:  Steel
+		registered as also a user of material:  ColoredSteel
+		processing begun of multimaterial:  arm.Multimaterial#5
+		num positions      :  241
+		num normals        :  241
+		num tangents       :  0
+		num uvs            :  482
+		num uvs2           :  0
+		num colors         :  964
+		num triangles      :  94
+	processing begun of mesh:  6-finger-tip
+		processing begun of material:  Steel
+		processing begun of material:  ColoredSteel
+		registered as also a user of material:  Steel
+		registered as also a user of material:  ColoredSteel
+		processing begun of multimaterial:  arm.Multimaterial#6
+		num positions      :  405
+		num normals        :  405
+		num tangents       :  0
+		num uvs            :  810
+		num uvs2           :  0
+		num colors         :  1620
+		num triangles      :  150
+	processing begun of mesh:  A-finger
+		mesh is an instance of :  5-finger.  Processing halted.
+	processing begun of mesh:  B-finger
+		mesh is an instance of :  5-finger.  Processing halted.
+	processing begun of mesh:  C-finger
+		mesh is an instance of :  5-finger.  Processing halted.
+	processing begun of mesh:  Z-finger.004
+		mesh is an instance of :  5-finger.  Processing halted.
+========= Writing of JSON file started =========
+	writing mesh:  0-arm
+	writing mesh:  2-foreArm
+	writing mesh:  1-elbow
+	writing mesh:  3-wrist
+	writing mesh:  4-hand
+	writing mesh:  5-finger
+	writing mesh:  6-finger-tip
+========= Writing of JSON file completed =========
+========= end of processing =========
+elapsed time:  0 min, 0.1047 secs
