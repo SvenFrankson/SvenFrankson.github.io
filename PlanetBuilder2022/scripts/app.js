@@ -783,7 +783,7 @@ class TutorialManager {
             ["Lesson 1.c / 87 - Jump. Press ", "<span class='pad yellow'>Y</span>", " to jump."],
         ];
         this.mainMenuText = [
-            ["Lesson 1.d / 87 - Open Menu. Press ", "<span class='keyboard'>²</span>", " to open Planet Selection Menu."],
+            ["Lesson 1.d / 87 - Open Menu. Press ", "<span class='keyboard'>²</span>", " or ", "<span class='keyboard'>M</span>", " to open Planet Selection Menu."],
             ["Lesson 1.d / 87 - Open Menu. Press ", "<span class='pad'>start</span>", " to open Planet Selection Menu."],
         ];
         this.waitForLookAroundTimer = 0;
@@ -8790,14 +8790,21 @@ class InputManager {
         this.keyInputMap.set("KeyD", KeyInput.MOVE_RIGHT);
         this.keyInputMap.set("Space", KeyInput.JUMP);
         this.keyInputMap.set("Backquote", KeyInput.MAIN_MENU);
+        this.keyInputMap.set("m", KeyInput.MAIN_MENU);
         window.addEventListener("keydown", (e) => {
             let keyInput = this.keyInputMap.get(e.code);
+            if (!isFinite(keyInput)) {
+                keyInput = this.keyInputMap.get(e.key);
+            }
             if (isFinite(keyInput)) {
                 this.doKeyInputDown(keyInput);
             }
         });
         window.addEventListener("keyup", (e) => {
             let keyInput = this.keyInputMap.get(e.code);
+            if (!isFinite(keyInput)) {
+                keyInput = this.keyInputMap.get(e.key);
+            }
             if (isFinite(keyInput)) {
                 this.doKeyInputUp(keyInput);
             }
