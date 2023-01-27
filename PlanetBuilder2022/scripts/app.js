@@ -262,7 +262,7 @@ class FlyTool {
                 let dir = wp.subtract(flightPlan.waypoints[index - 1]).normalize();
                 let dist = BABYLON.Vector3.Dot(player.position.subtract(flightPlan.from), totalDir);
                 let f = dist / totalDist;
-                if ((1 - f) * totalDist > 20) {
+                if ((1 - f) * totalDist > 10) {
                     player.targetLook = flightPlan.to;
                     player.targetLookStrength = 0.1;
                 }
@@ -2567,100 +2567,14 @@ class MainMenu extends Main {
                 this.inputManager.initialize(this.player);
                 this.onChunckManagerNotWorking(async () => {
                     await this.player.initialize();
+                    //let hud = new HeadUpDisplay(this.player, this.cameraManager);
+                    //hud.instantiate();
                     this.player.registerControlUIOnly();
                     setTimeout(() => {
                         hideLoading();
                         setTimeout(() => {
                             mainPanel.openAtPlayerPosition();
                         }, 1000);
-                        /*
-                        this.subtitleManager.add(Subtitle.Create(
-                            ["Use joystick ", "<span class='joystick'>R</span>", " to look around."],
-                            3
-                        ));
-                        this.subtitleManager.add(Subtitle.Create(
-                            ["Hold clic ", "<img src='datas/icons/mouse-left.svg'/>", " and rotate to look around."],
-                            3
-                        ));
-                        this.subtitleManager.add(Subtitle.Create(
-                            ["Touch ", "<img src='datas/icons/touch-icon.svg'/>", " and rotate to look around."],
-                            3
-                        ));
-
-                        this.subtitleManager.add(Subtitle.Create(
-                            ["Use joystick ", "<span class='joystick'>L</span>", " to move."],
-                            3
-                        ));
-                        this.subtitleManager.add(Subtitle.Create(
-                            [
-                                "Press ",
-                                "<span class='keyboard'>W</span>",
-                                ", ",
-                                "<span class='keyboard'>A</span>",
-                                ", ",
-                                "<span class='keyboard'>S</span>",
-                                " and ",
-                                "<span class='keyboard'>D</span>",
-                                " to move."
-                            ],
-                            3
-                        ));
-                        this.subtitleManager.add(Subtitle.Create(
-                            ["Hold clic ", "<img src='datas/icons/mouse-left.svg'/>", " in place to move to target location."],
-                            3
-                        ));
-                        this.subtitleManager.add(Subtitle.Create(
-                            ["Hold touch ", "<img src='datas/icons/touch-icon.svg'/>", " in place to move to target location."],
-                            3
-                        ));
-                        
-                        this.subtitleManager.add(Subtitle.Create(["Press ", "<span class='keyboard'>SPACE</span>", " to jump."], 3));
-                        this.subtitleManager.add(Subtitle.Create(["Press ", "<span class='pad yellow'>Y</span>", " to jump."], 3));
-                        
-                        this.subtitleManager.add(Subtitle.Create(["Press ", "<span class='keyboard'>²</span>", " to open Menu."], 3));
-                        this.subtitleManager.add(Subtitle.Create(["Press ", "<span class='pad'>start</span>", " to open Menu."], 3));
-                        
-                        this.subtitleManager.add(new Subtitle(
-                            [
-                                "Press ",
-                                " or ",
-                                " or ",
-                                " or ",
-                                " or ",
-                                " or ",
-                                " or ",
-                                " or ",
-                                " or ",
-                                " or ",
-                                " or ",
-                                " or ",
-                                " to Jump. Also please clic ",
-                                " and ",
-                                " and ",
-                                ".",
-
-                            ],
-                            [
-                                "<span class='keyboard'>SPACE</span>",
-                                "<span class='keyboard'>J</span>",
-                                "<span class='pad green'>A</span>",
-                                "<span class='pad red'>B</span>",
-                                "<span class='pad blue'>X</span>",
-                                "<span class='pad yellow'>Y</span>",
-                                "<span class='pad'>start</span>",
-                                "<span class='joystick'>R</span>",
-                                "<span class='pad red'>B</span>",
-                                "<span class='pad blue'>X</span>",
-                                "<span class='pad yellow'>Y</span>",
-                                "<span class='joystick'>R</span>",
-                                "<img src='datas/icons/mouse-left.svg'/>",
-                                "<img src='datas/icons/mouse-right.svg'/>",
-                                "<img src='datas/icons/mouse-wheel.svg'/>"
-                            ],
-                            3600)
-                        );
-                        */
-                        //mainPanel.openAtPlayerPosition();
                     }, 500);
                 });
                 //let debugAltimeter = new Altimeter3D(this.player);
@@ -9070,7 +8984,6 @@ class Player extends BABYLON.Mesh {
         this.inputHeadUp = 0;
         this.inputHeadRight = 0;
         this.lockInPlace = false;
-        this.lockInput = true;
         this.sqrDistToPlanet = Infinity;
         this.altitudeOnPlanet = 0;
         this.targetLookStrength = 0.5;
@@ -11378,6 +11291,50 @@ class Easing {
         return 1 - 1 / (1.35 * fps);
     }
 }
+class HeadUpDisplay extends BABYLON.Mesh {
+    constructor(player, cameraManager) {
+        super("head-up-display");
+        this.player = player;
+        this.cameraManager = cameraManager;
+    }
+    async instantiate() {
+        let camera = this.cameraManager.noOutlineCamera;
+        let yAngle = camera.fov;
+        let w = camera.getEngine().getRenderWidth();
+        let h = camera.getEngine().getRenderHeight();
+        let ratio = w / h;
+        let dist = (h * 0.5) / Math.tan(yAngle * 0.5);
+        let xAngle = 2 * Math.atan((h * ratio * 0.5) / (dist));
+        //console.log("xAngle = " + (xAngle / Math.PI * 180).toFixed(1) + " | yAngle = " + (yAngle / Math.PI * 180).toFixed(1));
+        /*
+        let debug = BABYLON.MeshBuilder.CreatePlane("debug", { size: 0.1 });
+        let a = xAngle * 0.5 - 0.06;
+        debug.position.x = - Math.sin(a);
+        debug.position.z = Math.cos(a);
+        debug.rotationQuaternion = BABYLON.Quaternion.Identity();
+        VMath.QuaternionFromZYAxisToRef(debug.position, BABYLON.Axis.Y, debug.rotationQuaternion);
+        debug.parent = this;
+        
+        let debug2 = BABYLON.MeshBuilder.CreatePlane("debug2", { size: 0.1 });
+        let a2 = xAngle * 0.25;
+        debug2.position.x = - Math.sin(a2);
+        debug2.position.z = Math.cos(a2);
+        debug2.rotationQuaternion = BABYLON.Quaternion.Identity();
+        VMath.QuaternionFromZYAxisToRef(debug2.position, BABYLON.Axis.Y, debug2.rotationQuaternion);
+        debug2.parent = this;
+        */
+        for (let b = 0; b <= 0.6; b += 0.08) {
+            let debug3 = BABYLON.MeshBuilder.CreatePlane("debug3", { size: 0.06 });
+            debug3.position.y = Math.sin(b);
+            debug3.position.z = Math.cos(b);
+            debug3.rotationQuaternion = BABYLON.Quaternion.Identity();
+            VMath.QuaternionFromZYAxisToRef(debug3.position, BABYLON.Axis.Y, debug3.rotationQuaternion);
+            debug3.parent = this;
+            debug3.rotateAround(BABYLON.Vector3.Zero(), BABYLON.Axis.Y, -(xAngle * 0.5 - 0.06));
+        }
+        this.parent = this.player.camPos;
+    }
+}
 /// <reference path="../PlanetObject.ts"/>
 var InteractionMode;
 (function (InteractionMode) {
@@ -12216,7 +12173,7 @@ class MainMenuPanel extends HoloPanel {
     }
     async openAtPlayerPosition() {
         let player = this.inputManager.player;
-        if (player) {
+        if (player && !player.lockInPlace && !player.targetDestination && !player.targetLook) {
             await this.close(0);
             let p = player.position.add(player.forward.scale(1.2));
             this.planet = player.planet;
