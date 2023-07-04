@@ -1,10 +1,15 @@
 var playerColor = "#0abdc6";
 var creepColor = "#ea00d9";
 class Creep {
+    pos;
+    main;
+    speed;
+    radius = 15;
+    svgElement;
+    testCreep;
     constructor(pos, main) {
         this.pos = pos;
         this.main = main;
-        this.radius = 15;
         this.main;
         this.speed = new Vec2(Math.random() - 0.5, Math.random() - 0.5);
         let s = Math.random() * 100 + 50;
@@ -68,22 +73,12 @@ class Creep {
     }
 }
 class Main {
+    container;
+    terrain;
+    player;
+    creeps = [];
+    score = 0;
     constructor() {
-        this.creeps = [];
-        this.score = 0;
-        this._lastT = 0;
-        this._mainLoop = () => {
-            let dt = 0;
-            let t = performance.now();
-            if (isFinite(this._lastT)) {
-                dt = (t - this._lastT) / 1000;
-            }
-            this._lastT = t;
-            if (this._update) {
-                this._update(dt);
-            }
-            requestAnimationFrame(this._mainLoop);
-        };
         this.terrain = new Terrain(this);
     }
     initialize() {
@@ -149,12 +144,34 @@ class Main {
         this._update = () => {
         };
     }
-    gameover() {
+    _lastT = 0;
+    _mainLoop = () => {
+        let dt = 0;
+        let t = performance.now();
+        if (isFinite(this._lastT)) {
+            dt = (t - this._lastT) / 1000;
+        }
+        this._lastT = t;
+        if (this._update) {
+            this._update(dt);
+        }
+        requestAnimationFrame(this._mainLoop);
+    };
+    gameover(success) {
         this.stop();
         document.getElementById("play").style.display = "block";
         document.getElementById("game-over").style.display = "block";
+        if (success) {
+            document.getElementById("game-over").style.backgroundColor = "#0abdc6";
+            document.getElementById("success-value").innerText = "SUCCESS";
+        }
+        else {
+            document.getElementById("game-over").style.backgroundColor = "#711c91";
+            document.getElementById("success-value").innerText = "GAME OVER";
+        }
         document.getElementById("credit").style.display = "block";
     }
+    _update;
 }
 window.addEventListener("load", () => {
     document.getElementById("game-over").style.display = "none";
@@ -171,14 +188,19 @@ var PlayerMode;
     PlayerMode[PlayerMode["Closing"] = 2] = "Closing";
 })(PlayerMode || (PlayerMode = {}));
 class Player {
+    pos;
+    main;
+    mode = PlayerMode.Idle;
+    speedValue = 200;
+    speed;
+    radius = 15;
+    svgElement;
+    playerDrawnPath;
+    currentSegmentIndex = 0;
+    drawnPoints = [];
     constructor(pos, main) {
         this.pos = pos;
         this.main = main;
-        this.mode = PlayerMode.Idle;
-        this.speedValue = 200;
-        this.radius = 15;
-        this.currentSegmentIndex = 0;
-        this.drawnPoints = [];
         this.main;
         this.speed = new Vec2(0, 0);
     }
@@ -302,10 +324,13 @@ class Player {
     }
 }
 class Terrain {
+    main;
+    path;
+    pathCut;
+    points = [];
+    pointsCut = [];
     constructor(main) {
         this.main = main;
-        this.points = [];
-        this.pointsCut = [];
         this.points = [
             new Vec2(20, 20),
             new Vec2(980, 20),
@@ -341,6 +366,9 @@ class Terrain {
             else {
                 this.points = pointsInside;
                 this.pointsCut = pointsOutside;
+            }
+            if (Math.max(inSurface, outSurface) < 960 * 960 * 0.2) {
+                this.main.gameover(true);
             }
             this.removePathCut();
             return Vec2.BBoxSurface(...this.pointsCut);
@@ -380,6 +408,7 @@ class Terrain {
         this.pathCut.setAttribute("stroke-width", "4");
         this.pathCut.setAttribute("d", dCut);
     }
+    _timout;
     removePathCut() {
         clearTimeout(this._timout);
         this._timout = setTimeout(() => {
@@ -388,6 +417,8 @@ class Terrain {
     }
 }
 class Vec2 {
+    x;
+    y;
     constructor(x = 0, y = 0) {
         this.x = x;
         this.y = y;
