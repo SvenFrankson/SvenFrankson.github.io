@@ -431,7 +431,7 @@ class Terrain extends Gameobject {
     }
     instantiate() {
         super.instantiate();
-        this.cutSound = new Audio("sounds/doorClose_000.ogg");
+        this.cutSound = new Audio("doorClose_000.ogg");
         this.cutSound.volume = 1;
         this.path = this.addComponent(new PathRenderer(this, { layer: 0, close: true, classList: ["terrain-path"] }));
         this.pathCut = this.addComponent(new PathRenderer(this, { layer: 0, close: true, classList: ["terrain-path-cut"] }));
