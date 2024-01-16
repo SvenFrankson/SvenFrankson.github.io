@@ -1,0 +1,155 @@
+html {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+    touch-action: none;
+}
+
+body {
+    background-color: black;
+}
+
+.debug-log {
+    position: relative;
+    color: red;
+    z-index: 1;
+	font-family: monospace;
+}
+
+#render-canvas.square {
+    width: min(90vw, 90vh);
+    height: min(90vw, 90vh);
+    position: fixed;
+    left: calc((100vw - min(90vw, 90vh)) * 0.5);
+    top: calc((100vh - min(90vw, 90vh)) * 0.5);
+    outline: none;
+    border: 1px solid white;
+}
+
+#render-canvas.full-screen {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    outline: none;
+    border: none;
+    z-index: 0;
+}
+
+.menu {
+    position: fixed;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#track-editor-menu {
+    padding: 10px;
+    top: 20px;
+    left: 20px;
+    width: 400px;
+}
+
+.line {
+    height: 30px;
+}
+
+.separator {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border-top: 1px solid black;
+    height: 1px;
+}
+
+.line-flex {
+    height: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.paginated-title {
+    display: flex;
+    flex-direction: row;
+}
+
+.label {
+    display: inline-block;
+    width: 85px;
+    font-size: 13px;
+}
+
+.label-s {
+    display: inline-block;
+    width: 35px;
+    text-align: right;
+    font-size: 14px;
+    color: rgb(40, 40, 40);
+}
+
+.number-val {
+    display: inline-block;
+    width: 55px;
+    border: 1px solid rgb(80, 80, 80);
+    border-radius: 3px;
+    text-align: right;
+    padding-right: 3px;
+    font-size: 14px;
+}
+
+.btn-l {
+    display: inline-block;
+    width: 100%;
+    height: 25px;
+}
+
+.btn-m {
+    display: inline-block;
+    width: 120px;
+    height: 25px;
+}
+
+.btn-s {
+    display: inline-block;
+    width: 80px;
+    height: 25px;
+}
+
+.btn-xs {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+}
+
+.spacer {
+    visibility: hidden;
+}
+
+.title {
+    display: inline-block;
+    width: 100%;
+    font-weight: bold;
+    text-align: center;
+}
+
+.title.t1 {
+    font-size: 26px;
+}
+
+.title.t2 {
+    font-size: 22px;
+}
+
+.paginated-title .title {
+    flex: auto;
+    text-align: center;
+}
+
+input-vec3 {
+    display: inline-block;
+    width: 300px;
+}
+input-number {
+    display: inline-block;
+    width: 100px;
+}
