@@ -44,6 +44,15 @@ var Nabu;
 var Nabu;
 (function (Nabu) {
     class Easing {
+        static easeInSquare(x) {
+            return x * x;
+        }
+        static easeOutSquare(x) {
+            return 1 - (1 - x) * (1 - x);
+        }
+        static easeInCubic(x) {
+            return x * x * x;
+        }
         static easeOutCubic(x) {
             return 1 - Math.pow(1 - x, 3);
         }

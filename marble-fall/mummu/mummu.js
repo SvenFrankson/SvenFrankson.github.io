@@ -26,7 +26,7 @@ var Mummu;
                 });
             };
         }
-        static CreateNumber(owner, obj, property, onUpdateCallback, isAngle) {
+        static CreateNumber(owner, obj, property, onUpdateCallback, isAngle, easing) {
             return (target, duration) => {
                 return new Promise(resolve => {
                     let origin = obj[property];
@@ -42,6 +42,9 @@ var Mummu;
                                 obj[property] = Nabu.LerpAngle(origin, target, f);
                             }
                             else {
+                                if (easing) {
+                                    f = easing(f);
+                                }
                                 obj[property] = origin * (1 - f) + target * f;
                             }
                             if (onUpdateCallback) {

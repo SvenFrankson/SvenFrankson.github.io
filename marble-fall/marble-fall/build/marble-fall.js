@@ -121,16 +121,18 @@ class Ball extends BABYLON.Mesh {
         while (this._timer > 0) {
             let m = this.mass;
             let dt = this.game.physicDT;
-            this._timer -= dt;
+            let f = this.velocity.length();
+            f = Math.max(Math.min(f, 1), 0.4);
+            this._timer -= dt / f;
             let weight = new BABYLON.Vector3(0, -9 * m, 0);
             let reactions = BABYLON.Vector3.Zero();
             let reactionsCount = 0;
             let forcedDisplacement = BABYLON.Vector3.Zero();
             let canceledSpeed = BABYLON.Vector3.Zero();
-            this.machine.tracks.forEach(track => {
-                if (Mummu.AABBAABBIntersect(this.position.x - this.radius, this.position.x + this.radius, this.position.y - this.radius, this.position.y + this.radius, this.position.z - this.radius, this.position.z + this.radius, track.AABBMin.x - this.radius, track.AABBMax.x + this.radius, track.AABBMin.y - this.radius, track.AABBMax.y + this.radius, track.AABBMin.z - this.radius, track.AABBMax.z + this.radius)) {
-                    track.wires.forEach(wire => {
-                        let col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.5, !(track instanceof UTurnLarge));
+            this.machine.parts.forEach(part => {
+                if (Mummu.AABBAABBIntersect(this.position.x - this.radius, this.position.x + this.radius, this.position.y - this.radius, this.position.y + this.radius, this.position.z - this.radius, this.position.z + this.radius, part.AABBMin.x - this.radius, part.AABBMax.x + this.radius, part.AABBMin.y - this.radius, part.AABBMax.y + this.radius, part.AABBMin.z - this.radius, part.AABBMax.z + this.radius)) {
+                    part.allWires.forEach(wire => {
+                        let col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.5, !(part instanceof UTurnLarge));
                         if (col.hit) {
                             let colDig = col.normal.scale(-1);
                             // Move away from collision
@@ -158,11 +160,11 @@ class Ball extends BABYLON.Mesh {
                         let mySpeed = this.velocity.clone();
                         let v = this.velocity.length();
                         if (v > 0.1) {
-                            this.marbleChocSound.volume = v / 5;
+                            this.marbleChocSound.volume = v / 5 * this.game.mainVolume;
                             this.marbleChocSound.play();
                         }
-                        this.velocity.scaleInPlace(-0.1).addInPlace(otherSpeed.scale(0.8));
-                        ball.velocity.scaleInPlace(-0.1).addInPlace(mySpeed.scale(0.8));
+                        this.velocity.scaleInPlace(-0.15).addInPlace(otherSpeed.scale(0.85));
+                        ball.velocity.scaleInPlace(-0.15).addInPlace(mySpeed.scale(0.85));
                         //this.velocity.copyFrom(otherSpeed).scaleInPlace(.5);
                         //ball.velocity.copyFrom(mySpeed).scaleInPlace(.6);
                         let dir = this.position.subtract(ball.position).normalize();
@@ -184,7 +186,7 @@ class Ball extends BABYLON.Mesh {
             this.velocity.addInPlace(acceleration.scale(dt));
             this.position.addInPlace(this.velocity.scale(dt));
         }
-        this.marbleLoopSound.volume = this.strReaction * this.velocity.length();
+        this.marbleLoopSound.volume = this.strReaction * this.velocity.length() * this.game.timeFactor * this.game.mainVolume;
     }
 }
 var demo1 = {
@@ -239,7 +241,7 @@ var demo2 = {
         { name: "ramp-1.1", i: 2, j: 4 },
     ],
 };
-var demo3 = {
+var demo4 = {
     balls: [
         { x: 0.7063794660954964, y: -0.017640293121974498 },
         { x: -0.2545074285696747, y: 0.011180937689018683 },
@@ -275,6 +277,56 @@ var demo3 = {
         { name: "ramp-1.0", i: 3, j: -2, mirror: true },
         { name: "ramp-2.2", i: 3, j: -1 },
         { name: "rampX-2.1", i: 1, j: -9 },
+    ],
+};
+var demoTest = {
+    balls: [{ x: -0.19965407373238375, y: 0.06913964667829861 }],
+    parts: [
+        { name: "split", i: 0, j: -1 },
+        { name: "ramp-1.1", i: -1, j: -2 },
+        { name: "uturn-l", i: 1, j: 1 },
+        { name: "uturn-s", i: -1, j: 1, mirror: true },
+        { name: "ramp-1.0", i: 0, j: 2 },
+    ],
+};
+var demo3 = {
+    balls: [
+        { x: -0.7529580212020577, y: -0.1654427630682682 },
+        { x: -0.7513297912847231, y: -0.32829114967876044 },
+        { x: -0.7517784289994465, y: -0.2470864404297073 },
+        { x: -0.7522482200985597, y: -0.08369699812598332 },
+        { x: -0.7521042373550704, y: -0.0019488102905312332 },
+    ],
+    parts: [
+        { name: "split", i: -2, j: 0 },
+        { name: "split", i: -2, j: 3 },
+        { name: "split", i: -2, j: 6 },
+        { name: "join", i: -2, j: 9, mirror: true },
+        { name: "ramp-2.1", i: -4, j: 10, mirror: true },
+        { name: "uturn-l", i: -1, j: 2 },
+        { name: "uturn-l", i: -4, j: 2, mirror: true },
+        { name: "uturn-l", i: -1, j: 5 },
+        { name: "uturn-l", i: -1, j: 8 },
+        { name: "uturn-l", i: -4, j: 5, mirror: true },
+        { name: "uturn-l", i: -4, j: 8, mirror: true },
+        { name: "ramp-2.1", i: -4, j: -1 },
+        { name: "elevator-13", i: -5, j: -2, mirror: true },
+    ],
+};
+var createDefault = {
+    balls: [
+        { x: 0.42531514018827754, y: -0.04840511502662046 },
+        { x: 0.4025330286177473, y: -0.048624483332179405 },
+        { x: 0.3799147747766348, y: -0.047314622188705205 },
+        { x: 0.35788764058897626, y: -0.04672729838009122 },
+        { x: 0.3351445547662884, y: -0.045358694798261004 },
+    ],
+    parts: [
+        { name: "loop", i: 1, j: -6, mirror: true },
+        { name: "spiral", i: 0, j: -3, mirror: true },
+        { name: "uturn-l", i: -2, j: 0, mirror: true },
+        { name: "ramp-3.1", i: 0, j: 1 },
+        { name: "elevator-9", i: 3, j: -7 },
     ],
 };
 class HelperShape {
@@ -401,159 +453,6 @@ class HelperShape {
         }
     }
 }
-class Machine {
-    constructor(game) {
-        this.game = game;
-        this.tracks = [];
-        this.balls = [];
-        this.instantiated = false;
-        this.playing = false;
-        this.onStopCallbacks = new Nabu.UniqueList();
-        this.trackFactory = new TrackFactory(this);
-    }
-    async instantiate() {
-        for (let i = 0; i < this.balls.length; i++) {
-            await this.balls[i].instantiate();
-        }
-        for (let i = 0; i < this.tracks.length; i++) {
-            await this.tracks[i].instantiate();
-        }
-        return new Promise(resolve => {
-            requestAnimationFrame(() => {
-                for (let i = 0; i < this.tracks.length; i++) {
-                    this.tracks[i].recomputeAbsolutePath();
-                }
-                this.instantiated = true;
-                resolve();
-            });
-        });
-    }
-    dispose() {
-        while (this.balls.length > 0) {
-            this.balls[0].dispose();
-        }
-        while (this.tracks.length > 0) {
-            this.tracks[0].dispose();
-        }
-        this.instantiated = false;
-    }
-    update() {
-        if (!this.instantiated) {
-            return;
-        }
-        if (this.playing) {
-            let dt = this.game.scene.deltaTime / 1000;
-            if (isFinite(dt)) {
-                for (let i = 0; i < this.balls.length; i++) {
-                    this.balls[i].update(dt);
-                }
-                for (let i = 0; i < this.tracks.length; i++) {
-                    this.tracks[i].update(dt);
-                }
-            }
-        }
-    }
-    play() {
-        this.playing = true;
-    }
-    stop() {
-        for (let i = 0; i < this.balls.length; i++) {
-            this.balls[i].reset();
-        }
-        this.onStopCallbacks.forEach(callback => {
-            callback();
-        });
-        this.playing = false;
-    }
-    async generateBaseMesh() {
-        let minX = -0.15;
-        let maxX = 0.15;
-        let minY = -0.15;
-        let maxY = 0.15;
-        for (let i = 0; i < this.tracks.length; i++) {
-            let track = this.tracks[i];
-            minX = Math.min(minX, track.position.x - tileWidth * 0.5);
-            maxX = Math.max(maxX, track.position.x + tileWidth * (track.deltaI + 0.5));
-            minY = Math.min(minY, track.position.y - tileHeight * (track.deltaJ + 1));
-            maxY = Math.max(maxY, track.position.y);
-        }
-        let w = maxX - minX;
-        let h = maxY - minY;
-        let u = w * 4;
-        let v = h * 4;
-        if (this.baseWall) {
-            this.baseWall.dispose();
-        }
-        this.baseWall = BABYLON.MeshBuilder.CreatePlane("base-wall", { width: h + 0.2, height: w + 0.2, sideOrientation: BABYLON.Mesh.DOUBLESIDE, frontUVs: new BABYLON.Vector4(0, 0, v, u) });
-        this.baseWall.position.x = (maxX + minX) * 0.5;
-        this.baseWall.position.y = (maxY + minY) * 0.5;
-        this.baseWall.position.z += 0.016;
-        this.baseWall.rotation.z = Math.PI / 2;
-        this.baseWall.material = this.game.woodMaterial;
-        if (this.baseFrame) {
-            this.baseFrame.dispose();
-        }
-        this.baseFrame = new BABYLON.Mesh("base-frame");
-        this.baseFrame.position.copyFrom(this.baseWall.position);
-        this.baseFrame.material = this.game.steelMaterial;
-        let vertexDatas = await this.game.vertexDataLoader.get("./meshes/base-frame.babylon");
-        let data = Mummu.CloneVertexData(vertexDatas[0]);
-        let positions = [...data.positions];
-        for (let i = 0; i < positions.length / 3; i++) {
-            let x = positions[3 * i];
-            let y = positions[3 * i + 1];
-            if (x > 0) {
-                positions[3 * i] += w * 0.5 - 0.01 + 0.1;
-            }
-            else if (x < 0) {
-                positions[3 * i] -= w * 0.5 - 0.01 + 0.1;
-            }
-            if (y > 0) {
-                positions[3 * i + 1] += h * 0.5 - 0.01 + 0.1;
-            }
-            else if (y < 0) {
-                positions[3 * i + 1] -= h * 0.5 - 0.01 + 0.1;
-            }
-        }
-        data.positions = positions;
-        data.applyToMesh(this.baseFrame);
-    }
-    serialize() {
-        let data = {
-            balls: [],
-            parts: []
-        };
-        for (let i = 0; i < this.balls.length; i++) {
-            data.balls.push({
-                x: this.balls[i].positionZero.x,
-                y: this.balls[i].positionZero.y,
-            });
-        }
-        for (let i = 0; i < this.tracks.length; i++) {
-            data.parts.push({
-                name: this.tracks[i].trackName,
-                i: this.tracks[i].i,
-                j: this.tracks[i].j,
-                mirror: this.tracks[i].mirror
-            });
-        }
-        return data;
-    }
-    deserialize(data) {
-        this.balls = [];
-        this.tracks = [];
-        for (let i = 0; i < data.balls.length; i++) {
-            let ballData = data.balls[i];
-            let ball = new Ball(new BABYLON.Vector3(ballData.x, ballData.y, 0), this);
-            this.balls.push(ball);
-        }
-        for (let i = 0; i < data.parts.length; i++) {
-            let part = data.parts[i];
-            let track = this.trackFactory.createTrack(part.name, part.i, part.j, part.mirror);
-            this.tracks.push(track);
-        }
-    }
-}
 class MachineEditor {
     constructor(game) {
         this.game = game;
@@ -583,11 +482,11 @@ class MachineEditor {
                     else {
                         let i = Math.round(pick.pickedPoint.x / tileWidth);
                         let j = Math.floor((-pick.pickedPoint.y + 0.25 * tileHeight) / tileHeight);
-                        pickedObject = this.machine.tracks.find(track => {
+                        pickedObject = this.machine.parts.find(track => {
                             if (track.i <= i) {
-                                if ((track.i + track.deltaI) >= i) {
+                                if ((track.i + track.w - 1) >= i) {
                                     if (track.j <= j) {
-                                        if ((track.j + track.deltaJ) >= j) {
+                                        if ((track.j + track.h) >= j) {
                                             return true;
                                         }
                                     }
@@ -602,7 +501,7 @@ class MachineEditor {
                             }
                         });
                         if (pick.hit && pick.pickedPoint) {
-                            if (this.selectedObject instanceof Track) {
+                            if (this.selectedObject instanceof MachinePart) {
                                 this._dragOffset.copyFrom(this.selectedObject.position).subtractInPlace(pick.pickedPoint);
                             }
                             else if (this.selectedObject instanceof Ball) {
@@ -624,14 +523,14 @@ class MachineEditor {
                 });
                 if (pick.hit) {
                     let point = pick.pickedPoint.add(this._dragOffset);
-                    if (this.draggedObject instanceof Track) {
+                    if (this.draggedObject instanceof MachinePart) {
                         let i = Math.round(point.x / tileWidth);
                         let j = Math.floor((-point.y + 0.25 * tileHeight) / tileHeight);
                         if (i != this.draggedObject.i || j != this.draggedObject.j) {
                             this.draggedObject.setI(i);
                             this.draggedObject.setJ(j);
                             this.draggedObject.setIsVisible(true);
-                            this.updateActionTile();
+                            this.updateFloatingElements();
                         }
                     }
                     else if (this.draggedObject instanceof Ball) {
@@ -639,7 +538,7 @@ class MachineEditor {
                         p.z = 0;
                         this.draggedObject.setPositionZero(p);
                         this.draggedObject.setIsVisible(true);
-                        this.updateActionTile();
+                        this.updateFloatingElements();
                         if (!this.machine.playing) {
                             this.draggedObject.reset();
                         }
@@ -651,15 +550,6 @@ class MachineEditor {
             }
         };
         this.pointerUp = (event) => {
-            if (!this.draggedObject) {
-                let pick = this.game.scene.pick(this.game.scene.pointerX, this.game.scene.pointerY, (mesh) => {
-                    return mesh instanceof ActionTile && this.actionTiles.indexOf(mesh) != -1;
-                });
-                if (pick.hit && pick.pickedMesh instanceof BABYLON.Mesh) {
-                    this.onActionTilePointerUp(pick.pickedMesh);
-                    return;
-                }
-            }
             let pick = this.game.scene.pick(this.game.scene.pointerX, this.game.scene.pointerY, (mesh) => {
                 if (!this.draggedObject && mesh instanceof BallGhost) {
                     return true;
@@ -671,14 +561,14 @@ class MachineEditor {
             });
             if (pick.hit) {
                 let point = pick.pickedPoint.add(this._dragOffset);
-                if (this.draggedObject instanceof Track) {
+                if (this.draggedObject instanceof MachinePart) {
                     let draggedTrack = this.draggedObject;
                     let i = Math.round(point.x / tileWidth);
                     let j = Math.floor((-point.y + 0.25 * tileHeight) / tileHeight);
                     draggedTrack.setI(i);
                     draggedTrack.setJ(j);
-                    if (this.machine.tracks.indexOf(draggedTrack) === -1) {
-                        this.machine.tracks.push(draggedTrack);
+                    if (this.machine.parts.indexOf(draggedTrack) === -1) {
+                        this.machine.parts.push(draggedTrack);
                     }
                     draggedTrack.setIsVisible(true);
                     draggedTrack.generateWires();
@@ -713,11 +603,11 @@ class MachineEditor {
                         else if (pick.pickedMesh === this.machine.baseWall) {
                             let i = Math.round(pick.pickedPoint.x / tileWidth);
                             let j = Math.floor((-pick.pickedPoint.y + 0.25 * tileHeight) / tileHeight);
-                            let pickedTrack = this.machine.tracks.find(track => {
+                            let pickedTrack = this.machine.parts.find(track => {
                                 if (track.i <= i) {
-                                    if ((track.i + track.deltaI) >= i) {
+                                    if ((track.i + track.w - 1) >= i) {
                                         if (track.j <= j) {
-                                            if ((track.j + track.deltaJ) >= j) {
+                                            if ((track.j + track.h) >= j) {
                                                 return true;
                                             }
                                         }
@@ -731,6 +621,96 @@ class MachineEditor {
             }
         };
         this.actionTileSize = 0.018;
+        this._onHPlusTop = async () => {
+            let track = this.selectedObject;
+            if (track instanceof MachinePart && track.yExtendable) {
+                let h = track.h + 1;
+                let j = track.j - 1;
+                let editedTrack = await this.editTrackInPlace(track, undefined, j, track.xExtendable ? track.w : undefined, h);
+                this.setSelectedObject(editedTrack);
+            }
+        };
+        this._onHMinusTop = async () => {
+            let track = this.selectedObject;
+            if (track instanceof MachinePart && track.yExtendable) {
+                let h = track.h - 1;
+                let j = track.j + 1;
+                if (h >= 0) {
+                    let editedTrack = await this.editTrackInPlace(track, undefined, j, track.xExtendable ? track.w : undefined, h);
+                    this.setSelectedObject(editedTrack);
+                }
+            }
+        };
+        this._onWPlusRight = async () => {
+            let track = this.selectedObject;
+            if (track instanceof MachinePart && track.xExtendable) {
+                let w = track.w + 1;
+                let editedTrack = await this.editTrackInPlace(track, undefined, undefined, w, track.yExtendable ? track.h : undefined);
+                this.setSelectedObject(editedTrack);
+            }
+        };
+        this._onWMinusRight = async () => {
+            let track = this.selectedObject;
+            if (track instanceof MachinePart && track.xExtendable) {
+                let w = track.w - 1;
+                if (w >= 1) {
+                    let editedTrack = await this.editTrackInPlace(track, undefined, undefined, w, track.yExtendable ? track.h : undefined);
+                    this.setSelectedObject(editedTrack);
+                }
+            }
+        };
+        this._onHPlusBottom = async () => {
+            let track = this.selectedObject;
+            if (track instanceof MachinePart && track.yExtendable) {
+                let h = track.h + 1;
+                let editedTrack = await this.editTrackInPlace(track, undefined, undefined, track.xExtendable ? track.w : undefined, h);
+                this.setSelectedObject(editedTrack);
+            }
+        };
+        this._onHMinusBottom = async () => {
+            let track = this.selectedObject;
+            if (track instanceof MachinePart && track.yExtendable) {
+                let h = track.h - 1;
+                if (h >= 0) {
+                    let editedTrack = await this.editTrackInPlace(track, undefined, undefined, track.xExtendable ? track.w : undefined, h);
+                    this.setSelectedObject(editedTrack);
+                }
+            }
+        };
+        this._onWPlusLeft = async () => {
+            let track = this.selectedObject;
+            if (track instanceof MachinePart && track.xExtendable) {
+                let i = track.i - 1;
+                let w = track.w + 1;
+                let editedTrack = await this.editTrackInPlace(track, i, undefined, w, track.yExtendable ? track.h : undefined);
+                this.setSelectedObject(editedTrack);
+            }
+        };
+        this._onWMinusLeft = async () => {
+            let track = this.selectedObject;
+            if (track instanceof MachinePart && track.xExtendable) {
+                let i = track.i + 1;
+                let w = track.w - 1;
+                if (w >= 1) {
+                    let editedTrack = await this.editTrackInPlace(track, i, undefined, w, track.yExtendable ? track.h : undefined);
+                    this.setSelectedObject(editedTrack);
+                }
+            }
+        };
+        this._onDelete = async () => {
+            if (this.selectedObject) {
+                this.selectedObject.dispose();
+                this.setSelectedObject(undefined);
+                this.setDraggedObject(undefined);
+            }
+        };
+        this._onMirror = async () => {
+            let track = this.selectedObject;
+            if (track instanceof MachinePart) {
+                track = await this.mirrorTrackInPlace(track);
+                this.setSelectedObject(track);
+            }
+        };
         this.container = document.getElementById("machine-menu");
         this.itemContainer = this.container.querySelector("#machine-editor-item-container");
     }
@@ -780,11 +760,11 @@ class MachineEditor {
         if (this._selectedObject) {
             this._selectedObject.select();
         }
-        this.updateActionTile();
+        this.updateFloatingElements();
     }
     async instantiate() {
         document.getElementById("machine-editor-objects").style.display = "block";
-        document.getElementById("machine-file").style.display = "flex";
+        this.game.toolbar.resize();
         let ballItem = document.createElement("div");
         ballItem.classList.add("machine-editor-item");
         ballItem.style.backgroundImage = "url(./datas/icons/ball.png)";
@@ -840,7 +820,7 @@ class MachineEditor {
             });
         }
         document.addEventListener("keyup", (event) => {
-            if (event.key === "x") {
+            if (event.key === "x" || event.key === "Delete") {
                 if (this.selectedObject) {
                     this.selectedObject.dispose();
                     this.setSelectedObject(undefined);
@@ -848,12 +828,12 @@ class MachineEditor {
                 }
             }
             else if (event.key === "m") {
-                if (this.draggedObject && this.draggedObject instanceof Track) {
+                if (this.draggedObject && this.draggedObject instanceof MachinePart) {
                     this.mirrorTrackInPlace(this.draggedObject).then(track => {
                         this.setDraggedObject(track);
                     });
                 }
-                else if (this.selectedObject && this.selectedObject instanceof Track) {
+                else if (this.selectedObject && this.selectedObject instanceof MachinePart) {
                     this.mirrorTrackInPlace(this.selectedObject).then(track => {
                         this.setSelectedObject(track);
                     });
@@ -863,92 +843,129 @@ class MachineEditor {
         this.game.canvas.addEventListener("pointerdown", this.pointerDown);
         this.game.canvas.addEventListener("pointermove", this.pointerMove);
         this.game.canvas.addEventListener("pointerup", this.pointerUp);
-        document.getElementById("machine-editor-save").addEventListener("click", () => {
-            let data = this.machine.serialize();
-            window.localStorage.setItem("last-saved-machine", JSON.stringify(data));
-            Nabu.download("my-marble-machine.json", JSON.stringify(data));
-        });
-        document.getElementById("machine-editor-load-input").addEventListener("change", (event) => {
-            let files = event.target.files;
-            let file = files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.addEventListener('load', (event) => {
-                    this.machine.dispose();
-                    this.machine.deserialize(JSON.parse(event.target.result));
-                    this.machine.instantiate();
-                    this.machine.generateBaseMesh();
-                    for (let i = 0; i < this.machine.balls.length; i++) {
-                        this.machine.balls[i].setShowPositionZeroGhost(true);
-                    }
-                });
-                reader.readAsText(file);
-            }
-        });
         for (let i = 0; i < this.machine.balls.length; i++) {
             this.machine.balls[i].setShowPositionZeroGhost(true);
         }
-        this.actionTileHPlusTop = new ActionTile("", this.actionTileSize, this.game);
-        await this.actionTileHPlusTop.instantiate();
-        this.actionTileHPlusTop.texture.drawText("^", 17, 66, "64px 'Arial'", "white", "black");
-        this.actionTileHMinusTop = new ActionTile("", this.actionTileSize, this.game);
-        await this.actionTileHMinusTop.instantiate();
-        this.actionTileHMinusTop.rotation.z = Math.PI;
-        this.actionTileHMinusTop.texture.drawText("^", 17, 66, "64px 'Arial'", "white", "black");
-        this.actionTileWPlusRight = new ActionTile("", this.actionTileSize, this.game);
-        await this.actionTileWPlusRight.instantiate();
-        this.actionTileWPlusRight.rotation.z = -Math.PI / 2;
-        this.actionTileWPlusRight.texture.drawText("^", 17, 66, "64px 'Arial'", "white", "black");
-        this.actionTileWMinusRight = new ActionTile("", this.actionTileSize, this.game);
-        await this.actionTileWMinusRight.instantiate();
-        this.actionTileWMinusRight.rotation.z = Math.PI / 2;
-        this.actionTileWMinusRight.texture.drawText("^", 17, 66, "64px 'Arial'", "white", "black");
-        this.actionTileHDownBottom = new ActionTile("", this.actionTileSize, this.game);
-        await this.actionTileHDownBottom.instantiate();
-        this.actionTileHDownBottom.rotation.z = Math.PI;
-        this.actionTileHDownBottom.texture.drawText("^", 17, 66, "64px 'Arial'", "white", "black");
-        this.actionTileHUpBottom = new ActionTile("", this.actionTileSize, this.game);
-        await this.actionTileHUpBottom.instantiate();
-        this.actionTileHUpBottom.texture.drawText("^", 17, 66, "64px 'Arial'", "white", "black");
-        this.actionTileWPlusLeft = new ActionTile("", this.actionTileSize, this.game);
-        await this.actionTileWPlusLeft.instantiate();
-        this.actionTileWPlusLeft.rotation.z = Math.PI / 2;
-        this.actionTileWPlusLeft.texture.drawText("^", 17, 66, "64px 'Arial'", "white", "black");
-        this.actionTileWMinusLeft = new ActionTile("", this.actionTileSize, this.game);
-        await this.actionTileWMinusLeft.instantiate();
-        this.actionTileWMinusLeft.rotation.z = -Math.PI / 2;
-        this.actionTileWMinusLeft.texture.drawText("^", 17, 66, "64px 'Arial'", "white", "black");
-        this.actionTileDelete = new ActionTile("", this.actionTileSize, this.game);
-        await this.actionTileDelete.instantiate();
-        this.actionTileDelete.texture.drawText("x", 20, 45, "50px 'Arial'", "white", "black");
-        this.actionTileMirror = new ActionTile("", this.actionTileSize, this.game);
-        await this.actionTileMirror.instantiate();
-        this.actionTileMirror.texture.drawText("< >", 5, 44, "37px 'Arial'", "white", "black");
-        this.actionTiles = [
-            this.actionTileHPlusTop,
-            this.actionTileHMinusTop,
-            this.actionTileWPlusRight,
-            this.actionTileWMinusRight,
-            this.actionTileHDownBottom,
-            this.actionTileHUpBottom,
-            this.actionTileWPlusLeft,
-            this.actionTileWMinusLeft,
-            this.actionTileDelete,
-            this.actionTileMirror
+        this.floatingElementTop = FloatingElement.Create(this.game);
+        this.floatingElementTop.anchor = FloatingElementAnchor.BottomCenter;
+        this.HPlusTopButton = this._createButton("machine-editor-h-plus-top", this.floatingElementTop);
+        this.HPlusTopButton.innerHTML = `
+            <svg class="label" viewBox="0 0 100 100">
+                <path d="M25 70 L50 20 L80 70" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        `;
+        this.HPlusTopButton.onclick = this._onHPlusTop;
+        this.HMinusTopButton = this._createButton("machine-editor-h-minus-top", this.floatingElementTop);
+        this.HMinusTopButton.innerHTML = `
+            <svg class="label" viewBox="0 0 100 100">
+                <path d="M25 30 L50 80 L80 30" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        `;
+        this.HMinusTopButton.onclick = this._onHMinusTop;
+        this.floatingElementRight = FloatingElement.Create(this.game);
+        this.floatingElementRight.anchor = FloatingElementAnchor.LeftMiddle;
+        this.WMinusRightButton = this._createButton("machine-editor-w-minus-right", this.floatingElementRight);
+        this.WMinusRightButton.innerHTML = `
+            <svg class="label" viewBox="0 0 100 100">
+                <path d="M70 25 L20 50 L70 80" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        `;
+        this.WMinusRightButton.onclick = this._onWMinusRight;
+        this.WPlusRightButton = this._createButton("machine-editor-w-plus-right", this.floatingElementRight);
+        this.WPlusRightButton.innerHTML = `
+            <svg class="label" viewBox="0 0 100 100">
+				<path d="M30 25 L80 50 L30 80" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+			</svg>
+        `;
+        this.WPlusRightButton.onclick = this._onWPlusRight;
+        this.floatingElementBottom = FloatingElement.Create(this.game);
+        this.floatingElementBottom.anchor = FloatingElementAnchor.TopCenter;
+        this.HMinusBottomButton = this._createButton("machine-editor-h-minus-bottom", this.floatingElementBottom);
+        this.HMinusBottomButton.innerHTML = `
+            <svg class="label" viewBox="0 0 100 100">
+                <path d="M25 70 L50 20 L80 70" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        `;
+        this.HMinusBottomButton.onclick = this._onHMinusBottom;
+        this.HPlusBottomButton = this._createButton("machine-editor-h-plus-bottom", this.floatingElementBottom);
+        this.HPlusBottomButton.innerHTML = `
+            <svg class="label" viewBox="0 0 100 100">
+                <path d="M25 30 L50 80 L80 30" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        `;
+        this.HPlusBottomButton.onclick = this._onHPlusBottom;
+        this.floatingElementLeft = FloatingElement.Create(this.game);
+        this.floatingElementLeft.anchor = FloatingElementAnchor.RightMiddle;
+        this.WPlusLeftButton = this._createButton("machine-editor-w-plus-left", this.floatingElementLeft);
+        this.WPlusLeftButton.innerHTML = `
+            <svg class="label" viewBox="0 0 100 100">
+                <path d="M70 25 L20 50 L70 80" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        `;
+        this.WPlusLeftButton.onclick = this._onWPlusLeft;
+        this.WMinusLeftButton = this._createButton("machine-editor-w-minus-left", this.floatingElementLeft);
+        this.WMinusLeftButton.innerHTML = `
+            <svg class="label" viewBox="0 0 100 100">
+                <path d="M30 25 L80 50 L30 80" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        `;
+        this.WMinusLeftButton.onclick = this._onWMinusLeft;
+        this.floatingElementDelete = FloatingElement.Create(this.game);
+        this.floatingElementDelete.anchor = FloatingElementAnchor.LeftBottom;
+        this.deletebutton = this._createButton("machine-editor-delete", this.floatingElementDelete);
+        this.deletebutton.innerHTML = `
+            <svg class="label" viewBox="0 0 100 100">
+                <path d="M25 25 L75 75 M25 75 L75 25" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        `;
+        this.deletebutton.onclick = this._onDelete;
+        this.floatingElementBottomRight = FloatingElement.Create(this.game);
+        this.floatingElementBottomRight.anchor = FloatingElementAnchor.LeftTop;
+        this.tileMirrorButton = this._createButton("machine-editor-mirror", this.floatingElementBottomRight);
+        this.tileMirrorButton.innerHTML = `
+            <svg class="label" viewBox="0 0 100 100">
+                <path d="M25 30 L10 50 L25 70 Z" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M75 30 L90 50 L75 70 Z" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M15 50 L85 50" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        `;
+        this.tileMirrorButton.onclick = this._onMirror;
+        this.floatingButtons = [
+            this.HPlusTopButton,
+            this.HMinusTopButton,
+            this.WMinusRightButton,
+            this.WPlusRightButton,
+            this.HMinusBottomButton,
+            this.HPlusBottomButton,
+            this.WPlusLeftButton,
+            this.WMinusLeftButton,
+            this.deletebutton,
+            this.tileMirrorButton
         ];
-        this.updateActionTile();
+        this.updateFloatingElements();
+    }
+    _createButton(id, parent) {
+        let button = document.createElement("button");
+        button.id = id;
+        button.classList.add("btn");
+        button.classList.add("xs");
+        parent.appendChild(button);
+        return button;
     }
     dispose() {
         document.getElementById("machine-editor-objects").style.display = "none";
-        document.getElementById("machine-file").style.display = "none";
+        this.game.toolbar.resize();
+        this.floatingElementTop.dispose();
+        this.floatingElementRight.dispose();
+        this.floatingElementBottom.dispose();
+        this.floatingElementLeft.dispose();
+        this.floatingElementDelete.dispose();
+        this.floatingElementBottomRight.dispose();
         this.itemContainer.innerHTML = "";
         this.items = new Map();
         this.game.canvas.removeEventListener("pointerdown", this.pointerDown);
         this.game.canvas.removeEventListener("pointermove", this.pointerMove);
         this.game.canvas.removeEventListener("pointerup", this.pointerUp);
-        this.actionTiles.forEach(tile => {
-            tile.dispose();
-        });
         for (let i = 0; i < this.machine.balls.length; i++) {
             this.machine.balls[i].setShowPositionZeroGhost(false);
         }
@@ -974,9 +991,9 @@ class MachineEditor {
         if (!mirror) {
             mirror = track.mirror;
         }
-        let editedTrack = this.machine.trackFactory.createTrackWH(track.trackName, i, j, w, h, mirror);
+        let editedTrack = this.machine.trackFactory.createTrackWH(track.partName, i, j, w, h, mirror);
         track.dispose();
-        this.machine.tracks.push(editedTrack);
+        this.machine.parts.push(editedTrack);
         editedTrack.setIsVisible(true);
         editedTrack.generateWires();
         await editedTrack.instantiate();
@@ -985,9 +1002,9 @@ class MachineEditor {
         return editedTrack;
     }
     async mirrorTrackInPlace(track) {
-        let mirroredTrack = this.machine.trackFactory.createTrack(track.trackName, track.i, track.j, !track.mirror);
+        let mirroredTrack = this.machine.trackFactory.createTrack(track.partName, track.i, track.j, !track.mirror);
         track.dispose();
-        this.machine.tracks.push(mirroredTrack);
+        this.machine.parts.push(mirroredTrack);
         mirroredTrack.setIsVisible(true);
         mirroredTrack.generateWires();
         await mirroredTrack.instantiate();
@@ -997,147 +1014,46 @@ class MachineEditor {
     getCurrentItemElement() {
         return this.items.get(this._selectedItem);
     }
-    updateActionTile() {
-        this.actionTiles.forEach(tile => {
-            tile.setIsVisible(false);
+    updateFloatingElements() {
+        this.floatingButtons.forEach(button => {
+            button.style.display = "none";
         });
         if (this.selectedObject) {
             let s = this.actionTileSize;
             if (this.selectedObject instanceof Ball) {
-                this.actionTileDelete.setIsVisible(true);
-                this.actionTileDelete.position.x = 0;
-                this.actionTileDelete.position.y = -this.selectedObject.radius - 1.2 * s;
-                this.actionTileDelete.position.addInPlace(this.selectedObject.positionZeroGhost.position);
+                this.deletebutton.style.display = "";
+                this.floatingElementDelete.setTarget(new BABYLON.Vector3(this.selectedObject.positionZeroGhost.position.x, this.selectedObject.positionZeroGhost.position.y - this.selectedObject.radius - 0.005, this.selectedObject.positionZeroGhost.position.z + 0));
+                this.floatingElementDelete.anchor = FloatingElementAnchor.TopCenter;
             }
-            else if (this.selectedObject instanceof Track) {
+            else if (this.selectedObject instanceof MachinePart) {
                 let s34 = 3 * s / 4;
                 let xLeft = -tileWidth * 0.5;
-                let xRight = tileWidth * (this.selectedObject.deltaI + 0.5);
+                let xRight = tileWidth * (this.selectedObject.w - 0.5);
                 let xCenter = (xLeft + xRight) * 0.5;
                 let yTop = tileHeight * 0.25;
-                let yBottom = -tileHeight * (this.selectedObject.deltaJ + 0.75);
+                let yBottom = -tileHeight * (this.selectedObject.h + 0.75);
                 let yCenter = (yTop + yBottom) * 0.5;
-                this.actionTileHPlusTop.position.x = xCenter - s34;
-                this.actionTileHPlusTop.position.y = yTop + s;
-                this.actionTileHMinusTop.position.x = xCenter + s34;
-                this.actionTileHMinusTop.position.y = yTop + s;
-                this.actionTileWPlusRight.position.x = xRight + s;
-                this.actionTileWPlusRight.position.y = yCenter + s34;
-                this.actionTileWMinusRight.position.x = xRight + s;
-                this.actionTileWMinusRight.position.y = yCenter - s34;
-                this.actionTileHUpBottom.position.x = xCenter - s34;
-                this.actionTileHUpBottom.position.y = yBottom - s;
-                this.actionTileHDownBottom.position.x = xCenter + s34;
-                this.actionTileHDownBottom.position.y = yBottom - s;
-                this.actionTileWPlusLeft.position.x = xLeft - s;
-                this.actionTileWPlusLeft.position.y = yCenter + s34;
-                this.actionTileWMinusLeft.position.x = xLeft - s;
-                this.actionTileWMinusLeft.position.y = yCenter - s34;
-                this.actionTileMirror.position.x = xRight - 0.5 * s;
-                this.actionTileMirror.position.y = yBottom - s;
-                this.actionTileDelete.position.x = xRight - 0.5 * s;
-                this.actionTileDelete.position.y = yTop + s;
+                this.floatingElementTop.setTarget(new BABYLON.Vector3(this.selectedObject.position.x + xCenter, this.selectedObject.position.y + yTop, this.selectedObject.position.z + 0));
+                this.floatingElementRight.setTarget(new BABYLON.Vector3(this.selectedObject.position.x + xRight, this.selectedObject.position.y + yCenter, this.selectedObject.position.z + 0));
+                this.floatingElementBottom.setTarget(new BABYLON.Vector3(this.selectedObject.position.x + xCenter, this.selectedObject.position.y + yBottom, this.selectedObject.position.z + 0));
+                this.floatingElementLeft.setTarget(new BABYLON.Vector3(this.selectedObject.position.x + xLeft, this.selectedObject.position.y + yCenter, this.selectedObject.position.z + 0));
+                this.floatingElementDelete.setTarget(new BABYLON.Vector3(this.selectedObject.position.x + xRight, this.selectedObject.position.y + yTop, this.selectedObject.position.z + 0));
+                this.floatingElementDelete.anchor = FloatingElementAnchor.LeftBottom;
+                this.floatingElementBottomRight.setTarget(new BABYLON.Vector3(this.selectedObject.position.x + xRight, this.selectedObject.position.y + yBottom, this.selectedObject.position.z + 0));
                 if (this.selectedObject.xExtendable) {
-                    this.actionTileWMinusRight.setIsVisible(true);
-                    this.actionTileWPlusRight.setIsVisible(true);
-                    this.actionTileWMinusLeft.setIsVisible(true);
-                    this.actionTileWPlusLeft.setIsVisible(true);
+                    this.WMinusRightButton.style.display = "";
+                    this.WPlusRightButton.style.display = "";
+                    this.WMinusLeftButton.style.display = "";
+                    this.WPlusLeftButton.style.display = "";
                 }
                 if (this.selectedObject.yExtendable) {
-                    this.actionTileHMinusTop.setIsVisible(true);
-                    this.actionTileHPlusTop.setIsVisible(true);
-                    this.actionTileHUpBottom.setIsVisible(true);
-                    this.actionTileHDownBottom.setIsVisible(true);
+                    this.HMinusTopButton.style.display = "";
+                    this.HPlusTopButton.style.display = "";
+                    this.HPlusBottomButton.style.display = "";
+                    this.HMinusBottomButton.style.display = "";
                 }
-                this.actionTileDelete.setIsVisible(true);
-                this.actionTileMirror.setIsVisible(true);
-                this.actionTiles.forEach(tile => {
-                    tile.position.addInPlace(this.selectedObject.position);
-                });
-            }
-        }
-    }
-    async onActionTilePointerUp(tile) {
-        if (this.selectedObject) {
-            if (tile === this.actionTileDelete) {
-                this.selectedObject.dispose();
-                this.setSelectedObject(undefined);
-                this.setDraggedObject(undefined);
-            }
-            else if (this.selectedObject instanceof Track) {
-                let track = this.selectedObject;
-                if (tile === this.actionTileHPlusTop) {
-                    if (track.yExtendable) {
-                        let h = track.h + 1;
-                        let j = track.j - 1;
-                        let editedTrack = await this.editTrackInPlace(track, undefined, j, track.xExtendable ? track.w : undefined, h);
-                        this.setSelectedObject(editedTrack);
-                    }
-                }
-                else if (tile === this.actionTileHMinusTop) {
-                    if (track.yExtendable) {
-                        let h = track.h - 1;
-                        let j = track.j + 1;
-                        if (h >= 0) {
-                            let editedTrack = await this.editTrackInPlace(track, undefined, j, track.xExtendable ? track.w : undefined, h);
-                            this.setSelectedObject(editedTrack);
-                        }
-                    }
-                }
-                else if (tile === this.actionTileWPlusRight) {
-                    if (track.xExtendable) {
-                        let w = track.w + 1;
-                        let editedTrack = await this.editTrackInPlace(track, undefined, undefined, w, track.yExtendable ? track.h : undefined);
-                        this.setSelectedObject(editedTrack);
-                    }
-                }
-                else if (tile === this.actionTileWMinusRight) {
-                    if (track.xExtendable) {
-                        let w = track.w - 1;
-                        if (w >= 1) {
-                            let editedTrack = await this.editTrackInPlace(track, undefined, undefined, w, track.yExtendable ? track.h : undefined);
-                            this.setSelectedObject(editedTrack);
-                        }
-                    }
-                }
-                else if (tile === this.actionTileHDownBottom) {
-                    if (track.yExtendable) {
-                        let h = track.h + 1;
-                        let editedTrack = await this.editTrackInPlace(track, undefined, undefined, track.xExtendable ? track.w : undefined, h);
-                        this.setSelectedObject(editedTrack);
-                    }
-                }
-                else if (tile === this.actionTileHUpBottom) {
-                    if (track.yExtendable) {
-                        let h = track.h - 1;
-                        if (h >= 0) {
-                            let editedTrack = await this.editTrackInPlace(track, undefined, undefined, track.xExtendable ? track.w : undefined, h);
-                            this.setSelectedObject(editedTrack);
-                        }
-                    }
-                }
-                else if (tile === this.actionTileWPlusLeft) {
-                    if (track.xExtendable) {
-                        let i = track.i - 1;
-                        let w = track.w + 1;
-                        let editedTrack = await this.editTrackInPlace(track, i, undefined, w, track.yExtendable ? track.h : undefined);
-                        this.setSelectedObject(editedTrack);
-                    }
-                }
-                else if (tile === this.actionTileWMinusLeft) {
-                    if (track.xExtendable) {
-                        let i = track.i + 1;
-                        let w = track.w - 1;
-                        if (w >= 1) {
-                            let editedTrack = await this.editTrackInPlace(track, i, undefined, w, track.yExtendable ? track.h : undefined);
-                            this.setSelectedObject(editedTrack);
-                        }
-                    }
-                }
-                else if (tile === this.actionTileMirror) {
-                    track = await this.mirrorTrackInPlace(track);
-                    this.setSelectedObject(track);
-                }
+                this.deletebutton.style.display = "";
+                this.tileMirrorButton.style.display = "";
             }
         }
     }
@@ -1161,6 +1077,7 @@ var GameMode;
 class Game {
     constructor(canvasElement) {
         this.cameraOrtho = false;
+        this.mainVolume = 0;
         this.targetTimeFactor = 0.8;
         this.timeFactor = 0.1;
         this.physicDT = 0.001;
@@ -1230,6 +1147,20 @@ class Game {
         this.canvas.requestPointerLock = this.canvas.requestPointerLock || this.canvas.msRequestPointerLock || this.canvas.mozRequestPointerLock || this.canvas.webkitRequestPointerLock;
         this.engine = new BABYLON.Engine(this.canvas, true);
         BABYLON.Engine.ShadersRepository = "./shaders/";
+        let savedMainSound = window.localStorage.getItem("saved-main-volume");
+        if (savedMainSound) {
+            let v = parseFloat(savedMainSound);
+            if (isFinite(v)) {
+                this.mainVolume = Math.max(Math.min(v, 1), 0);
+            }
+        }
+        let savedTimeFactor = window.localStorage.getItem("saved-time-factor");
+        if (savedTimeFactor) {
+            let v = parseFloat(savedTimeFactor);
+            if (isFinite(v)) {
+                this.targetTimeFactor = Math.max(Math.min(v, 1), 0);
+            }
+        }
     }
     async createScene() {
         this.scene = new BABYLON.Scene(this.engine);
@@ -1258,9 +1189,14 @@ class Game {
         this.ghostMaterial.alpha = 0.3;
         this.steelMaterial = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.scene);
         this.steelMaterial.baseColor = new BABYLON.Color3(0.5, 0.75, 1.0);
-        this.steelMaterial.metallic = 1.0; // set to 1 to only use it from the metallicRoughnessTexture
-        this.steelMaterial.roughness = 0.15; // set to 1 to only use it from the metallicRoughnessTexture
+        this.steelMaterial.metallic = 1.0;
+        this.steelMaterial.roughness = 0.15;
         this.steelMaterial.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./datas/environment/environmentSpecular.env", this.scene);
+        this.copperMaterial = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.scene);
+        this.copperMaterial.baseColor = BABYLON.Color3.FromHexString("#B87333");
+        this.copperMaterial.metallic = 1.0;
+        this.copperMaterial.roughness = 0.15;
+        this.copperMaterial.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./datas/environment/environmentSpecular.env", this.scene);
         this.woodMaterial = new BABYLON.StandardMaterial("wood-material");
         this.woodMaterial.diffuseColor.copyFromFloats(0.3, 0.3, 0.3);
         this.woodMaterial.diffuseTexture = new BABYLON.Texture("./datas/textures/wood-color.jpg");
@@ -1288,9 +1224,10 @@ class Game {
         this.camera.minZ = 0.01;
         this.camera.maxZ = 10;
         this.camera.wheelPrecision = 1000;
-        this.camera.panningSensibility = 10000;
+        this.camera.panningSensibility = 2000;
+        this.camera.panningInertia *= 0.1;
         this.camera.lowerRadiusLimit = 0.05;
-        this.camera.upperRadiusLimit = 2;
+        this.camera.upperRadiusLimit = 1.5;
         this.camera.angularSensibilityX = 2000;
         this.camera.angularSensibilityY = 2000;
         this.camera.pinchPrecision = 10000;
@@ -1330,7 +1267,6 @@ class Game {
         this.tileMenuContainer = new BABYLON.Mesh("menu");
         this.tileMenuContainer.position.y = -10;
         this.tileMenuContainer.position.z = 1;
-        document.getElementById("machine-buttons").style.display = "none";
         this.tileDemo1 = new MenuTile("tile-demo-1", 0.05, 0.075, this);
         await this.tileDemo1.instantiate();
         this.tileDemo1.position.x = -0.09;
@@ -1355,13 +1291,13 @@ class Game {
         this.tileCredit.position.x = 0.07;
         this.tileCredit.position.y = -0.09;
         this.tileCredit.parent = this.tileMenuContainer;
-        let creditPlaque = new MenuTile("credit-plaque", 0.2, 0.15, this);
-        await creditPlaque.instantiate();
-        creditPlaque.material.emissiveColor.copyFromFloats(1, 1, 1);
-        creditPlaque.position.x = 0;
-        creditPlaque.position.y = 0;
-        creditPlaque.position.z = 0.13;
-        creditPlaque.rotation.y = Math.PI;
+        this.creditPlaque = new MenuTile("credit-plaque", 0.2, 0.15, this);
+        await this.creditPlaque.instantiate();
+        this.creditPlaque.material.emissiveColor.copyFromFloats(1, 1, 1);
+        this.creditPlaque.position.x = 0;
+        this.creditPlaque.position.y = 0;
+        this.creditPlaque.position.z = 0.13;
+        this.creditPlaque.rotation.y = Math.PI;
         this.tiles = [this.tileDemo1, this.tileDemo2, this.tileDemo3, this.tileCreate, this.tileCredit];
         let doDrawTileMenuTextures = () => {
             let ctx = this.tileDemo1.texture.getContext();
@@ -1393,16 +1329,16 @@ class Game {
             h = this.tileCredit.texH;
             ctx.drawImage(blackboardTex, 80, 200, w, h, 0, 0, w, h);
             this.tileCredit.texture.drawText("CREDIT", 70, 100, "70px 'Serif'", "white", null);
-            ctx = creditPlaque.texture.getContext();
-            w = creditPlaque.texW;
-            h = creditPlaque.texH;
+            ctx = this.creditPlaque.texture.getContext();
+            w = this.creditPlaque.texW;
+            h = this.creditPlaque.texH;
             ctx.drawImage(blackboardTex, 80, 200, w, h, 0, 0, w, h);
-            creditPlaque.texture.drawText("DESIGN, ART & CODE", 140, 200, "70px 'Serif'", "white", null);
-            creditPlaque.texture.drawText("Sven Frankson", 70, 300, "70px 'Serif'", "white", null);
-            creditPlaque.texture.drawText("Powered by BABYLONJS", 70, 450, "50px 'Serif'", "white", null);
-            creditPlaque.texture.drawText("Blackboard texture from FREEPIK", 70, 550, "50px 'Serif'", "white", null);
-            creditPlaque.texture.drawText("CC0 Wood material from TEXTURECAN", 70, 650, "50px 'Serif'", "white", null);
-            creditPlaque.texture.drawText("Find license file on GitHub for related urls", 70, 750, "40px 'Serif'", "#8a8674", null);
+            this.creditPlaque.texture.drawText("DESIGN, ART & CODE", 140, 200, "70px 'Serif'", "white", null);
+            this.creditPlaque.texture.drawText("Sven Frankson", 70, 300, "70px 'Serif'", "white", null);
+            this.creditPlaque.texture.drawText("Powered by BABYLONJS", 70, 450, "50px 'Serif'", "white", null);
+            this.creditPlaque.texture.drawText("Blackboard texture from FREEPIK", 70, 550, "50px 'Serif'", "white", null);
+            this.creditPlaque.texture.drawText("CC0 Wood material from TEXTURECAN", 70, 650, "50px 'Serif'", "white", null);
+            this.creditPlaque.texture.drawText("Find license file on GitHub for related urls", 70, 750, "40px 'Serif'", "#8a8674", null);
         };
         if (blackboardTex.complete) {
             doDrawTileMenuTextures();
@@ -1413,40 +1349,11 @@ class Game {
         await this.machine.instantiate();
         await this.machine.generateBaseMesh();
         document.getElementById("track-editor-menu").style.display = "none";
-        document.getElementById("machine-play").onclick = () => {
-            if (this.machine) {
-                this.machine.play();
-            }
-        };
-        document.getElementById("machine-stop").onclick = () => {
-            if (this.machine) {
-                this.machine.stop();
-            }
-        };
-        document.getElementById("machine-back-main-menu").onclick = () => {
-            this.setContext(GameMode.MainMenu);
-        };
-        //this.trackEditor = new TrackEditor(this);
-        //this.trackEditor.initialize();
-        /*
-        setTimeout(() => {
-            let data = this.machine.serialize();
-            this.machine.dispose();
-            setTimeout(() => {
-                this.machine.deserialize(data);
-                this.machine.instantiate();
-                
-            }, 5000);
-        }, 5000);
-        */
+        //this.makeScreenshot("split");
+        //return;
+        this.toolbar = new Toolbar(this);
+        this.toolbar.initialize();
         this.setContext(GameMode.MainMenu);
-        //await this.makeScreenshot("ball");
-        /*
-        for (let i = 0; i < TrackNames.length; i++) {
-            let trackname = TrackNames[i];
-            await this.makeScreenshot(trackname);
-        }
-        */
     }
     animate() {
         this.engine.runRenderLoop(() => {
@@ -1455,6 +1362,7 @@ class Game {
         });
         window.addEventListener("resize", () => {
             this.engine.resize();
+            this.toolbar.resize();
         });
     }
     async initialize() {
@@ -1467,6 +1375,8 @@ class Game {
         let target = this.camera.target;
         window.localStorage.setItem("saved-target", JSON.stringify({ x: target.x, y: target.y, z: target.z }));
         window.localStorage.setItem("saved-cam-ortho", this.cameraOrtho ? "true" : "false");
+        window.localStorage.setItem("saved-main-volume", this.mainVolume.toFixed(2));
+        window.localStorage.setItem("saved-time-factor", this.targetTimeFactor.toFixed(2));
         let ratio = this.engine.getRenderWidth() / this.engine.getRenderHeight();
         if (this.cameraOrtho) {
             let f = this.camera.radius / 4;
@@ -1504,7 +1414,6 @@ class Game {
             if (this.mode === GameMode.MainMenu) {
                 this.tileMenuContainer.position.y = -10;
                 this.tileMenuContainer.position.z = 1;
-                document.getElementById("machine-buttons").style.display = "flex";
                 this.scene.onPointerObservable.removeCallback(this.onPointerEvent);
             }
             else if (this.mode === GameMode.CreateMode) {
@@ -1522,7 +1431,6 @@ class Game {
                 this.machine.play();
                 this.tileMenuContainer.position.y = 0;
                 this.tileMenuContainer.position.z = -0.03;
-                document.getElementById("machine-buttons").style.display = "none";
                 this.setCameraTarget(BABYLON.Vector3.Zero());
                 await this.setCameraAlphaBeta(-Math.PI * 0.5, Math.PI * 0.5, 0.35 * 0.8 / this.getCameraMinFOV());
                 this.camera.lowerAlphaLimit = -Math.PI * 0.65;
@@ -1533,7 +1441,7 @@ class Game {
             }
             else if (this.mode === GameMode.CreateMode) {
                 this.machine.dispose();
-                this.machine.deserialize(demo1);
+                this.machine.deserialize(createDefault);
                 await this.machine.instantiate();
                 await this.machine.generateBaseMesh();
                 this.machine.stop();
@@ -1553,7 +1461,7 @@ class Game {
                     this.setCameraTarget(new BABYLON.Vector3(0.08, 0.09, 0));
                 }
                 else if (demoIndex === 3) {
-                    this.setCameraTarget(new BABYLON.Vector3(0.22, 0.15, 0));
+                    this.setCameraTarget(new BABYLON.Vector3(-0.33, -0.17, 0));
                 }
                 else {
                     this.setCameraTarget(BABYLON.Vector3.Zero());
@@ -1573,6 +1481,7 @@ class Game {
                 this.camera.lowerBetaLimit = Math.PI * 0.2;
                 this.camera.upperBetaLimit = Math.PI * 0.8;
             }
+            this.toolbar.resize();
         }
     }
     async setCameraAlphaBeta(alpha, beta, radius) {
@@ -1594,6 +1503,7 @@ class Game {
         await anim(0, 0.6);
     }
     async makeScreenshot(objectName) {
+        this.creditPlaque.setIsVisible(false);
         this.machine.baseWall.isVisible = false;
         this.machine.baseFrame.isVisible = false;
         this.skybox.isVisible = false;
@@ -1611,8 +1521,8 @@ class Game {
                 }
                 else {
                     track = this.machine.trackFactory.createTrack(objectName, 0, 0);
-                    this.camera.radius = 0.25 + Math.max(0.15 * track.deltaI, 0);
-                    this.camera.target.copyFromFloats(tileWidth * (track.deltaI * 0.55), -tileHeight * (track.deltaJ) * 0.5, 0);
+                    this.camera.radius = 0.25 + Math.max(0.15 * (track.w - 1), 0);
+                    this.camera.target.copyFromFloats(tileWidth * ((track.w - 1) * 0.55), -tileHeight * (track.h) * 0.5, 0);
                 }
                 if (objectName === "spiral") {
                     this.camera.target.x -= tileWidth * 0.1;
@@ -1620,7 +1530,7 @@ class Game {
                     this.camera.radius += 0.1;
                 }
                 if (track) {
-                    this.machine.tracks = [track];
+                    this.machine.parts = [track];
                 }
                 if (ball) {
                     this.machine.balls = [ball];
@@ -1640,6 +1550,14 @@ class Game {
             return fov;
         }
         return fov * ratio;
+    }
+    getCameraZoomFactor() {
+        let f = 1 - (this.camera.radius - this.camera.lowerRadiusLimit) / (this.camera.upperRadiusLimit - this.camera.lowerRadiusLimit);
+        return f * f;
+    }
+    setCameraZoomFactor(v) {
+        let f = Math.sqrt(v);
+        this.camera.radius = (1 - f) * (this.camera.upperRadiusLimit - this.camera.lowerRadiusLimit) + this.camera.lowerRadiusLimit;
     }
 }
 window.addEventListener("DOMContentLoaded", () => {
@@ -1711,6 +1629,12 @@ class MenuTile extends BABYLON.Mesh {
     get ppm() {
         return MenuTile.ppc * 100;
     }
+    setIsVisible(isVisible) {
+        this.isVisible = isVisible;
+        this.getChildMeshes().forEach(m => {
+            m.isVisible = isVisible;
+        });
+    }
     async instantiate() {
         let button = BABYLON.MeshBuilder.CreateSphere("center", { diameter: 0.001 });
         this.game.vertexDataLoader.get("./meshes/button.babylon").then(vertexData => {
@@ -1776,7 +1700,9 @@ class Sound {
         return this._audioElement.volume;
     }
     set volume(v) {
-        this._audioElement.volume = v;
+        if (isFinite(v)) {
+            this._audioElement.volume = Math.max(Math.min(v, 1), 0);
+        }
     }
     play(fromBegin = true) {
         if (this._audioElement) {
@@ -1804,16 +1730,16 @@ class TrackPointHandle extends BABYLON.Mesh {
         super("trackpoint-handle");
         this.trackPoint = trackPoint;
         this._normal = BABYLON.Vector3.Up();
-        let data = BABYLON.CreateSphereVertexData({ diameter: 0.6 * this.trackPoint.track.wireGauge });
+        let data = BABYLON.CreateSphereVertexData({ diameter: 0.6 * this.trackPoint.track.part.wireGauge });
         data.applyToMesh(this);
         this.position.copyFrom(this.trackPoint.position);
         this.rotationQuaternion = BABYLON.Quaternion.Identity();
         this.setNormal(trackPoint.normal);
-        this.parent = trackPoint.track;
-        let normalIndicator = BABYLON.MeshBuilder.CreateCylinder("normal", { height: this.trackPoint.track.wireGauge, diameter: 0.0005, tessellation: 8 });
+        this.parent = trackPoint.track.part;
+        let normalIndicator = BABYLON.MeshBuilder.CreateCylinder("normal", { height: this.trackPoint.track.part.wireGauge, diameter: 0.0005, tessellation: 8 });
         normalIndicator.parent = this;
-        normalIndicator.position.copyFromFloats(0, 0.6 * this.trackPoint.track.wireGauge * 0.5 + this.trackPoint.track.wireGauge * 0.5, 0);
-        this.setMaterial(this.trackPoint.track.game.handleMaterial);
+        normalIndicator.position.copyFromFloats(0, 0.6 * this.trackPoint.track.part.wireGauge * 0.5 + this.trackPoint.track.part.wireGauge * 0.5, 0);
+        this.setMaterial(this.trackPoint.track.part.game.handleMaterial);
     }
     get normal() {
         return this._normal;
@@ -1917,17 +1843,17 @@ class TrackEditor {
                     this.dragNormal = false;
                     this.selectedTrackPoint.normal.copyFrom(this.selectedTrackPointHandle.normal);
                     this.selectedTrackPoint.fixedNormal = true;
-                    this.track.generateWires();
-                    this.track.recomputeAbsolutePath();
-                    this.track.rebuildWireMeshes();
+                    this.part.generateWires();
+                    this.part.recomputeAbsolutePath();
+                    this.part.rebuildWireMeshes();
                     this.updateHandles();
                 }
                 else if (this.dragTrackPoint && this.hoveredTrackPoint && !this.hoveredTrackPoint.isFirstOrLast()) {
                     this.dragTrackPoint = false;
                     this.hoveredTrackPoint.position.copyFrom(this.hoveredTrackPointHandle.position);
-                    this.track.generateWires();
-                    this.track.recomputeAbsolutePath();
-                    this.track.rebuildWireMeshes();
+                    this.part.generateWires();
+                    this.part.recomputeAbsolutePath();
+                    this.part.rebuildWireMeshes();
                     this.updateHandles();
                 }
                 else {
@@ -1954,9 +1880,9 @@ class TrackEditor {
                         let dA = 3 * (eventData.event.deltaY / 100) / 180 * Math.PI;
                         Mummu.RotateInPlace(this.hoveredTrackPoint.normal, this.hoveredTrackPoint.dir, dA);
                         this.hoveredTrackPoint.fixedNormal = true;
-                        this.track.generateWires();
-                        this.track.recomputeAbsolutePath();
-                        this.track.rebuildWireMeshes();
+                        this.part.generateWires();
+                        this.part.recomputeAbsolutePath();
+                        this.part.rebuildWireMeshes();
                         this.updateHandles();
                     }
                 }
@@ -1972,31 +1898,31 @@ class TrackEditor {
                     this.activeTrackpointPositionInput.targetXYZ = this.selectedTrackPoint.position;
                     this.activeTrackpointNormalInput.targetXYZ = this.selectedTrackPoint.normal;
                 }
-                let slopePrev = this.track.getSlopeAt(this.selectedTrackPointIndex - 1);
+                let slopePrev = this.part.getSlopeAt(this.selectedTrackPointIndex - 1);
                 document.getElementById("slope-prev").innerText = slopePrev.toFixed(1) + "%";
-                let slopeCurr = this.track.getSlopeAt(this.selectedTrackPointIndex);
+                let slopeCurr = this.part.getSlopeAt(this.selectedTrackPointIndex);
                 document.getElementById("slope-curr").innerText = slopeCurr.toFixed(1) + "%";
-                let slopeNext = this.track.getSlopeAt(this.selectedTrackPointIndex + 1);
+                let slopeNext = this.part.getSlopeAt(this.selectedTrackPointIndex + 1);
                 document.getElementById("slope-next").innerText = slopeNext.toFixed(1) + "%";
                 this.activeTrackpointTangentIn.setValue(this.selectedTrackPoint.tangentIn);
                 this.activeTrackpointTangentOut.setValue(this.selectedTrackPoint.tangentOut);
-                let bankCurr = this.track.getBankAt(this.selectedTrackPointIndex);
+                let bankCurr = this.part.getBankAt(this.selectedTrackPointIndex);
                 document.getElementById("active-trackpoint-bank").innerText = bankCurr.toFixed(1) + "°";
             }
-            if (this.track) {
-                document.getElementById("slope-global").innerText = this.track.globalSlope.toFixed(1) + "%";
+            if (this.part) {
+                document.getElementById("slope-global").innerText = this.part.globalSlope.toFixed(1) + "%";
             }
             this.helperCircleRadius.setValue(this.helperShape.circleRadius);
             this.helperGridSize.setValue(this.helperShape.gridSize);
         };
-        this.setTrack(this.game.machine.tracks[0]);
+        this.setTrack(this.game.machine.parts[0]);
         this.helperShape = new HelperShape();
     }
-    get track() {
+    get part() {
         return this._track;
     }
     setTrack(t) {
-        if (t != this.track) {
+        if (t != this.part) {
             if (this._track) {
             }
             this._track = t;
@@ -2010,34 +1936,34 @@ class TrackEditor {
         this.pointerPlane.visibility = 0;
         this.pointerPlane.rotationQuaternion = BABYLON.Quaternion.Identity();
         document.getElementById("prev-track").addEventListener("click", () => {
-            let trackIndex = this.game.machine.tracks.indexOf(this._track);
+            let trackIndex = this.game.machine.parts.indexOf(this._track);
             if (trackIndex > 0) {
-                this.setTrack(this.game.machine.tracks[trackIndex - 1]);
+                this.setTrack(this.game.machine.parts[trackIndex - 1]);
                 this.centerOnTrack();
             }
         });
         document.getElementById("next-track").addEventListener("click", () => {
-            let trackIndex = this.game.machine.tracks.indexOf(this._track);
-            if (trackIndex < this.game.machine.tracks.length - 1) {
-                this.setTrack(this.game.machine.tracks[trackIndex + 1]);
+            let trackIndex = this.game.machine.parts.indexOf(this._track);
+            if (trackIndex < this.game.machine.parts.length - 1) {
+                this.setTrack(this.game.machine.parts[trackIndex + 1]);
                 this.centerOnTrack();
             }
         });
         document.getElementById("load").addEventListener("click", () => {
-            if (this.track) {
+            if (this.part) {
                 let s = window.localStorage.getItem("last-saved-track");
                 if (s) {
                     let data = JSON.parse(s);
-                    this.track.deserialize(data);
-                    this.track.generateWires();
-                    this.track.recomputeAbsolutePath();
-                    this.track.rebuildWireMeshes();
+                    this.part.deserialize(data);
+                    this.part.generateWires();
+                    this.part.recomputeAbsolutePath();
+                    this.part.rebuildWireMeshes();
                 }
             }
         });
         document.getElementById("save").addEventListener("click", () => {
-            if (this.track) {
-                let data = this.track.serialize();
+            if (this.part) {
+                let data = this.part.serialize();
                 window.localStorage.setItem("last-saved-track", JSON.stringify(data));
                 Nabu.download("track.json", JSON.stringify(data));
             }
@@ -2066,8 +1992,8 @@ class TrackEditor {
             this.helperShape.setShow(false);
         });
         document.getElementById("btn-focus-point").addEventListener("click", () => {
-            if (this.track && this.selectedTrackPoint) {
-                let target = BABYLON.Vector3.TransformCoordinates(this.selectedTrackPoint.position, this.track.getWorldMatrix());
+            if (this.part && this.selectedTrackPoint) {
+                let target = BABYLON.Vector3.TransformCoordinates(this.selectedTrackPoint.position, this.part.getWorldMatrix());
                 this.game.setCameraTarget(target);
             }
         });
@@ -2075,16 +2001,16 @@ class TrackEditor {
             this.centerOnTrack();
         });
         document.getElementById("btn-display-wire").addEventListener("click", () => {
-            if (this.track) {
-                this.track.renderOnlyPath = false;
-                this.track.rebuildWireMeshes();
+            if (this.part) {
+                this.part.renderOnlyPath = false;
+                this.part.rebuildWireMeshes();
                 this.updateHandles();
             }
         });
         document.getElementById("btn-display-path").addEventListener("click", () => {
-            if (this.track) {
-                this.track.renderOnlyPath = true;
-                this.track.rebuildWireMeshes();
+            if (this.part) {
+                this.part.renderOnlyPath = true;
+                this.part.rebuildWireMeshes();
                 this.updateHandles();
             }
         });
@@ -2103,80 +2029,80 @@ class TrackEditor {
             this.helperShape.setGridSize(n);
         };
         document.getElementById("prev-trackpoint").addEventListener("click", () => {
-            if (this.track) {
-                let newTrackIndex = (this.selectedTrackPointIndex - 1 + this.track.trackPoints.length) % this.track.trackPoints.length;
+            if (this.part) {
+                let newTrackIndex = (this.selectedTrackPointIndex - 1 + this.part.tracks[0].trackpoints.length) % this.part.tracks[0].trackpoints.length;
                 this.setSelectedTrackPointIndex(newTrackIndex);
             }
         });
         document.getElementById("next-trackpoint").addEventListener("click", () => {
-            if (this.track) {
-                let newTrackIndex = (this.selectedTrackPointIndex + 1) % this.track.trackPoints.length;
+            if (this.part) {
+                let newTrackIndex = (this.selectedTrackPointIndex + 1) % this.part.tracks[0].trackpoints.length;
                 this.setSelectedTrackPointIndex(newTrackIndex);
             }
         });
         this.activeTrackpointPositionInput = document.getElementById("active-trackpoint-pos");
         this.activeTrackpointPositionInput.onInputXYZCallback = (xyz) => {
-            if (this.track) {
+            if (this.part) {
                 if (this.selectedTrackPoint && !this.selectedTrackPoint.isFirstOrLast()) {
-                    this.track.generateWires();
-                    this.track.recomputeAbsolutePath();
-                    this.track.rebuildWireMeshes();
+                    this.part.generateWires();
+                    this.part.recomputeAbsolutePath();
+                    this.part.rebuildWireMeshes();
                     this.updateHandles();
                 }
             }
         };
         this.activeTrackpointNormalInput = document.getElementById("active-trackpoint-normal");
         this.activeTrackpointNormalInput.onInputXYZCallback = (xyz) => {
-            if (this.track) {
+            if (this.part) {
                 if (this.selectedTrackPoint && !this.selectedTrackPoint.isFirstOrLast()) {
-                    this.track.generateWires();
-                    this.track.recomputeAbsolutePath();
-                    this.track.rebuildWireMeshes();
+                    this.part.generateWires();
+                    this.part.recomputeAbsolutePath();
+                    this.part.rebuildWireMeshes();
                     this.updateHandles();
                 }
             }
         };
         this.activeTrackpointTangentIn = document.getElementById("active-trackpoint-tan-in");
         this.activeTrackpointTangentIn.onInputNCallback = (n) => {
-            if (this.track) {
+            if (this.part) {
                 if (this.selectedTrackPoint && !this.selectedTrackPoint.isFirstOrLast()) {
                     this.selectedTrackPoint.tangentIn = n;
                     this.selectedTrackPoint.fixedTangentIn = true;
-                    this.track.generateWires();
-                    this.track.recomputeAbsolutePath();
-                    this.track.rebuildWireMeshes();
+                    this.part.generateWires();
+                    this.part.recomputeAbsolutePath();
+                    this.part.rebuildWireMeshes();
                     this.updateHandles();
                 }
             }
         };
         this.activeTrackpointTangentOut = document.getElementById("active-trackpoint-tan-out");
         this.activeTrackpointTangentOut.onInputNCallback = (n) => {
-            if (this.track) {
+            if (this.part) {
                 if (this.selectedTrackPoint && !this.selectedTrackPoint.isFirstOrLast()) {
                     this.selectedTrackPoint.tangentOut = n;
                     this.selectedTrackPoint.fixedTangentOut = true;
-                    this.track.generateWires();
-                    this.track.recomputeAbsolutePath();
-                    this.track.rebuildWireMeshes();
+                    this.part.generateWires();
+                    this.part.recomputeAbsolutePath();
+                    this.part.rebuildWireMeshes();
                     this.updateHandles();
                 }
             }
         };
         document.getElementById("active-trackpoint-split").addEventListener("click", () => {
-            if (this.track) {
-                this.track.splitTrackPointAt(this.selectedTrackPointIndex);
-                this.track.generateWires();
-                this.track.recomputeAbsolutePath();
-                this.track.rebuildWireMeshes();
+            if (this.part) {
+                this.part.splitTrackPointAt(this.selectedTrackPointIndex);
+                this.part.generateWires();
+                this.part.recomputeAbsolutePath();
+                this.part.rebuildWireMeshes();
                 this.rebuildHandles();
             }
         });
         document.getElementById("active-trackpoint-delete").addEventListener("click", () => {
-            if (this.track) {
-                this.track.deleteTrackPointAt(this.selectedTrackPointIndex);
-                this.track.generateWires();
-                this.track.recomputeAbsolutePath();
-                this.track.rebuildWireMeshes();
+            if (this.part) {
+                this.part.deleteTrackPointAt(this.selectedTrackPointIndex);
+                this.part.generateWires();
+                this.part.recomputeAbsolutePath();
+                this.part.rebuildWireMeshes();
                 this.rebuildHandles();
             }
         });
@@ -2244,19 +2170,19 @@ class TrackEditor {
     }
     rebuildHandles() {
         this.removeHandles();
-        for (let i = 0; i < this.track.trackPoints.length; i++) {
-            let handle = new TrackPointHandle(this.track.trackPoints[0][i]);
+        for (let i = 0; i < this.part.tracks[0].trackpoints.length; i++) {
+            let handle = new TrackPointHandle(this.part.tracks[0].trackpoints[0][i]);
             this.trackPointhandles.push(handle);
-            let pPrev = this.track.trackPoints[0][i - 1] ? this.track.trackPoints[0][i - 1].position : undefined;
-            let p = this.track.trackPoints[0][i].position;
-            let pNext = this.track.trackPoints[0][i + 1] ? this.track.trackPoints[0][i + 1].position : undefined;
+            let pPrev = this.part.tracks[0].trackpoints[0][i - 1] ? this.part.tracks[0].trackpoints[0][i - 1].position : undefined;
+            let p = this.part.tracks[0].trackpoints[0][i].position;
+            let pNext = this.part.tracks[0].trackpoints[0][i + 1] ? this.part.tracks[0].trackpoints[0][i + 1].position : undefined;
             if (!pPrev) {
                 pPrev = p.subtract(pNext.subtract(p));
             }
             if (!pNext) {
                 pNext = p.add(p.subtract(pPrev));
             }
-            Mummu.QuaternionFromYZAxisToRef(this.track.trackPoints[0][i].normal, pNext.subtract(pPrev), handle.rotationQuaternion);
+            Mummu.QuaternionFromYZAxisToRef(this.part.tracks[0].trackpoints[0][i].normal, pNext.subtract(pPrev), handle.rotationQuaternion);
         }
         this.normalHandle = BABYLON.MeshBuilder.CreateCylinder("normal-handle", { height: 0.03, diameter: 0.0025, tessellation: 8 });
         this.normalHandle.rotationQuaternion = BABYLON.Quaternion.Identity();
@@ -2271,7 +2197,7 @@ class TrackEditor {
         if (this.selectedTrackPointHandle) {
             this.normalHandle.isVisible = true;
             this.normalHandle.parent = this.selectedTrackPointHandle;
-            this.normalHandle.position.copyFromFloats(0, 0.015 + 0.5 * this.track.wireGauge / 2, 0);
+            this.normalHandle.position.copyFromFloats(0, 0.015 + 0.5 * this.part.wireGauge / 2, 0);
             if (this.selectedTrackPointHandle.trackPoint.fixedNormal) {
                 this.normalHandle.material = this.game.handleMaterialActive;
             }
@@ -2284,9 +2210,9 @@ class TrackEditor {
         }
     }
     centerOnTrack() {
-        if (this.track) {
-            let center = this.track.getBarycenter();
-            center.x = this.track.position.x;
+        if (this.part) {
+            let center = this.part.getBarycenter();
+            center.x = this.part.position.x;
             this.game.setCameraTarget(center);
         }
     }
@@ -2303,6 +2229,9 @@ class Wire extends BABYLON.Mesh {
         Wire.Instances.push(this);
     }
     get size() {
+        if (isFinite(this.wireSize)) {
+            return this.wireSize;
+        }
         return this.track.wireSize;
     }
     get radius() {
@@ -2361,9 +2290,786 @@ class Wire extends BABYLON.Mesh {
 }
 Wire.DEBUG_DISPLAY = false;
 Wire.Instances = new Nabu.UniqueList();
+class Machine {
+    constructor(game) {
+        this.game = game;
+        this.parts = [];
+        this.balls = [];
+        this.instantiated = false;
+        this.playing = false;
+        this.onStopCallbacks = new Nabu.UniqueList();
+        this.trackFactory = new MachinePartFactory(this);
+    }
+    async instantiate() {
+        for (let i = 0; i < this.balls.length; i++) {
+            await this.balls[i].instantiate();
+        }
+        for (let i = 0; i < this.parts.length; i++) {
+            await this.parts[i].instantiate();
+        }
+        return new Promise(resolve => {
+            requestAnimationFrame(() => {
+                for (let i = 0; i < this.parts.length; i++) {
+                    this.parts[i].recomputeAbsolutePath();
+                }
+                this.instantiated = true;
+                resolve();
+            });
+        });
+    }
+    dispose() {
+        while (this.balls.length > 0) {
+            this.balls[0].dispose();
+        }
+        while (this.parts.length > 0) {
+            this.parts[0].dispose();
+        }
+        this.instantiated = false;
+    }
+    update() {
+        if (!this.instantiated) {
+            return;
+        }
+        if (this.playing) {
+            let dt = this.game.scene.deltaTime / 1000;
+            if (isFinite(dt)) {
+                for (let i = 0; i < this.balls.length; i++) {
+                    this.balls[i].update(dt);
+                }
+                for (let i = 0; i < this.parts.length; i++) {
+                    this.parts[i].update(dt);
+                }
+            }
+        }
+        else {
+            for (let i = 0; i < this.balls.length; i++) {
+                if (this.balls[i].marbleLoopSound.volume > 0.01) {
+                    this.balls[i].marbleLoopSound.volume *= 0.9;
+                }
+                else {
+                    this.balls[i].marbleLoopSound.volume = 0;
+                }
+            }
+        }
+    }
+    play() {
+        this.playing = true;
+    }
+    stop() {
+        for (let i = 0; i < this.balls.length; i++) {
+            this.balls[i].reset();
+        }
+        this.onStopCallbacks.forEach(callback => {
+            callback();
+        });
+        this.playing = false;
+    }
+    async generateBaseMesh() {
+        let minX = -0.15;
+        let maxX = 0.15;
+        let minY = -0.15;
+        let maxY = 0.15;
+        for (let i = 0; i < this.parts.length; i++) {
+            let track = this.parts[i];
+            minX = Math.min(minX, track.position.x - tileWidth * 0.5);
+            maxX = Math.max(maxX, track.position.x + tileWidth * (track.w - 0.5));
+            minY = Math.min(minY, track.position.y - tileHeight * (track.h + 1));
+            maxY = Math.max(maxY, track.position.y);
+        }
+        let w = maxX - minX;
+        let h = maxY - minY;
+        let u = w * 4;
+        let v = h * 4;
+        if (this.baseWall) {
+            this.baseWall.dispose();
+        }
+        this.baseWall = BABYLON.MeshBuilder.CreatePlane("base-wall", { width: h + 0.2, height: w + 0.2, sideOrientation: BABYLON.Mesh.DOUBLESIDE, frontUVs: new BABYLON.Vector4(0, 0, v, u) });
+        this.baseWall.position.x = (maxX + minX) * 0.5;
+        this.baseWall.position.y = (maxY + minY) * 0.5;
+        this.baseWall.position.z += 0.016;
+        this.baseWall.rotation.z = Math.PI / 2;
+        this.baseWall.material = this.game.woodMaterial;
+        if (this.baseFrame) {
+            this.baseFrame.dispose();
+        }
+        this.baseFrame = new BABYLON.Mesh("base-frame");
+        this.baseFrame.position.copyFrom(this.baseWall.position);
+        this.baseFrame.material = this.game.steelMaterial;
+        let vertexDatas = await this.game.vertexDataLoader.get("./meshes/base-frame.babylon");
+        let data = Mummu.CloneVertexData(vertexDatas[0]);
+        let positions = [...data.positions];
+        for (let i = 0; i < positions.length / 3; i++) {
+            let x = positions[3 * i];
+            let y = positions[3 * i + 1];
+            if (x > 0) {
+                positions[3 * i] += w * 0.5 - 0.01 + 0.1;
+            }
+            else if (x < 0) {
+                positions[3 * i] -= w * 0.5 - 0.01 + 0.1;
+            }
+            if (y > 0) {
+                positions[3 * i + 1] += h * 0.5 - 0.01 + 0.1;
+            }
+            else if (y < 0) {
+                positions[3 * i + 1] -= h * 0.5 - 0.01 + 0.1;
+            }
+        }
+        data.positions = positions;
+        data.applyToMesh(this.baseFrame);
+    }
+    serialize() {
+        let data = {
+            balls: [],
+            parts: []
+        };
+        for (let i = 0; i < this.balls.length; i++) {
+            data.balls.push({
+                x: this.balls[i].positionZero.x,
+                y: this.balls[i].positionZero.y,
+            });
+        }
+        for (let i = 0; i < this.parts.length; i++) {
+            data.parts.push({
+                name: this.parts[i].partName,
+                i: this.parts[i].i,
+                j: this.parts[i].j,
+                mirror: this.parts[i].mirror
+            });
+        }
+        return data;
+    }
+    deserialize(data) {
+        this.balls = [];
+        this.parts = [];
+        for (let i = 0; i < data.balls.length; i++) {
+            let ballData = data.balls[i];
+            let ball = new Ball(new BABYLON.Vector3(ballData.x, ballData.y, 0), this);
+            this.balls.push(ball);
+        }
+        for (let i = 0; i < data.parts.length; i++) {
+            let part = data.parts[i];
+            let track = this.trackFactory.createTrack(part.name, part.i, part.j, part.mirror);
+            this.parts.push(track);
+        }
+    }
+}
 var baseRadius = 0.075;
 var tileWidth = 0.15;
 var tileHeight = 0.03;
+class MachinePart extends BABYLON.Mesh {
+    constructor(machine, _i, _j, w = 1, h = 1, mirror) {
+        super("track", machine.game.scene);
+        this.machine = machine;
+        this._i = _i;
+        this._j = _j;
+        this.w = w;
+        this.h = h;
+        this.mirror = mirror;
+        this.partName = "machine-part";
+        this.tracks = [];
+        this.wires = [];
+        this.allWires = [];
+        this.wireSize = 0.0015;
+        this.wireGauge = 0.013;
+        this.renderOnlyPath = false;
+        this.summedLength = [0];
+        this.totalLength = 0;
+        this.globalSlope = 0;
+        this.AABBMin = BABYLON.Vector3.Zero();
+        this.AABBMax = BABYLON.Vector3.Zero();
+        this.xExtendable = false;
+        this.yExtendable = false;
+        this.position.x = this._i * tileWidth;
+        this.position.y = -this._j * tileHeight;
+        this.tracks = [new Track(this)];
+    }
+    get game() {
+        return this.machine.game;
+    }
+    get i() {
+        return this._i;
+    }
+    setI(v) {
+        this._i = v;
+        this.position.x = this._i * tileWidth;
+    }
+    get j() {
+        return this._j;
+    }
+    setJ(v) {
+        this._j = v;
+        this.position.y = -this._j * tileHeight;
+    }
+    setIsVisible(isVisible) {
+        this.isVisible = isVisible;
+        this.getChildMeshes().forEach(m => {
+            m.isVisible = isVisible;
+        });
+    }
+    select() {
+        this.selectedMesh.isVisible = true;
+    }
+    unselect() {
+        this.selectedMesh.isVisible = false;
+    }
+    mirrorTrackPointsInPlace() {
+        for (let i = 0; i < this.tracks.length; i++) {
+            this.tracks[i].mirrorTrackPointsInPlace();
+        }
+    }
+    getSlopeAt(index, trackIndex = 0) {
+        if (this.tracks[trackIndex]) {
+            return this.tracks[trackIndex].getSlopeAt(index);
+        }
+        return 0;
+    }
+    getBankAt(index, trackIndex = 0) {
+        if (this.tracks[trackIndex]) {
+            return this.tracks[trackIndex].getBankAt(index);
+        }
+        return 0;
+    }
+    splitTrackPointAt(index, trackIndex = 0) {
+        if (this.tracks[trackIndex]) {
+            this.tracks[trackIndex].splitTrackPointAt(index);
+        }
+    }
+    deleteTrackPointAt(index, trackIndex = 0) {
+        if (this.tracks[trackIndex]) {
+            this.tracks[trackIndex].deleteTrackPointAt(index);
+        }
+    }
+    getBarycenter() {
+        if (this.tracks[0].trackpoints.length < 2) {
+            return this.position.clone();
+        }
+        let barycenter = this.tracks[0].trackpoints.map(trackpoint => {
+            return trackpoint.position;
+        }).reduce((pos1, pos2) => {
+            return pos1.add(pos2);
+        }).scaleInPlace(1 / this.tracks[0].trackpoints.length);
+        return BABYLON.Vector3.TransformCoordinates(barycenter, this.getWorldMatrix());
+    }
+    recomputeAbsolutePath() {
+        this.tracks.forEach(track => {
+            track.recomputeAbsolutePath();
+        });
+        this.wires.forEach(wire => {
+            wire.recomputeAbsolutePath();
+        });
+    }
+    async instantiate() {
+        this.sleepersMesh = new BABYLON.Mesh("sleepers-mesh");
+        this.sleepersMesh.material = this.game.steelMaterial;
+        this.sleepersMesh.parent = this;
+        if (this.selectedMesh) {
+            this.selectedMesh.dispose();
+        }
+        let xLeft = -tileWidth * 0.5;
+        let xRight = tileWidth * (this.w - 0.5);
+        let yTop = tileHeight * 0.25;
+        let yBottom = -tileHeight * (this.h + 0.75);
+        this.selectedMesh = BABYLON.MeshBuilder.CreateLines("select-mesh", {
+            points: [
+                new BABYLON.Vector3(xLeft, yTop, 0),
+                new BABYLON.Vector3(xRight, yTop, 0),
+                new BABYLON.Vector3(xRight, yBottom, 0),
+                new BABYLON.Vector3(xLeft, yBottom, 0),
+                new BABYLON.Vector3(xLeft, yTop, 0)
+            ]
+        });
+        this.selectedMesh.parent = this;
+        this.selectedMesh.isVisible = false;
+        this.rebuildWireMeshes();
+    }
+    dispose() {
+        super.dispose();
+        let index = this.machine.parts.indexOf(this);
+        if (index > -1) {
+            this.machine.parts.splice(index, 1);
+        }
+    }
+    generateWires() {
+        this.AABBMin.copyFromFloats(Infinity, Infinity, Infinity);
+        this.AABBMax.copyFromFloats(-Infinity, -Infinity, -Infinity);
+        this.allWires = [...this.wires];
+        this.tracks.forEach(track => {
+            track.generateWires();
+            this.AABBMin.minimizeInPlace(track.AABBMin);
+            this.AABBMax.maximizeInPlace(track.AABBMax);
+            this.allWires.push(track.wires[0], track.wires[1]);
+        });
+    }
+    update(dt) { }
+    rebuildWireMeshes() {
+        if (this.renderOnlyPath) {
+            let n = 8;
+            let shape = [];
+            for (let i = 0; i < n; i++) {
+                let a = i / n * 2 * Math.PI;
+                let cosa = Math.cos(a);
+                let sina = Math.sin(a);
+                shape[i] = new BABYLON.Vector3(cosa * this.wireSize * 0.5, sina * this.wireSize * 0.5, 0);
+            }
+            let tmp = BABYLON.ExtrudeShape("wire", { shape: shape, path: this.tracks[0].interpolatedPoints, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+            let vertexData = BABYLON.VertexData.ExtractFromMesh(tmp);
+            vertexData.applyToMesh(this.sleepersMesh);
+            tmp.dispose();
+            this.allWires.forEach(wire => {
+                wire.hide();
+            });
+        }
+        else {
+            this.allWires.forEach(wire => {
+                wire.show();
+            });
+            SleeperMeshBuilder.GenerateSleepersVertexData(this, 0.03).applyToMesh(this.sleepersMesh);
+            this.tracks.forEach(track => {
+                track.wires.forEach(wire => {
+                    wire.instantiate();
+                });
+            });
+            this.wires.forEach(wire => {
+                wire.instantiate();
+            });
+        }
+    }
+    serialize() {
+        let data = { points: [] };
+        for (let i = 0; i < this.tracks[0].trackpoints.length; i++) {
+            data.points[i] = {
+                position: { x: this.tracks[0].trackpoints[i].position.x, y: this.tracks[0].trackpoints[i].position.y, z: this.tracks[0].trackpoints[i].position.z }
+            };
+            if (this.tracks[0].trackpoints[i].fixedNormal) {
+                data.points[i].normal = { x: this.tracks[0].trackpoints[i].normal.x, y: this.tracks[0].trackpoints[i].normal.y, z: this.tracks[0].trackpoints[i].normal.z };
+            }
+            if (this.tracks[0].trackpoints[i].fixedDir) {
+                data.points[i].dir = { x: this.tracks[0].trackpoints[i].dir.x, y: this.tracks[0].trackpoints[i].dir.y, z: this.tracks[0].trackpoints[i].dir.z };
+            }
+            if (this.tracks[0].trackpoints[i].fixedTangentIn) {
+                data.points[i].tangentIn = this.tracks[0].trackpoints[i].tangentIn;
+            }
+            if (this.tracks[0].trackpoints[i].fixedTangentOut) {
+                data.points[i].tangentOut = this.tracks[0].trackpoints[i].tangentOut;
+            }
+        }
+        return data;
+    }
+    deserialize(data) {
+        this.tracks = [new Track(this)];
+        for (let i = 0; i < data.points.length; i++) {
+            let pointData = data.points[i];
+            let normal;
+            let direction;
+            if (pointData.normal) {
+                normal = new BABYLON.Vector3(pointData.normal.x, pointData.normal.y, pointData.normal.z);
+            }
+            if (pointData.dir) {
+                direction = new BABYLON.Vector3(pointData.dir.x, pointData.dir.y, pointData.dir.z);
+            }
+            let trackPoint = new TrackPoint(this.tracks[0], new BABYLON.Vector3(pointData.position.x, pointData.position.y, pointData.position.z), normal, direction, pointData.tangentIn, pointData.tangentOut);
+            this.tracks[0].trackpoints[i] = trackPoint;
+        }
+    }
+}
+var TrackNames = [
+    "ramp-1.1",
+    "join",
+    "split",
+    "rampX-1.1",
+    "uturn-s",
+    "uturn-l",
+    "loop",
+    "wave",
+    "snake",
+    "spiral",
+    "elevator-4"
+];
+class MachinePartFactory {
+    constructor(machine) {
+        this.machine = machine;
+    }
+    createTrackWH(trackname, i, j, w, h, mirror) {
+        trackname = trackname.split("-")[0];
+        let wh = "";
+        if (isFinite(w)) {
+            wh += w.toFixed(0) + ".";
+        }
+        if (isFinite(h)) {
+            wh += h.toFixed(0);
+        }
+        trackname += "-" + wh;
+        return this.createTrack(trackname, i, j, mirror);
+    }
+    createTrack(trackname, i, j, mirror) {
+        if (trackname.startsWith("flat-")) {
+            let w = parseInt(trackname.split("-")[1]);
+            return new Ramp(this.machine, i, j, w, 0, mirror);
+        }
+        if (trackname.startsWith("flatX-")) {
+            let w = parseInt(trackname.split("-")[1]);
+            return new CrossingRamp(this.machine, i, j, w, 0, mirror);
+        }
+        if (trackname.startsWith("ramp-")) {
+            let w = parseInt(trackname.split("-")[1].split(".")[0]);
+            let h = parseInt(trackname.split("-")[1].split(".")[1]);
+            return new Ramp(this.machine, i, j, w, h, mirror);
+        }
+        if (trackname.startsWith("rampX-")) {
+            let w = parseInt(trackname.split("-")[1].split(".")[0]);
+            let h = parseInt(trackname.split("-")[1].split(".")[1]);
+            return new CrossingRamp(this.machine, i, j, w, h, mirror);
+        }
+        if (trackname === "uturn-s") {
+            return new UTurn(this.machine, i, j, mirror);
+        }
+        if (trackname === "uturn-l") {
+            return new UTurnLarge(this.machine, i, j, mirror);
+        }
+        if (trackname === "loop") {
+            return new Loop(this.machine, i, j, mirror);
+        }
+        if (trackname === "wave") {
+            return new Wave(this.machine, i, j, mirror);
+        }
+        if (trackname === "snake") {
+            return new Snake(this.machine, i, j, mirror);
+        }
+        if (trackname === "spiral") {
+            return new Spiral(this.machine, i, j, mirror);
+        }
+        if (trackname === "join") {
+            return new Join(this.machine, i, j, mirror);
+        }
+        if (trackname === "split") {
+            return new Split(this.machine, i, j, mirror);
+        }
+        if (trackname.startsWith("elevator-")) {
+            let h = parseInt(trackname.split("-")[1]);
+            return new Elevator(this.machine, i, j, h, mirror);
+        }
+    }
+}
+class SleeperMeshBuilder {
+    static GenerateSleepersVertexData(part, spacing) {
+        let partialsDatas = [];
+        for (let j = 0; j < part.tracks.length; j++) {
+            let interpolatedPoints = part.tracks[j].interpolatedPoints;
+            let summedLength = [0];
+            for (let i = 1; i < interpolatedPoints.length; i++) {
+                let prev = interpolatedPoints[i - 1];
+                let trackpoint = interpolatedPoints[i];
+                let dist = BABYLON.Vector3.Distance(prev, trackpoint);
+                summedLength[i] = summedLength[i - 1] + dist;
+            }
+            let count = Math.round(summedLength[summedLength.length - 1] / spacing / 3) * 3;
+            count = Math.max(1, count);
+            let correctedSpacing = summedLength[summedLength.length - 1] / count;
+            let radius = part.wireSize * 0.5 * 0.75;
+            let nShape = 6;
+            let shape = [];
+            for (let i = 0; i < nShape; i++) {
+                let a = i / nShape * 2 * Math.PI;
+                let cosa = Math.cos(a);
+                let sina = Math.sin(a);
+                shape[i] = new BABYLON.Vector3(cosa * radius, sina * radius, 0);
+            }
+            let shapeSmall = [];
+            for (let i = 0; i < nShape; i++) {
+                let a = i / nShape * 2 * Math.PI;
+                let cosa = Math.cos(a);
+                let sina = Math.sin(a);
+                shapeSmall[i] = new BABYLON.Vector3(cosa * radius * 0.75, sina * radius * 0.75, 0);
+            }
+            let radiusPath = part.wireGauge * 0.5;
+            let nPath = 12;
+            let basePath = [];
+            for (let i = 0; i <= nPath; i++) {
+                let a = i / nPath * Math.PI;
+                let cosa = Math.cos(a);
+                let sina = Math.sin(a);
+                basePath[i] = new BABYLON.Vector3(cosa * radiusPath, -sina * radiusPath, 0);
+            }
+            let q = BABYLON.Quaternion.Identity();
+            let n = 0.5;
+            for (let i = 1; i < interpolatedPoints.length - 1; i++) {
+                let sumPrev = summedLength[i - 1];
+                let sum = summedLength[i];
+                let sumNext = summedLength[i + 1];
+                let targetSumLength = n * correctedSpacing;
+                let addSleeper = false;
+                if (sumPrev < targetSumLength && sum >= targetSumLength) {
+                    let f = (targetSumLength - sumPrev) / (sum - sumPrev);
+                    if (f > 0.5) {
+                        addSleeper = true;
+                    }
+                }
+                if (sum <= targetSumLength && sumNext > targetSumLength) {
+                    let f = (targetSumLength - sum) / (sumNext - sum);
+                    if (f <= 0.5) {
+                        addSleeper = true;
+                    }
+                }
+                if (addSleeper) {
+                    let path = basePath.map(v => { return v.clone(); });
+                    let dir = interpolatedPoints[i + 1].subtract(interpolatedPoints[i - 1]).normalize();
+                    let t = interpolatedPoints[i];
+                    Mummu.QuaternionFromYZAxisToRef(part.tracks[j].interpolatedNormals[i], dir, q);
+                    let m = BABYLON.Matrix.Compose(BABYLON.Vector3.One(), q, t);
+                    for (let j = 0; j < path.length; j++) {
+                        BABYLON.Vector3.TransformCoordinatesToRef(path[j], m, path[j]);
+                    }
+                    let tmp = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                    partialsDatas.push(BABYLON.VertexData.ExtractFromMesh(tmp));
+                    tmp.dispose();
+                    let addAnchor = false;
+                    if ((n - 1.5) % 3 === 0) {
+                        let anchor = path[nPath / 2 - 1];
+                        if (anchor.z > -0.01) {
+                            addAnchor = true;
+                        }
+                    }
+                    if (addAnchor) {
+                        let anchor = path[nPath / 2 - 1];
+                        let anchorCenter = anchor.clone();
+                        anchorCenter.z = 0.015;
+                        let radiusFixation = Math.abs(anchor.z - anchorCenter.z);
+                        let anchorWall = anchorCenter.clone();
+                        anchorWall.y -= radiusFixation * 0.5;
+                        let nFixation = 10;
+                        let fixationPath = [];
+                        for (let i = 0; i <= nFixation; i++) {
+                            let a = i / nFixation * 0.5 * Math.PI;
+                            let cosa = Math.cos(a);
+                            let sina = Math.sin(a);
+                            fixationPath[i] = new BABYLON.Vector3(0, -sina * radiusFixation * 0.5, -cosa * radiusFixation);
+                            fixationPath[i].addInPlace(anchorCenter);
+                        }
+                        let tmp = BABYLON.ExtrudeShape("tmp", { shape: shape, path: fixationPath, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                        partialsDatas.push(BABYLON.VertexData.ExtractFromMesh(tmp));
+                        tmp.dispose();
+                        let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.001, diameter: 0.01 });
+                        let q = BABYLON.Quaternion.Identity();
+                        Mummu.QuaternionFromYZAxisToRef(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0), q);
+                        Mummu.RotateVertexDataInPlace(tmpVertexData, q);
+                        Mummu.TranslateVertexDataInPlace(tmpVertexData, anchorWall);
+                        partialsDatas.push(tmpVertexData);
+                        tmp.dispose();
+                    }
+                    n++;
+                }
+            }
+        }
+        return Mummu.MergeVertexDatas(...partialsDatas);
+    }
+}
+class Track {
+    constructor(part) {
+        this.part = part;
+        this.trackpoints = [];
+        this.summedLength = [0];
+        this.totalLength = 0;
+        this.globalSlope = 0;
+        this.AABBMin = BABYLON.Vector3.Zero();
+        this.AABBMax = BABYLON.Vector3.Zero();
+        this.wires = [
+            new Wire(this.part),
+            new Wire(this.part)
+        ];
+    }
+    mirrorTrackPointsInPlace() {
+        for (let i = 0; i < this.trackpoints.length; i++) {
+            this.trackpoints[i].position.x *= -1;
+            this.trackpoints[i].position.x += (this.part.w - 1) * tileWidth;
+            if (this.trackpoints[i].normal) {
+                this.trackpoints[i].normal.x *= -1;
+            }
+            if (this.trackpoints[i].dir) {
+                this.trackpoints[i].dir.x *= -1;
+            }
+        }
+    }
+    getSlopeAt(index) {
+        let trackpoint = this.trackpoints[index];
+        let nextTrackPoint = this.trackpoints[index + 1];
+        if (trackpoint) {
+            if (nextTrackPoint) {
+                let dy = nextTrackPoint.position.y - trackpoint.position.y;
+                let dLength = nextTrackPoint.summedLength - trackpoint.summedLength;
+                return dy / dLength * 100;
+            }
+            else {
+                let angleToVertical = Mummu.Angle(BABYLON.Axis.Y, trackpoint.dir);
+                let angleToHorizontal = Math.PI / 2 - angleToVertical;
+                return Math.tan(angleToHorizontal) * 100;
+            }
+        }
+        return 0;
+    }
+    getBankAt(index) {
+        let trackpoint = this.trackpoints[index];
+        if (trackpoint) {
+            let n = trackpoint.normal;
+            if (n.y < 0) {
+                n = n.scale(-1);
+            }
+            let angle = Mummu.AngleFromToAround(trackpoint.normal, BABYLON.Axis.Y, trackpoint.dir);
+            return angle / Math.PI * 180;
+        }
+        return 0;
+    }
+    splitTrackPointAt(index) {
+        if (index === 0) {
+            let trackPoint = this.trackpoints[0];
+            let nextTrackPoint = this.trackpoints[0 + 1];
+            let distA = BABYLON.Vector3.Distance(trackPoint.position, nextTrackPoint.position);
+            let tanInA = trackPoint.dir.scale(distA * trackPoint.tangentOut);
+            let tanOutA = nextTrackPoint.dir.scale(distA * nextTrackPoint.tangentIn);
+            let pointA = BABYLON.Vector3.Hermite(trackPoint.position, tanInA, nextTrackPoint.position, tanOutA, 0.5);
+            let normalA = BABYLON.Vector3.Lerp(trackPoint.normal, nextTrackPoint.normal, 0.5);
+            let trackPointA = new TrackPoint(this, pointA, normalA);
+            this.trackpoints.splice(1, 0, trackPointA);
+        }
+        if (index > 0 && index < this.trackpoints.length - 1) {
+            let prevTrackPoint = this.trackpoints[index - 1];
+            let trackPoint = this.trackpoints[index];
+            let nextTrackPoint = this.trackpoints[index + 1];
+            let distA = BABYLON.Vector3.Distance(trackPoint.position, prevTrackPoint.position);
+            let tanInA = prevTrackPoint.dir.scale(distA * prevTrackPoint.tangentOut);
+            let tanOutA = trackPoint.dir.scale(distA * trackPoint.tangentIn);
+            let pointA = BABYLON.Vector3.Hermite(prevTrackPoint.position, tanInA, trackPoint.position, tanOutA, 2 / 3);
+            let normalA = BABYLON.Vector3.Lerp(prevTrackPoint.normal, trackPoint.normal, 2 / 3);
+            let distB = BABYLON.Vector3.Distance(trackPoint.position, nextTrackPoint.position);
+            let tanInB = trackPoint.dir.scale(distB * trackPoint.tangentOut);
+            let tanOutB = nextTrackPoint.dir.scale(distB * nextTrackPoint.tangentIn);
+            let pointB = BABYLON.Vector3.Hermite(trackPoint.position, tanInB, nextTrackPoint.position, tanOutB, 1 / 3);
+            let normalB = BABYLON.Vector3.Lerp(trackPoint.normal, nextTrackPoint.normal, 1 / 3);
+            let trackPointA = new TrackPoint(this, pointA, normalA);
+            let trackPointB = new TrackPoint(this, pointB, normalB);
+            this.trackpoints.splice(index, 1, trackPointA, trackPointB);
+        }
+    }
+    deleteTrackPointAt(index) {
+        if (index > 0 && index < this.trackpoints.length - 1) {
+            this.trackpoints.splice(index, 1);
+        }
+    }
+    generateWires() {
+        this.interpolatedPoints = [];
+        this.interpolatedNormals = [];
+        // Update normals and tangents
+        for (let i = 1; i < this.trackpoints.length - 1; i++) {
+            let prevTrackPoint = this.trackpoints[i - 1];
+            let trackPoint = this.trackpoints[i];
+            let nextTrackPoint = this.trackpoints[i + 1];
+            if (!trackPoint.fixedDir) {
+                trackPoint.dir.copyFrom(nextTrackPoint.position).subtractInPlace(prevTrackPoint.position).normalize();
+            }
+            if (!trackPoint.fixedTangentIn) {
+                trackPoint.tangentIn = 1;
+            }
+            if (!trackPoint.fixedTangentOut) {
+                trackPoint.tangentOut = 1;
+            }
+            if (!trackPoint.fixedNormal) {
+                let n = 0;
+                let nextTrackPointWithFixedNormal;
+                while (!nextTrackPointWithFixedNormal) {
+                    n++;
+                    let tmpTrackPoint = this.trackpoints[i + n];
+                    if (tmpTrackPoint.fixedNormal) {
+                        nextTrackPointWithFixedNormal = tmpTrackPoint;
+                    }
+                }
+                trackPoint.normal = BABYLON.Vector3.Lerp(prevTrackPoint.normal, nextTrackPointWithFixedNormal.normal, 1 / (1 + n));
+            }
+            let right = BABYLON.Vector3.Cross(trackPoint.normal, trackPoint.dir);
+            trackPoint.normal = BABYLON.Vector3.Cross(trackPoint.dir, right).normalize();
+        }
+        this.wires[0].path = [];
+        this.wires[1].path = [];
+        this.trackpoints[0].summedLength = 0;
+        for (let i = 0; i < this.trackpoints.length - 1; i++) {
+            let trackPoint = this.trackpoints[i];
+            let nextTrackPoint = this.trackpoints[i + 1];
+            let dist = BABYLON.Vector3.Distance(trackPoint.position, nextTrackPoint.position);
+            let tanIn = this.trackpoints[i].dir.scale(dist * trackPoint.tangentOut);
+            let tanOut = this.trackpoints[i + 1].dir.scale(dist * nextTrackPoint.tangentIn);
+            let count = Math.round(dist / 0.003);
+            count = Math.max(0, count);
+            this.interpolatedPoints.push(trackPoint.position);
+            this.interpolatedNormals.push(trackPoint.normal);
+            nextTrackPoint.summedLength = trackPoint.summedLength;
+            for (let k = 1; k < count; k++) {
+                let amount = k / count;
+                let point = BABYLON.Vector3.Hermite(trackPoint.position, tanIn, nextTrackPoint.position, tanOut, amount);
+                let normal = BABYLON.Vector3.CatmullRom(trackPoint.normal, trackPoint.normal, nextTrackPoint.normal, nextTrackPoint.normal, amount);
+                this.interpolatedPoints.push(point);
+                this.interpolatedNormals.push(normal);
+                nextTrackPoint.summedLength += BABYLON.Vector3.Distance(this.interpolatedPoints[this.interpolatedPoints.length - 2], this.interpolatedPoints[this.interpolatedPoints.length - 1]);
+            }
+            nextTrackPoint.summedLength += BABYLON.Vector3.Distance(nextTrackPoint.position, this.interpolatedPoints[this.interpolatedPoints.length - 1]);
+        }
+        this.interpolatedPoints.push(this.trackpoints[this.trackpoints.length - 1].position);
+        this.interpolatedNormals.push(this.trackpoints[this.trackpoints.length - 1].normal);
+        let N = this.interpolatedPoints.length;
+        this.summedLength = [0];
+        this.totalLength = 0;
+        for (let i = 0; i < N - 1; i++) {
+            let p = this.interpolatedPoints[i];
+            let pNext = this.interpolatedPoints[i + 1];
+            let dir = pNext.subtract(p);
+            let d = dir.length();
+            dir.scaleInPlace(1 / d);
+            let right = BABYLON.Vector3.Cross(this.interpolatedNormals[i], dir);
+            this.interpolatedNormals[i] = BABYLON.Vector3.Cross(dir, right).normalize();
+            this.summedLength[i + 1] = this.summedLength[i] + d;
+        }
+        this.totalLength = this.summedLength[N - 1];
+        let dh = this.interpolatedPoints[this.interpolatedPoints.length - 1].y - this.interpolatedPoints[0].y;
+        this.globalSlope = dh / this.totalLength * 100;
+        // Compute wire path and Update AABB values.
+        this.AABBMin.copyFromFloats(Infinity, Infinity, Infinity);
+        this.AABBMax.copyFromFloats(-Infinity, -Infinity, -Infinity);
+        for (let i = 0; i < N; i++) {
+            let pPrev = this.interpolatedPoints[i - 1] ? this.interpolatedPoints[i - 1] : undefined;
+            let p = this.interpolatedPoints[i];
+            let pNext = this.interpolatedPoints[i + 1] ? this.interpolatedPoints[i + 1] : undefined;
+            if (!pPrev) {
+                pPrev = p.subtract(pNext.subtract(p));
+            }
+            if (!pNext) {
+                pNext = p.add(p.subtract(pPrev));
+            }
+            let dir = pNext.subtract(pPrev).normalize();
+            let up = this.interpolatedNormals[i];
+            let rotation = BABYLON.Quaternion.Identity();
+            Mummu.QuaternionFromZYAxisToRef(dir, up, rotation);
+            let matrix = BABYLON.Matrix.Compose(BABYLON.Vector3.One(), rotation, p);
+            this.wires[0].path[i] = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(-this.part.wireGauge * 0.5, 0, 0), matrix);
+            this.wires[1].path[i] = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(this.part.wireGauge * 0.5, 0, 0), matrix);
+            this.AABBMin.minimizeInPlace(this.wires[0].path[i]);
+            this.AABBMin.minimizeInPlace(this.wires[1].path[i]);
+            this.AABBMax.maximizeInPlace(this.wires[0].path[i]);
+            this.AABBMax.maximizeInPlace(this.wires[1].path[i]);
+        }
+        Mummu.DecimatePathInPlace(this.wires[0].path, 2 / 180 * Math.PI);
+        Mummu.DecimatePathInPlace(this.wires[1].path, 2 / 180 * Math.PI);
+        this.AABBMin.x -= this.part.wireSize * 0.5;
+        this.AABBMin.y -= this.part.wireSize * 0.5;
+        this.AABBMin.z -= this.part.wireSize * 0.5;
+        this.AABBMax.x += this.part.wireSize * 0.5;
+        this.AABBMax.y += this.part.wireSize * 0.5;
+        this.AABBMax.z += this.part.wireSize * 0.5;
+        BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMin, this.part.getWorldMatrix(), this.AABBMin);
+        BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMax, this.part.getWorldMatrix(), this.AABBMax);
+    }
+    recomputeAbsolutePath() {
+        this.wires.forEach(wire => {
+            wire.recomputeAbsolutePath();
+        });
+    }
+}
 class TrackPoint {
     constructor(track, position, normal, dir, tangentIn, tangentOut) {
         this.track = track;
@@ -2409,378 +3115,15 @@ class TrackPoint {
         }
     }
     isFirstOrLast() {
-        let index = this.track.trackPoints[0].indexOf(this);
-        if (index === 0 || index === this.track.trackPoints.length - 1) {
+        let index = this.track.trackpoints.indexOf(this);
+        if (index === 0 || index === this.track.trackpoints.length - 1) {
             return true;
         }
         return false;
     }
 }
-class Track extends BABYLON.Mesh {
-    constructor(machine, _i, _j, mirror) {
-        super("track", machine.game.scene);
-        this.machine = machine;
-        this._i = _i;
-        this._j = _j;
-        this.mirror = mirror;
-        this.trackName = "track";
-        this.deltaI = 0;
-        this.deltaJ = 0;
-        this.wireSize = 0.0015;
-        this.wireGauge = 0.013;
-        this.renderOnlyPath = false;
-        this.summedLength = [0];
-        this.totalLength = 0;
-        this.globalSlope = 0;
-        this.AABBMin = BABYLON.Vector3.Zero();
-        this.AABBMax = BABYLON.Vector3.Zero();
-        this.xExtendable = false;
-        this.yExtendable = false;
-        this.position.x = this._i * tileWidth;
-        this.position.y = -this._j * tileHeight;
-        this.wires = [
-            new Wire(this),
-            new Wire(this)
-        ];
-    }
-    get game() {
-        return this.machine.game;
-    }
-    get i() {
-        return this._i;
-    }
-    setI(v) {
-        this._i = v;
-        this.position.x = this._i * tileWidth;
-    }
-    get j() {
-        return this._j;
-    }
-    setJ(v) {
-        this._j = v;
-        this.position.y = -this._j * tileHeight;
-    }
-    setIsVisible(isVisible) {
-        this.isVisible = isVisible;
-        this.getChildMeshes().forEach(m => {
-            m.isVisible = isVisible;
-        });
-    }
-    select() {
-        this.selectedMesh.isVisible = true;
-    }
-    unselect() {
-        this.selectedMesh.isVisible = false;
-    }
-    mirrorTrackPointsInPlace() {
-        for (let j = 0; j < this.trackPoints.length; j++) {
-            let trackpoints = this.trackPoints[j];
-            for (let i = 0; i < trackpoints.length; i++) {
-                trackpoints[i].position.x *= -1;
-                trackpoints[i].position.x += this.deltaI * tileWidth;
-                if (trackpoints[i].normal) {
-                    trackpoints[i].normal.x *= -1;
-                }
-                if (trackpoints[i].dir) {
-                    trackpoints[i].dir.x *= -1;
-                }
-            }
-        }
-    }
-    getSlopeAt(index, trackIndex = 0) {
-        let trackpoint = this.trackPoints[trackIndex][index];
-        let nextTrackPoint = this.trackPoints[trackIndex][index + 1];
-        if (trackpoint) {
-            if (nextTrackPoint) {
-                let dy = nextTrackPoint.position.y - trackpoint.position.y;
-                let dLength = nextTrackPoint.summedLength - trackpoint.summedLength;
-                return dy / dLength * 100;
-            }
-            else {
-                let angleToVertical = Mummu.Angle(BABYLON.Axis.Y, trackpoint.dir);
-                let angleToHorizontal = Math.PI / 2 - angleToVertical;
-                return Math.tan(angleToHorizontal) * 100;
-            }
-        }
-        return 0;
-    }
-    getBankAt(index, trackIndex = 0) {
-        let trackpoint = this.trackPoints[trackIndex][index];
-        if (trackpoint) {
-            let n = trackpoint.normal;
-            if (n.y < 0) {
-                n = n.scale(-1);
-            }
-            let angle = Mummu.AngleFromToAround(trackpoint.normal, BABYLON.Axis.Y, trackpoint.dir);
-            return angle / Math.PI * 180;
-        }
-        return 0;
-    }
-    splitTrackPointAt(index, trackIndex = 0) {
-        if (index === 0) {
-            let trackPoint = this.trackPoints[trackIndex][0];
-            let nextTrackPoint = this.trackPoints[trackIndex][0 + 1];
-            let distA = BABYLON.Vector3.Distance(trackPoint.position, nextTrackPoint.position);
-            let tanInA = trackPoint.dir.scale(distA * trackPoint.tangentOut);
-            let tanOutA = nextTrackPoint.dir.scale(distA * nextTrackPoint.tangentIn);
-            let pointA = BABYLON.Vector3.Hermite(trackPoint.position, tanInA, nextTrackPoint.position, tanOutA, 0.5);
-            let normalA = BABYLON.Vector3.Lerp(trackPoint.normal, nextTrackPoint.normal, 0.5);
-            let trackPointA = new TrackPoint(this, pointA, normalA);
-            this.trackPoints[trackIndex].splice(1, 0, trackPointA);
-        }
-        if (index > 0 && index < this.trackPoints[trackIndex].length - 1) {
-            let prevTrackPoint = this.trackPoints[trackIndex][index - 1];
-            let trackPoint = this.trackPoints[trackIndex][index];
-            let nextTrackPoint = this.trackPoints[trackIndex][index + 1];
-            let distA = BABYLON.Vector3.Distance(trackPoint.position, prevTrackPoint.position);
-            let tanInA = prevTrackPoint.dir.scale(distA * prevTrackPoint.tangentOut);
-            let tanOutA = trackPoint.dir.scale(distA * trackPoint.tangentIn);
-            let pointA = BABYLON.Vector3.Hermite(prevTrackPoint.position, tanInA, trackPoint.position, tanOutA, 2 / 3);
-            let normalA = BABYLON.Vector3.Lerp(prevTrackPoint.normal, trackPoint.normal, 2 / 3);
-            let distB = BABYLON.Vector3.Distance(trackPoint.position, nextTrackPoint.position);
-            let tanInB = trackPoint.dir.scale(distB * trackPoint.tangentOut);
-            let tanOutB = nextTrackPoint.dir.scale(distB * nextTrackPoint.tangentIn);
-            let pointB = BABYLON.Vector3.Hermite(trackPoint.position, tanInB, nextTrackPoint.position, tanOutB, 1 / 3);
-            let normalB = BABYLON.Vector3.Lerp(trackPoint.normal, nextTrackPoint.normal, 1 / 3);
-            let trackPointA = new TrackPoint(this, pointA, normalA);
-            let trackPointB = new TrackPoint(this, pointB, normalB);
-            this.trackPoints[trackIndex].splice(index, 1, trackPointA, trackPointB);
-        }
-    }
-    deleteTrackPointAt(index, trackIndex = 0) {
-        if (index > 0 && index < this.trackPoints[trackIndex].length - 1) {
-            this.trackPoints[trackIndex].splice(index, 1);
-        }
-    }
-    getBarycenter() {
-        if (this.trackPoints.length < 2) {
-            return this.position.clone();
-        }
-        let barycenter = this.trackPoints[0].map(trackpoint => {
-            return trackpoint.position;
-        }).reduce((pos1, pos2) => {
-            return pos1.add(pos2);
-        }).scaleInPlace(1 / this.trackPoints.length);
-        return BABYLON.Vector3.TransformCoordinates(barycenter, this.getWorldMatrix());
-    }
-    generateWires() {
-        this.interpolatedPoints = [];
-        this.interpolatedNormals = [];
-        // Update normals and tangents
-        for (let j = 0; j < this.trackPoints.length; j++) {
-            let trackPoints = this.trackPoints[j];
-            let interpolatedPoints = [];
-            this.interpolatedPoints[j] = interpolatedPoints;
-            let interpolatedNormals = [];
-            this.interpolatedNormals[j] = interpolatedNormals;
-            for (let i = 1; i < trackPoints.length - 1; i++) {
-                let prevTrackPoint = trackPoints[i - 1];
-                let trackPoint = trackPoints[i];
-                let nextTrackPoint = trackPoints[i + 1];
-                if (!trackPoint.fixedDir) {
-                    trackPoint.dir.copyFrom(nextTrackPoint.position).subtractInPlace(prevTrackPoint.position).normalize();
-                }
-                if (!trackPoint.fixedTangentIn) {
-                    trackPoint.tangentIn = 1;
-                }
-                if (!trackPoint.fixedTangentOut) {
-                    trackPoint.tangentOut = 1;
-                }
-                if (!trackPoint.fixedNormal) {
-                    let n = 0;
-                    let nextTrackPointWithFixedNormal;
-                    while (!nextTrackPointWithFixedNormal) {
-                        n++;
-                        let tmpTrackPoint = trackPoints[i + n];
-                        if (tmpTrackPoint.fixedNormal) {
-                            nextTrackPointWithFixedNormal = tmpTrackPoint;
-                        }
-                    }
-                    trackPoint.normal = BABYLON.Vector3.Lerp(prevTrackPoint.normal, nextTrackPointWithFixedNormal.normal, 1 / (1 + n));
-                }
-                let right = BABYLON.Vector3.Cross(trackPoint.normal, trackPoint.dir);
-                trackPoint.normal = BABYLON.Vector3.Cross(trackPoint.dir, right).normalize();
-            }
-            this.wires[2 * j].path = [];
-            this.wires[2 * j + 1].path = [];
-            trackPoints[0].summedLength = 0;
-            for (let i = 0; i < trackPoints.length - 1; i++) {
-                let trackPoint = trackPoints[i];
-                let nextTrackPoint = trackPoints[i + 1];
-                let dist = BABYLON.Vector3.Distance(trackPoint.position, nextTrackPoint.position);
-                let tanIn = trackPoints[i].dir.scale(dist * trackPoint.tangentOut);
-                let tanOut = trackPoints[i + 1].dir.scale(dist * nextTrackPoint.tangentIn);
-                let count = Math.round(dist / 0.003);
-                count = Math.max(0, count);
-                interpolatedPoints.push(trackPoint.position);
-                interpolatedNormals.push(trackPoint.normal);
-                nextTrackPoint.summedLength = trackPoint.summedLength;
-                for (let k = 1; k < count; k++) {
-                    let amount = k / count;
-                    let point = BABYLON.Vector3.Hermite(trackPoint.position, tanIn, nextTrackPoint.position, tanOut, amount);
-                    let normal = BABYLON.Vector3.CatmullRom(trackPoint.normal, trackPoint.normal, nextTrackPoint.normal, nextTrackPoint.normal, amount);
-                    interpolatedPoints.push(point);
-                    interpolatedNormals.push(normal);
-                    nextTrackPoint.summedLength += BABYLON.Vector3.Distance(interpolatedPoints[interpolatedPoints.length - 2], interpolatedPoints[interpolatedPoints.length - 1]);
-                }
-                nextTrackPoint.summedLength += BABYLON.Vector3.Distance(nextTrackPoint.position, interpolatedPoints[interpolatedPoints.length - 1]);
-            }
-            interpolatedPoints.push(trackPoints[trackPoints.length - 1].position);
-            interpolatedNormals.push(trackPoints[trackPoints.length - 1].normal);
-            let N = interpolatedPoints.length;
-            this.summedLength = [0];
-            this.totalLength = 0;
-            for (let i = 0; i < N - 1; i++) {
-                let p = interpolatedPoints[i];
-                let pNext = interpolatedPoints[i + 1];
-                let d = BABYLON.Vector3.Distance(p, pNext);
-                this.summedLength[i + 1] = this.summedLength[i] + d;
-            }
-            this.totalLength = this.summedLength[N - 1];
-            let dh = interpolatedPoints[interpolatedPoints.length - 1].y - interpolatedPoints[0].y;
-            this.globalSlope = dh / this.totalLength * 100;
-            // Compute wire path and Update AABB values.
-            this.AABBMin.copyFromFloats(Infinity, Infinity, Infinity);
-            this.AABBMax.copyFromFloats(-Infinity, -Infinity, -Infinity);
-            for (let i = 0; i < N; i++) {
-                let pPrev = interpolatedPoints[i - 1] ? interpolatedPoints[i - 1] : undefined;
-                let p = interpolatedPoints[i];
-                let pNext = interpolatedPoints[i + 1] ? interpolatedPoints[i + 1] : undefined;
-                if (!pPrev) {
-                    pPrev = p.subtract(pNext.subtract(p));
-                }
-                if (!pNext) {
-                    pNext = p.add(p.subtract(pPrev));
-                }
-                let dir = pNext.subtract(pPrev).normalize();
-                let up = interpolatedNormals[i];
-                let rotation = BABYLON.Quaternion.Identity();
-                Mummu.QuaternionFromZYAxisToRef(dir, up, rotation);
-                let matrix = BABYLON.Matrix.Compose(BABYLON.Vector3.One(), rotation, p);
-                this.wires[2 * j].path[i] = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(-this.wireGauge * 0.5, 0, 0), matrix);
-                this.wires[2 * j + 1].path[i] = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(this.wireGauge * 0.5, 0, 0), matrix);
-                this.AABBMin.minimizeInPlace(this.wires[0].path[i]);
-                this.AABBMin.minimizeInPlace(this.wires[1].path[i]);
-                this.AABBMax.maximizeInPlace(this.wires[0].path[i]);
-                this.AABBMax.maximizeInPlace(this.wires[1].path[i]);
-            }
-            Mummu.DecimatePathInPlace(this.wires[2 * j].path, 2 / 180 * Math.PI);
-            Mummu.DecimatePathInPlace(this.wires[2 * j + 1].path, 2 / 180 * Math.PI);
-            this.AABBMin.x -= this.wireSize * 0.5;
-            this.AABBMin.y -= this.wireSize * 0.5;
-            this.AABBMin.z -= this.wireSize * 0.5;
-            this.AABBMax.x += this.wireSize * 0.5;
-            this.AABBMax.y += this.wireSize * 0.5;
-            this.AABBMax.z += this.wireSize * 0.5;
-            BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMin, this.getWorldMatrix(), this.AABBMin);
-            BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMax, this.getWorldMatrix(), this.AABBMax);
-        }
-    }
-    recomputeAbsolutePath() {
-        this.wires.forEach(wire => {
-            wire.recomputeAbsolutePath();
-        });
-    }
-    async instantiate() {
-        this.sleepersMesh = new BABYLON.Mesh("sleepers-mesh");
-        this.sleepersMesh.material = this.game.steelMaterial;
-        this.sleepersMesh.parent = this;
-        if (this.selectedMesh) {
-            this.selectedMesh.dispose();
-        }
-        let xLeft = -tileWidth * 0.5;
-        let xRight = tileWidth * (this.deltaI + 0.5);
-        let yTop = tileHeight * 0.25;
-        let yBottom = -tileHeight * (this.deltaJ + 0.75);
-        this.selectedMesh = BABYLON.MeshBuilder.CreateLines("select-mesh", {
-            points: [
-                new BABYLON.Vector3(xLeft, yTop, 0),
-                new BABYLON.Vector3(xRight, yTop, 0),
-                new BABYLON.Vector3(xRight, yBottom, 0),
-                new BABYLON.Vector3(xLeft, yBottom, 0),
-                new BABYLON.Vector3(xLeft, yTop, 0)
-            ]
-        });
-        this.selectedMesh.parent = this;
-        this.selectedMesh.isVisible = false;
-        this.rebuildWireMeshes();
-    }
-    dispose() {
-        super.dispose();
-        let index = this.machine.tracks.indexOf(this);
-        if (index > -1) {
-            this.machine.tracks.splice(index, 1);
-        }
-    }
-    update(dt) { }
-    rebuildWireMeshes() {
-        if (this.renderOnlyPath) {
-            let n = 8;
-            let shape = [];
-            for (let i = 0; i < n; i++) {
-                let a = i / n * 2 * Math.PI;
-                let cosa = Math.cos(a);
-                let sina = Math.sin(a);
-                shape[i] = new BABYLON.Vector3(cosa * this.wireSize * 0.5, sina * this.wireSize * 0.5, 0);
-            }
-            let tmp = BABYLON.ExtrudeShape("wire", { shape: shape, path: this.interpolatedPoints[0], closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-            let vertexData = BABYLON.VertexData.ExtractFromMesh(tmp);
-            vertexData.applyToMesh(this.sleepersMesh);
-            tmp.dispose();
-            this.wires.forEach(wire => {
-                wire.hide();
-            });
-        }
-        else {
-            this.wires.forEach(wire => {
-                wire.show();
-            });
-            SleeperMeshBuilder.GenerateSleepersVertexData(this, 0.03).applyToMesh(this.sleepersMesh);
-            this.wires.forEach(wire => {
-                wire.instantiate();
-            });
-        }
-    }
-    serialize() {
-        let data = { points: [] };
-        for (let i = 0; i < this.trackPoints[0].length; i++) {
-            data.points[i] = {
-                position: { x: this.trackPoints[0][i].position.x, y: this.trackPoints[0][i].position.y, z: this.trackPoints[0][i].position.z }
-            };
-            if (this.trackPoints[0][i].fixedNormal) {
-                data.points[i].normal = { x: this.trackPoints[0][i].normal.x, y: this.trackPoints[0][i].normal.y, z: this.trackPoints[0][i].normal.z };
-            }
-            if (this.trackPoints[0][i].fixedDir) {
-                data.points[i].dir = { x: this.trackPoints[0][i].dir.x, y: this.trackPoints[0][i].dir.y, z: this.trackPoints[0][i].dir.z };
-            }
-            if (this.trackPoints[0][i].fixedTangentIn) {
-                data.points[i].tangentIn = this.trackPoints[0][i].tangentIn;
-            }
-            if (this.trackPoints[0][i].fixedTangentOut) {
-                data.points[i].tangentOut = this.trackPoints[0][i].tangentOut;
-            }
-        }
-        return data;
-    }
-    deserialize(data) {
-        this.trackPoints = [[]];
-        for (let i = 0; i < data.points.length; i++) {
-            let pointData = data.points[i];
-            let normal;
-            let direction;
-            if (pointData.normal) {
-                normal = new BABYLON.Vector3(pointData.normal.x, pointData.normal.y, pointData.normal.z);
-            }
-            if (pointData.dir) {
-                direction = new BABYLON.Vector3(pointData.dir.x, pointData.dir.y, pointData.dir.z);
-            }
-            let trackPoint = new TrackPoint(this, new BABYLON.Vector3(pointData.position.x, pointData.position.y, pointData.position.z), normal, direction, pointData.tangentIn, pointData.tangentOut);
-            this.trackPoints[0][i] = trackPoint;
-        }
-    }
-}
-/// <reference path="./Track.ts"/>
-class DoubleLoop extends Track {
+/// <reference path="../machine/MachinePart.ts"/>
+class DoubleLoop extends MachinePart {
     constructor(machine, i, j) {
         super(machine, i, j);
         this.deserialize({
@@ -2805,9 +3148,9 @@ class DoubleLoop extends Track {
         this.generateWires();
     }
 }
-class Elevator extends Track {
+class Elevator extends MachinePart {
     constructor(machine, i, j, h = 1, mirror) {
-        super(machine, i, j, mirror);
+        super(machine, i, j, 1, h, mirror);
         this.h = h;
         this.boxesCount = 4;
         this.rWheel = 0.015;
@@ -2826,7 +3169,7 @@ class Elevator extends Track {
         this.speed = 0.04; // in m/s
         this.boxesCount;
         this.yExtendable = true;
-        this.trackName = "elevator-" + h.toFixed(0);
+        this.partName = "elevator-" + h.toFixed(0);
         let dir = new BABYLON.Vector3(1, 0, 0);
         dir.normalize();
         let n = new BABYLON.Vector3(0, 1, 0);
@@ -2839,33 +3182,29 @@ class Elevator extends Track {
         dirRight.normalize();
         let nRight = new BABYLON.Vector3(-1, 1, 0);
         nRight.normalize();
-        this.deltaJ = h;
-        this.trackPoints = [
-            [
-                new TrackPoint(this, new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * this.deltaJ, 0), n, dir),
-                new TrackPoint(this, new BABYLON.Vector3(-tileWidth * 0.1, -tileHeight * (this.deltaJ + 0.1), 0), n, dir),
-                new TrackPoint(this, new BABYLON.Vector3(0, -tileHeight * (this.deltaJ + 0.25), 0), n, dir),
-                new TrackPoint(this, new BABYLON.Vector3(0 + 0.01, -tileHeight * (this.deltaJ + 0.25) + 0.01, 0), dir.scale(-1), n),
-                new TrackPoint(this, new BABYLON.Vector3(0 + 0.01, 0 - tileHeight, 0), dir.scale(-1), n),
-                new TrackPoint(this, new BABYLON.Vector3(-0.005, 0.035 - tileHeight, 0), (new BABYLON.Vector3(-1, -1, 0)).normalize(), (new BABYLON.Vector3(-1, 1, 0)).normalize())
-            ],
-            [
-                new TrackPoint(this, new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight, 0), nLeft, dirLeft),
-                new TrackPoint(this, new BABYLON.Vector3(-0.008, -tileHeight * 0.5, 0), nRight, dirRight)
-            ]
+        this.tracks[0].trackpoints = [
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * this.h, 0), n, dir),
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.1, -tileHeight * (this.h + 0.15), 0), n, dir),
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(0, -tileHeight * (this.h + 0.35), 0), n, dir),
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(0 + 0.01, -tileHeight * (this.h + 0.35) + 0.01, 0), dir.scale(-1), n),
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(0 + 0.01, 0 - tileHeight, 0), dir.scale(-1), n),
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-0.005, 0.035 - tileHeight, 0), (new BABYLON.Vector3(-1, -1, 0)).normalize(), (new BABYLON.Vector3(-1, 1, 0)).normalize())
         ];
-        this.wires.push(new Wire(this), new Wire(this));
+        this.tracks[1] = new Track(this);
+        this.tracks[1].trackpoints = [
+            new TrackPoint(this.tracks[1], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight, 0), nLeft, dirLeft),
+            new TrackPoint(this.tracks[1], new BABYLON.Vector3(-0.008, -tileHeight * 0.5, 0), nRight, dirRight)
+        ];
         let x = 1;
         if (mirror) {
             this.mirrorTrackPointsInPlace();
             x = -1;
         }
-        this.generateWires();
         this.wheels = [
             new BABYLON.Mesh("wheel-0"),
             new BABYLON.Mesh("wheel-1")
         ];
-        this.wheels[0].position.copyFromFloats(0.030 * x, -tileHeight * (this.deltaJ + 0.25), 0);
+        this.wheels[0].position.copyFromFloats(0.030 * x, -tileHeight * (this.h + 0.35), 0);
         this.wheels[0].parent = this;
         this.wheels[0].material = this.game.steelMaterial;
         this.wheels[1].position.copyFromFloats(0.030 * x, 0.035 - tileHeight, 0);
@@ -2878,6 +3217,7 @@ class Elevator extends Track {
                 vertexData.applyToMesh(this.wheels[1]);
             }
         });
+        this.wires = [];
         this.l = Math.abs(this.wheels[1].position.y - this.wheels[0].position.y);
         this.p = 2 * Math.PI * this.rWheel;
         this.chainLength = 2 * this.l + this.p;
@@ -2888,7 +3228,7 @@ class Elevator extends Track {
             box.parent = this;
             let rampWire0 = new Wire(this);
             let rRamp = this.wireGauge * 0.35;
-            rampWire0.path = [new BABYLON.Vector3(-0.019 * x, 0.001, rRamp)];
+            rampWire0.path = [new BABYLON.Vector3(-0.02 * x, 0.0015, rRamp)];
             let nRamp = 12;
             for (let i = 0; i <= nRamp; i++) {
                 let a = i / nRamp * Math.PI;
@@ -2896,7 +3236,7 @@ class Elevator extends Track {
                 let sina = Math.sin(a);
                 rampWire0.path.push(new BABYLON.Vector3((sina * rRamp - rRamp - 0.0005) * x, 0, cosa * rRamp));
             }
-            rampWire0.path.push(new BABYLON.Vector3(-0.019 * x, 0.001, -rRamp));
+            rampWire0.path.push(new BABYLON.Vector3(-0.02 * x, 0.0015, -rRamp));
             rampWire0.parent = box;
             this.boxes.push(box);
             this.wires.push(rampWire0);
@@ -2930,6 +3270,7 @@ class Elevator extends Track {
         this.cable = BABYLON.ExtrudeShape("wire", { shape: cableShape, path: pathCable, closeShape: true, closePath: true });
         this.cable.material = this.game.leatherMaterial;
         this.cable.parent = this;
+        this.generateWires();
         this.machine.onStopCallbacks.push(this.reset);
         this.reset();
     }
@@ -2972,7 +3313,7 @@ class Elevator extends Track {
                 let right = this.wheels[0].position.subtract(this.boxes[i].position).normalize();
                 Mummu.QuaternionFromXZAxisToRef(right.scale(x), BABYLON.Axis.Z, this.boxes[i].rotationQuaternion);
             }
-            this.wires[4 + i].recomputeAbsolutePath();
+            this.wires[i].recomputeAbsolutePath();
         }
         let deltaAngle = dx / this.p * 2 * Math.PI * x;
         this.wheels[0].rotation.z -= deltaAngle;
@@ -3026,8 +3367,8 @@ class CrossingFlat extends Track {
     }
 }
 */ 
-/// <reference path="./Track.ts"/>
-class FlatLoop extends Track {
+/// <reference path="../machine/MachinePart.ts"/>
+class FlatLoop extends MachinePart {
     constructor(machine, i, j, mirror) {
         super(machine, i, j);
         this.deserialize({
@@ -3045,20 +3386,42 @@ class FlatLoop extends Track {
                 { position: { x: 0.075, y: -0.03, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
             ],
         });
-        this.deltaJ = 1;
         if (mirror) {
             this.mirrorTrackPointsInPlace();
         }
         this.generateWires();
     }
 }
-/// <reference path="./Track.ts"/>
-class Loop extends Track {
+class Join extends MachinePart {
     constructor(machine, i, j, mirror) {
-        super(machine, i, j, mirror);
-        this.trackName = "loop";
-        this.deltaI = 1;
-        this.deltaJ = 3;
+        super(machine, i, j, 1, 1, mirror);
+        this.partName = "join";
+        let dir = new BABYLON.Vector3(1, 0, 0);
+        dir.normalize();
+        let n = new BABYLON.Vector3(0, 1, 0);
+        n.normalize();
+        let dirJoin = (new BABYLON.Vector3(-2, -1, 0)).normalize();
+        let nJoin = (new BABYLON.Vector3(-1, 2, 0)).normalize();
+        this.tracks[0].trackpoints = [
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), n, dir),
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(tileWidth * (this.w - 0.5), -tileHeight * this.h, 0), n, dir)
+        ];
+        this.tracks[1] = new Track(this);
+        this.tracks[1].trackpoints = [
+            new TrackPoint(this.tracks[1], new BABYLON.Vector3(tileWidth * 0.5, 0, 0), n, dir.scale(-1)),
+            new TrackPoint(this.tracks[1], new BABYLON.Vector3(tileWidth * 0.25, -tileHeight * 0.25, 0), nJoin, dirJoin)
+        ];
+        if (mirror) {
+            this.mirrorTrackPointsInPlace();
+        }
+        this.generateWires();
+    }
+}
+/// <reference path="../machine/MachinePart.ts"/>
+class Loop extends MachinePart {
+    constructor(machine, i, j, mirror) {
+        super(machine, i, j, 2, 3, mirror);
+        this.partName = "loop";
         this.deserialize({
             points: [
                 { position: { x: -0.07499999999999998, y: 0, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
@@ -3084,175 +3447,57 @@ class Loop extends Track {
         this.generateWires();
     }
 }
-class Ramp extends Track {
+class Ramp extends MachinePart {
     constructor(machine, i, j, w = 1, h = 1, mirror) {
-        super(machine, i, j, mirror);
+        super(machine, i, j, w, h, mirror);
         this.w = w;
         this.h = h;
         this.xExtendable = true;
         this.yExtendable = true;
-        this.trackName = "ramp-" + w.toFixed(0) + "." + h.toFixed(0);
+        this.partName = "ramp-" + w.toFixed(0) + "." + h.toFixed(0);
         let dir = new BABYLON.Vector3(1, 0, 0);
         dir.normalize();
         let n = new BABYLON.Vector3(0, 1, 0);
         n.normalize();
-        this.deltaI = w - 1;
-        this.deltaJ = h;
-        this.trackPoints = [[
-                new TrackPoint(this, new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), n, dir),
-                new TrackPoint(this, new BABYLON.Vector3(tileWidth * (this.deltaI + 0.5), -tileHeight * (this.deltaJ), 0), n, dir)
-            ]];
+        this.tracks[0].trackpoints = [
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), n, dir),
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(tileWidth * (this.w - 0.5), -tileHeight * this.h, 0), n, dir)
+        ];
         if (mirror) {
             this.mirrorTrackPointsInPlace();
         }
         this.generateWires();
     }
 }
-class CrossingRamp extends Track {
+class CrossingRamp extends MachinePart {
     constructor(machine, i, j, w = 1, h = 1, mirror) {
-        super(machine, i, j, mirror);
+        super(machine, i, j, w, h, mirror);
         this.w = w;
         this.h = h;
         this.xExtendable = true;
         this.yExtendable = true;
-        this.trackName = "rampX-" + w.toFixed(0) + "." + h.toFixed(0);
+        this.partName = "rampX-" + w.toFixed(0) + "." + h.toFixed(0);
         let dir = new BABYLON.Vector3(1, 0, 0);
         dir.normalize();
         let n = new BABYLON.Vector3(0, 1, 0);
         n.normalize();
         let nBank = new BABYLON.Vector3(0, Math.cos(15 / 180 * Math.PI), Math.sin(15 / 180 * Math.PI));
-        this.deltaI = w - 1;
-        this.deltaJ = h;
-        this.trackPoints = [[
-                new TrackPoint(this, new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), n.clone(), dir.clone(), 1.4, 1.4),
-                new TrackPoint(this, new BABYLON.Vector3((tileWidth * (this.deltaI + 0.5) - tileWidth * 0.5) * 0.5, -tileHeight * (this.deltaJ) * 0.5, -0.03), nBank, dir.clone(), 1.4, 1.4),
-                new TrackPoint(this, new BABYLON.Vector3(tileWidth * (this.deltaI + 0.5), -tileHeight * (this.deltaJ), 0), n.clone(), dir.clone(), 1.4, 1.4)
-            ]];
+        this.tracks[0].trackpoints = [
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), n.clone(), dir.clone(), 1.4, 1.4),
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3((tileWidth * (this.w - 0.5) - tileWidth * 0.5) * 0.5, -tileHeight * this.h * 0.5, -0.03), nBank, dir.clone(), 1.4, 1.4),
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(tileWidth * (this.w - 0.5), -tileHeight * this.h, 0), n.clone(), dir.clone(), 1.4, 1.4)
+        ];
         if (mirror) {
             this.mirrorTrackPointsInPlace();
         }
         this.generateWires();
     }
 }
-class SleeperMeshBuilder {
-    static GenerateSleepersVertexData(track, spacing) {
-        let partialsDatas = [];
-        for (let j = 0; j < track.interpolatedPoints.length; j++) {
-            let interpolatedPoints = track.interpolatedPoints[j];
-            let summedLength = [0];
-            for (let i = 1; i < interpolatedPoints.length; i++) {
-                let prev = interpolatedPoints[i - 1];
-                let trackpoint = interpolatedPoints[i];
-                let dist = BABYLON.Vector3.Distance(prev, trackpoint);
-                summedLength[i] = summedLength[i - 1] + dist;
-            }
-            let count = Math.round(summedLength[summedLength.length - 1] / spacing / 3) * 3;
-            let correctedSpacing = summedLength[summedLength.length - 1] / count;
-            let radius = track.wireSize * 0.5 * 0.75;
-            let nShape = 6;
-            let shape = [];
-            for (let i = 0; i < nShape; i++) {
-                let a = i / nShape * 2 * Math.PI;
-                let cosa = Math.cos(a);
-                let sina = Math.sin(a);
-                shape[i] = new BABYLON.Vector3(cosa * radius, sina * radius, 0);
-            }
-            let shapeSmall = [];
-            for (let i = 0; i < nShape; i++) {
-                let a = i / nShape * 2 * Math.PI;
-                let cosa = Math.cos(a);
-                let sina = Math.sin(a);
-                shapeSmall[i] = new BABYLON.Vector3(cosa * radius * 0.75, sina * radius * 0.75, 0);
-            }
-            let radiusPath = track.wireGauge * 0.5;
-            let nPath = 12;
-            let basePath = [];
-            for (let i = 0; i <= nPath; i++) {
-                let a = i / nPath * Math.PI;
-                let cosa = Math.cos(a);
-                let sina = Math.sin(a);
-                basePath[i] = new BABYLON.Vector3(cosa * radiusPath, -sina * radiusPath, 0);
-            }
-            let q = BABYLON.Quaternion.Identity();
-            let n = 0.5;
-            for (let i = 1; i < interpolatedPoints.length - 1; i++) {
-                let sumPrev = summedLength[i - 1];
-                let sum = summedLength[i];
-                let sumNext = summedLength[i + 1];
-                let targetSumLength = n * correctedSpacing;
-                let addSleeper = false;
-                if (sumPrev < targetSumLength && sum >= targetSumLength) {
-                    let f = (targetSumLength - sumPrev) / (sum - sumPrev);
-                    if (f > 0.5) {
-                        addSleeper = true;
-                    }
-                }
-                if (sum <= targetSumLength && sumNext > targetSumLength) {
-                    let f = (targetSumLength - sum) / (sumNext - sum);
-                    if (f <= 0.5) {
-                        addSleeper = true;
-                    }
-                }
-                if (addSleeper) {
-                    let path = basePath.map(v => { return v.clone(); });
-                    let dir = interpolatedPoints[i + 1].subtract(interpolatedPoints[i - 1]).normalize();
-                    let t = interpolatedPoints[i];
-                    Mummu.QuaternionFromYZAxisToRef(track.interpolatedNormals[j][i], dir, q);
-                    let m = BABYLON.Matrix.Compose(BABYLON.Vector3.One(), q, t);
-                    for (let j = 0; j < path.length; j++) {
-                        BABYLON.Vector3.TransformCoordinatesToRef(path[j], m, path[j]);
-                    }
-                    let tmp = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                    partialsDatas.push(BABYLON.VertexData.ExtractFromMesh(tmp));
-                    tmp.dispose();
-                    let addAnchor = false;
-                    if ((n - 1.5) % 3 === 0) {
-                        let anchor = path[nPath / 2 - 1];
-                        if (anchor.z > -0.01) {
-                            addAnchor = true;
-                        }
-                    }
-                    if (addAnchor) {
-                        let anchor = path[nPath / 2 - 1];
-                        let anchorCenter = anchor.clone();
-                        anchorCenter.z = 0.015;
-                        let radiusFixation = Math.abs(anchor.z - anchorCenter.z);
-                        let anchorWall = anchorCenter.clone();
-                        anchorWall.y -= radiusFixation * 0.5;
-                        let nFixation = 10;
-                        let fixationPath = [];
-                        for (let i = 0; i <= nFixation; i++) {
-                            let a = i / nFixation * 0.5 * Math.PI;
-                            let cosa = Math.cos(a);
-                            let sina = Math.sin(a);
-                            fixationPath[i] = new BABYLON.Vector3(0, -sina * radiusFixation * 0.5, -cosa * radiusFixation);
-                            fixationPath[i].addInPlace(anchorCenter);
-                        }
-                        let tmp = BABYLON.ExtrudeShape("tmp", { shape: shape, path: fixationPath, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                        partialsDatas.push(BABYLON.VertexData.ExtractFromMesh(tmp));
-                        tmp.dispose();
-                        let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.001, diameter: 0.01 });
-                        let q = BABYLON.Quaternion.Identity();
-                        Mummu.QuaternionFromYZAxisToRef(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0), q);
-                        Mummu.RotateVertexDataInPlace(tmpVertexData, q);
-                        Mummu.TranslateVertexDataInPlace(tmpVertexData, anchorWall);
-                        partialsDatas.push(tmpVertexData);
-                        tmp.dispose();
-                    }
-                    n++;
-                }
-            }
-        }
-        return Mummu.MergeVertexDatas(...partialsDatas);
-    }
-}
-/// <reference path="./Track.ts"/>
-class Snake extends Track {
+/// <reference path="../machine/MachinePart.ts"/>
+class Snake extends MachinePart {
     constructor(machine, i, j, mirror) {
-        super(machine, i, j);
-        this.trackName = "snake";
-        this.deltaI = 1;
-        this.deltaJ = 0;
+        super(machine, i, j, 2, 1, mirror);
+        this.partName = "snake";
         this.deserialize({
             points: [
                 { position: { x: -0.075, y: 0, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
@@ -3265,12 +3510,11 @@ class Snake extends Track {
         this.generateWires();
     }
 }
-/// <reference path="./Track.ts"/>
-class Spiral extends Track {
+/// <reference path="../machine/MachinePart.ts"/>
+class Spiral extends MachinePart {
     constructor(machine, i, j, mirror) {
-        super(machine, i, j, mirror);
-        this.trackName = "spiral";
-        this.deltaJ = 3;
+        super(machine, i, j, 1, 3, mirror);
+        this.partName = "spiral";
         this.deserialize({
             points: [
                 { position: { x: -0.075, y: 0, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
@@ -3308,80 +3552,178 @@ class Spiral extends Track {
         this.generateWires();
     }
 }
-var TrackNames = [
-    "ramp-1.1",
-    "rampX-1.1",
-    "uturn-s",
-    "uturn-l",
-    "loop",
-    "wave",
-    "snake",
-    "spiral",
-    "elevator-4"
-];
-class TrackFactory {
-    constructor(machine) {
-        this.machine = machine;
+class Split extends MachinePart {
+    constructor(machine, i, j, mirror) {
+        super(machine, i, j, 1, 2, mirror);
+        this._animatePivot = Mummu.AnimationFactory.EmptyNumberCallback;
+        this.pivotL = 0.025;
+        this.reset = () => {
+            this._moving = false;
+            this.pivot.rotation.z = Math.PI / 4;
+        };
+        this._moving = false;
+        this.partName = "split";
+        let dir = new BABYLON.Vector3(1, 0, 0);
+        dir.normalize();
+        let n = new BABYLON.Vector3(0, 1, 0);
+        n.normalize();
+        let rCurb = this.pivotL * 0.3;
+        let pEnd = new BABYLON.Vector3(0, -tileHeight, 0);
+        pEnd.x -= this.pivotL / Math.SQRT2;
+        pEnd.y += this.pivotL / Math.SQRT2;
+        let dirEnd = (new BABYLON.Vector3(1, -1, 0)).normalize();
+        let nEnd = (new BABYLON.Vector3(1, 1, 0)).normalize();
+        this.tracks[0].trackpoints = [
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), n, dir),
+            new TrackPoint(this.tracks[0], pEnd.subtract(dirEnd.scale(0.001)), nEnd, dirEnd)
+        ];
+        this.tracks[1] = new Track(this);
+        this.tracks[1].trackpoints = [
+            new TrackPoint(this.tracks[1], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * this.h, 0), n, dir),
+            new TrackPoint(this.tracks[1], new BABYLON.Vector3(-this.pivotL / Math.SQRT2, -tileHeight - this.pivotL / Math.SQRT2 - this.wireSize * 1.5, 0), BABYLON.Vector3.Up(), dirEnd.multiplyByFloats(1, -1, 1)),
+            new TrackPoint(this.tracks[1], new BABYLON.Vector3(this.pivotL / Math.SQRT2, -tileHeight - this.pivotL / Math.SQRT2 - this.wireSize * 1.5, 0), BABYLON.Vector3.Up(), dirEnd),
+            new TrackPoint(this.tracks[1], new BABYLON.Vector3(tileWidth * 0.5, -tileHeight * this.h, 0), n, dir)
+        ];
+        this.tracks[2] = new Track(this);
+        this.tracks[2].trackpoints = [
+            new TrackPoint(this.tracks[2], new BABYLON.Vector3(tileWidth * 0.5, 0, 0), n.multiplyByFloats(-1, 1, 1), dir.multiplyByFloats(-1, 1, 1)),
+            new TrackPoint(this.tracks[2], pEnd.subtract(dirEnd.scale(0.001)).multiplyByFloats(-1, 1, 1), nEnd.multiplyByFloats(-1, 1, 1), dirEnd.multiplyByFloats(-1, 1, 1))
+        ];
+        if (mirror) {
+            this.mirrorTrackPointsInPlace();
+        }
+        let anchorDatas = [];
+        let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.001, diameter: 0.01 });
+        let q = BABYLON.Quaternion.Identity();
+        Mummu.QuaternionFromYZAxisToRef(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0), q);
+        Mummu.RotateVertexDataInPlace(tmpVertexData, q);
+        Mummu.TranslateVertexDataInPlace(tmpVertexData, new BABYLON.Vector3(0, 0, 0.015));
+        anchorDatas.push(tmpVertexData);
+        let axisZMin = -this.wireGauge * 0.6;
+        let axisZMax = 0.015 - 0.001 * 0.5;
+        tmpVertexData = BABYLON.CreateCylinderVertexData({ height: axisZMax - axisZMin, diameter: 0.001 });
+        Mummu.QuaternionFromYZAxisToRef(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0), q);
+        Mummu.RotateVertexDataInPlace(tmpVertexData, q);
+        Mummu.TranslateVertexDataInPlace(tmpVertexData, new BABYLON.Vector3(0, 0, (axisZMax + axisZMin) * 0.5));
+        anchorDatas.push(tmpVertexData);
+        let anchor = new BABYLON.Mesh("anchor");
+        anchor.position.copyFromFloats(0, -tileHeight, 0);
+        anchor.parent = this;
+        anchor.material = this.game.steelMaterial;
+        Mummu.MergeVertexDatas(...anchorDatas).applyToMesh(anchor);
+        this.pivot = new BABYLON.Mesh("pivot");
+        this.pivot.position.copyFromFloats(0, -tileHeight, 0);
+        this.pivot.material = this.game.copperMaterial;
+        this.pivot.parent = this;
+        this.pivot.rotation.z = Math.PI / 4;
+        let dz = this.wireGauge * 0.5;
+        this.game.vertexDataLoader.get("./meshes/splitter-arrow.babylon").then(datas => {
+            if (datas[0]) {
+                let data = Mummu.CloneVertexData(datas[0]);
+                Mummu.TranslateVertexDataInPlace(data, new BABYLON.Vector3(0, 0, axisZMin));
+                data.applyToMesh(this.pivot);
+            }
+        });
+        let wireHorizontal0 = new Wire(this);
+        wireHorizontal0.parent = this.pivot;
+        wireHorizontal0.path = [new BABYLON.Vector3(-this.pivotL, 0, -dz), new BABYLON.Vector3(this.pivotL, 0, -dz)];
+        let wireHorizontal1 = new Wire(this);
+        wireHorizontal1.parent = this.pivot;
+        wireHorizontal1.path = [new BABYLON.Vector3(-this.pivotL, 0, dz), new BABYLON.Vector3(this.pivotL, 0, dz)];
+        let wireVertical0 = new Wire(this);
+        wireVertical0.parent = this.pivot;
+        wireVertical0.path = [new BABYLON.Vector3(0, this.pivotL, -dz), new BABYLON.Vector3(0, rCurb * 0.3, -dz)];
+        let wireVertical1 = new Wire(this);
+        wireVertical1.parent = this.pivot;
+        wireVertical1.path = [new BABYLON.Vector3(0, this.pivotL, dz), new BABYLON.Vector3(0, rCurb * 0.3, dz)];
+        let curbLeft0 = new Wire(this);
+        curbLeft0.wireSize = this.wireSize * 0.8;
+        curbLeft0.parent = this.pivot;
+        curbLeft0.path = [];
+        for (let i = 0; i <= 8; i++) {
+            let a = Math.PI / 2 * i / 8;
+            let cosa = Math.cos(a);
+            let sina = Math.sin(a);
+            curbLeft0.path.push(new BABYLON.Vector3(-rCurb + cosa * rCurb, rCurb - sina * rCurb, -dz));
+        }
+        let curbLeft1 = new Wire(this);
+        curbLeft1.wireSize = this.wireSize * 0.8;
+        curbLeft1.parent = this.pivot;
+        curbLeft1.path = [];
+        for (let i = 0; i <= 8; i++) {
+            let a = Math.PI / 2 * i / 8;
+            let cosa = Math.cos(a);
+            let sina = Math.sin(a);
+            curbLeft1.path.push(new BABYLON.Vector3(-rCurb + cosa * rCurb, rCurb - sina * rCurb, dz));
+        }
+        let curbRight0 = new Wire(this);
+        curbRight0.wireSize = this.wireSize * 0.8;
+        curbRight0.parent = this.pivot;
+        curbRight0.path = [];
+        for (let i = 0; i <= 8; i++) {
+            let a = Math.PI / 2 * i / 8;
+            let cosa = Math.cos(a);
+            let sina = Math.sin(a);
+            curbRight0.path.push(new BABYLON.Vector3(rCurb - cosa * rCurb, rCurb - sina * rCurb, -dz));
+        }
+        let curbRight1 = new Wire(this);
+        curbRight1.wireSize = this.wireSize * 0.8;
+        curbRight1.parent = this.pivot;
+        curbRight1.path = [];
+        for (let i = 0; i <= 8; i++) {
+            let a = Math.PI / 2 * i / 8;
+            let cosa = Math.cos(a);
+            let sina = Math.sin(a);
+            curbRight1.path.push(new BABYLON.Vector3(rCurb - cosa * rCurb, rCurb - sina * rCurb, dz));
+        }
+        this.wires = [wireHorizontal0, wireHorizontal1, curbLeft0, curbLeft1, wireVertical0, wireVertical1, curbRight0, curbRight1];
+        this.generateWires();
+        this._animatePivot = Mummu.AnimationFactory.CreateNumber(this, this.pivot.rotation, "z", () => {
+            if (!this.machine.playing) {
+                this.pivot.rotation.z = Math.PI / 4;
+            }
+            this.wires.forEach(wire => {
+                wire.recomputeAbsolutePath();
+            });
+        }, false, Nabu.Easing.easeInSquare);
+        this.machine.onStopCallbacks.push(this.reset);
+        this.reset();
     }
-    createTrackWH(trackname, i, j, w, h, mirror) {
-        trackname = trackname.split("-")[0];
-        let wh = "";
-        if (isFinite(w)) {
-            wh += w.toFixed(0) + ".";
-        }
-        if (isFinite(h)) {
-            wh += h.toFixed(0);
-        }
-        trackname += "-" + wh;
-        return this.createTrack(trackname, i, j, mirror);
+    dispose() {
+        super.dispose();
+        this.machine.onStopCallbacks.remove(this.reset);
     }
-    createTrack(trackname, i, j, mirror) {
-        if (trackname.startsWith("flat-")) {
-            let w = parseInt(trackname.split("-")[1]);
-            return new Ramp(this.machine, i, j, w, 0, mirror);
-        }
-        if (trackname.startsWith("flatX-")) {
-            let w = parseInt(trackname.split("-")[1]);
-            return new CrossingRamp(this.machine, i, j, w, 0, mirror);
-        }
-        if (trackname.startsWith("ramp-")) {
-            let w = parseInt(trackname.split("-")[1].split(".")[0]);
-            let h = parseInt(trackname.split("-")[1].split(".")[1]);
-            return new Ramp(this.machine, i, j, w, h, mirror);
-        }
-        if (trackname.startsWith("rampX-")) {
-            let w = parseInt(trackname.split("-")[1].split(".")[0]);
-            let h = parseInt(trackname.split("-")[1].split(".")[1]);
-            return new CrossingRamp(this.machine, i, j, w, h, mirror);
-        }
-        if (trackname === "uturn-s") {
-            return new UTurn(this.machine, i, j, mirror);
-        }
-        if (trackname === "uturn-l") {
-            return new UTurnLarge(this.machine, i, j, mirror);
-        }
-        if (trackname === "loop") {
-            return new Loop(this.machine, i, j, mirror);
-        }
-        if (trackname === "wave") {
-            return new Wave(this.machine, i, j, mirror);
-        }
-        if (trackname === "snake") {
-            return new Snake(this.machine, i, j, mirror);
-        }
-        if (trackname === "spiral") {
-            return new Spiral(this.machine, i, j, mirror);
-        }
-        if (trackname.startsWith("elevator-")) {
-            let h = parseInt(trackname.split("-")[1]);
-            return new Elevator(this.machine, i, j, h, mirror);
+    update(dt) {
+        if (!this._moving) {
+            for (let i = 0; i < this.machine.balls.length; i++) {
+                let ball = this.machine.balls[i];
+                if (BABYLON.Vector3.Distance(ball.position, this.pivot.absolutePosition) < 0.05) {
+                    let local = BABYLON.Vector3.TransformCoordinates(ball.position, this.pivot.getWorldMatrix().clone().invert());
+                    if (local.y < ball.radius * 0.9) {
+                        if (local.x > ball.radius * 0.5 && local.x < this.pivotL) {
+                            this._moving = true;
+                            this._animatePivot(-Math.PI / 4, 0.3 / this.game.timeFactor).then(() => {
+                                this._moving = false;
+                            });
+                            return;
+                        }
+                        else if (local.x > -this.pivotL && local.x < -ball.radius * 0.5) {
+                            this._moving = true;
+                            this._animatePivot(Math.PI / 4, 0.3 / this.game.timeFactor).then(() => {
+                                this._moving = false;
+                            });
+                            return;
+                        }
+                    }
+                }
+            }
         }
     }
 }
-class UTurnLarge extends Track {
+class UTurnLarge extends MachinePart {
     constructor(machine, i, j, mirror) {
-        super(machine, i, j, mirror);
-        this.trackName = "uturn-l";
+        super(machine, i, j, 2, 1, mirror);
+        this.partName = "uturn-l";
         this.deserialize({
             points: [
                 { position: { x: -0.075, y: 0, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
@@ -3400,18 +3742,16 @@ class UTurnLarge extends Track {
                 { position: { x: -0.075, y: -0.03, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: -1, y: 0, z: 0 } },
             ],
         });
-        this.deltaI = 1;
-        this.deltaJ = 1;
         if (mirror) {
             this.mirrorTrackPointsInPlace();
         }
         this.generateWires();
     }
 }
-class UTurn extends Track {
+class UTurn extends MachinePart {
     constructor(machine, i, j, mirror) {
-        super(machine, i, j, mirror);
-        this.trackName = "uturn-s";
+        super(machine, i, j, 1, 1, mirror);
+        this.partName = "uturn-s";
         this.deserialize({
             points: [
                 { position: { x: -0.075, y: 0, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
@@ -3425,20 +3765,17 @@ class UTurn extends Track {
                 { position: { x: -0.075, y: -0.03, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: -1, y: 0, z: 0 } },
             ],
         });
-        this.deltaJ = 1;
         if (mirror) {
             this.mirrorTrackPointsInPlace();
         }
         this.generateWires();
     }
 }
-/// <reference path="./Track.ts"/>
-class Wave extends Track {
+/// <reference path="../machine/MachinePart.ts"/>
+class Wave extends MachinePart {
     constructor(machine, i, j, mirror) {
-        super(machine, i, j);
-        this.trackName = "wave";
-        this.deltaI = 1;
-        this.deltaJ = 1;
+        super(machine, i, j, 2, 1, mirror);
+        this.partName = "wave";
         this.deserialize({
             points: [
                 { position: { x: -0.075, y: 0, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
@@ -3454,5 +3791,303 @@ class Wave extends Track {
             this.mirrorTrackPointsInPlace();
         }
         this.generateWires();
+    }
+}
+var FloatingElementAnchor;
+(function (FloatingElementAnchor) {
+    FloatingElementAnchor[FloatingElementAnchor["BottomCenter"] = 0] = "BottomCenter";
+    FloatingElementAnchor[FloatingElementAnchor["LeftMiddle"] = 1] = "LeftMiddle";
+    FloatingElementAnchor[FloatingElementAnchor["TopCenter"] = 2] = "TopCenter";
+    FloatingElementAnchor[FloatingElementAnchor["RightMiddle"] = 3] = "RightMiddle";
+    FloatingElementAnchor[FloatingElementAnchor["LeftBottom"] = 4] = "LeftBottom";
+    FloatingElementAnchor[FloatingElementAnchor["LeftTop"] = 5] = "LeftTop";
+})(FloatingElementAnchor || (FloatingElementAnchor = {}));
+class FloatingElement extends HTMLElement {
+    constructor() {
+        super();
+        this._initialized = false;
+        this.anchor = FloatingElementAnchor.BottomCenter;
+        this.anchorMargin = 10;
+        this._update = () => {
+            if (!this._targetMesh && !this._targetPosition) {
+                return;
+            }
+            if (this.style.display === "none") {
+                return;
+            }
+            let p = this._targetPosition;
+            if (!p) {
+                p = this._targetMesh.absolutePosition;
+            }
+            let screenPos = BABYLON.Vector3.Project(p, BABYLON.Matrix.Identity(), this.game.scene.getTransformMatrix(), this.game.camera.viewport.toGlobal(1, 1));
+            let dLeft = 0;
+            let dBottom = 0;
+            if (this.anchor === FloatingElementAnchor.TopCenter) {
+                dLeft = -0.5 * this.clientWidth;
+                dBottom = -this.clientHeight - this.anchorMargin;
+            }
+            if (this.anchor === FloatingElementAnchor.LeftMiddle) {
+                dLeft = this.anchorMargin;
+                dBottom = -0.5 * this.clientHeight;
+            }
+            if (this.anchor === FloatingElementAnchor.BottomCenter) {
+                dLeft = -0.5 * this.clientWidth;
+                dBottom = this.anchorMargin;
+            }
+            if (this.anchor === FloatingElementAnchor.RightMiddle) {
+                dLeft = -this.clientWidth - this.anchorMargin;
+                dBottom = -0.5 * this.clientHeight;
+            }
+            if (this.anchor === FloatingElementAnchor.LeftBottom) {
+                dLeft = this.anchorMargin;
+                dBottom = this.anchorMargin;
+            }
+            if (this.anchor === FloatingElementAnchor.LeftTop) {
+                dLeft = this.anchorMargin;
+                dBottom = -this.clientHeight - this.anchorMargin;
+            }
+            this.style.left = (screenPos.x * this.game.canvas.width + dLeft).toFixed(1) + "px";
+            this.style.bottom = ((1 - screenPos.y) * this.game.canvas.height + dBottom).toFixed(1) + "px";
+        };
+    }
+    static Create(game) {
+        let panel = document.createElement("floating-element");
+        panel.game = game;
+        document.body.appendChild(panel);
+        return panel;
+    }
+    connectedCallback() {
+        if (this._initialized) {
+            return;
+        }
+        this._initialized = true;
+    }
+    dispose() {
+        if (this._targetMesh) {
+            this._targetMesh.getScene().onBeforeRenderObservable.removeCallback(this._update);
+        }
+        document.body.removeChild(this);
+    }
+    show() {
+        this.style.display = "block";
+    }
+    hide() {
+        this.style.display = "none";
+    }
+    setTarget(target) {
+        this.style.position = "fixed";
+        if (target instanceof BABYLON.Mesh) {
+            this._targetMesh = target;
+            this._targetPosition = undefined;
+        }
+        else if (target instanceof BABYLON.Vector3) {
+            this._targetPosition = target;
+            this._targetMesh = undefined;
+        }
+        this.game.scene.onAfterRenderObservable.add(this._update);
+    }
+}
+window.customElements.define("floating-element", FloatingElement);
+class Toolbar {
+    constructor(game) {
+        this.game = game;
+        this.timeFactorInputShown = false;
+        this.loadInputShown = false;
+        this.soundInputShown = false;
+        this.zoomInputShown = false;
+        this._udpate = () => {
+            if (this.game.machine) {
+                if (this.game.machine.playing != this._lastPlaying) {
+                    if (this.game.machine.playing) {
+                        this.playButton.style.display = "none";
+                        this.pauseButton.style.display = "";
+                    }
+                    else {
+                        this.playButton.style.display = "";
+                        this.pauseButton.style.display = "none";
+                    }
+                    this._lastPlaying = this.game.machine.playing;
+                    this.resize();
+                }
+                this.timeFactorValue.innerText = this.game.timeFactor.toFixed(2);
+            }
+            if (this.zoomInputShown) {
+                this.zoomInput.value = this.game.getCameraZoomFactor().toFixed(3);
+            }
+        };
+        this.onPlay = () => {
+            this.game.machine.playing = true;
+        };
+        this.onPause = () => {
+            this.game.machine.playing = false;
+        };
+        this.onStop = () => {
+            this.game.machine.stop();
+        };
+        this.onTimeFactorButton = () => {
+            this.timeFactorInputShown = !this.timeFactorInputShown;
+            this.resize();
+        };
+        this.onTimeFactorInput = (e) => {
+            this.game.targetTimeFactor = parseFloat(e.target.value);
+        };
+        this.onSave = () => {
+            let data = this.game.machine.serialize();
+            window.localStorage.setItem("last-saved-machine", JSON.stringify(data));
+            Nabu.download("my-marble-machine.json", JSON.stringify(data));
+        };
+        this.onLoad = () => {
+            this.loadInputShown = !this.loadInputShown;
+            this.resize();
+        };
+        this.onLoadInput = (event) => {
+            let files = event.target.files;
+            let file = files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.addEventListener('load', (event) => {
+                    this.game.machine.dispose();
+                    this.game.machine.deserialize(JSON.parse(event.target.result));
+                    this.game.machine.instantiate();
+                    this.game.machine.generateBaseMesh();
+                    for (let i = 0; i < this.game.machine.balls.length; i++) {
+                        this.game.machine.balls[i].setShowPositionZeroGhost(true);
+                    }
+                    this.loadInputShown = false;
+                    this.resize();
+                });
+                reader.readAsText(file);
+            }
+        };
+        this.onSoundButton = () => {
+            this.soundInputShown = !this.soundInputShown;
+            this.resize();
+        };
+        this.onSoundInput = (e) => {
+            this.game.mainVolume = parseFloat(e.target.value);
+        };
+        this.onZoomButton = () => {
+            this.zoomInputShown = !this.zoomInputShown;
+            this.resize();
+        };
+        this.onZoomInput = (e) => {
+            this.game.setCameraZoomFactor(parseFloat(e.target.value));
+        };
+        this.onBack = () => {
+            this.game.setContext(GameMode.MainMenu);
+        };
+        this.closeAllDropdowns = () => {
+            if (this.timeFactorInputShown || this.loadInputShown || this.soundInputShown || this.zoomInputShown) {
+                this.timeFactorInputShown = false;
+                this.loadInputShown = false;
+                this.soundInputShown = false;
+                this.zoomInputShown = false;
+                this.resize();
+            }
+        };
+    }
+    initialize() {
+        this.container = document.querySelector("#toolbar");
+        this.container.style.display = "block";
+        this.playButton = document.querySelector("#toolbar-play");
+        this.playButton.addEventListener("click", this.onPlay);
+        this.pauseButton = document.querySelector("#toolbar-pause");
+        this.pauseButton.addEventListener("click", this.onPause);
+        this.stopButton = document.querySelector("#toolbar-stop");
+        this.stopButton.addEventListener("click", this.onStop);
+        this.timeFactorButton = document.querySelector("#toolbar-time-factor");
+        this.timeFactorButton.addEventListener("click", this.onTimeFactorButton);
+        this.timeFactorValue = document.querySelector("#toolbar-time-factor .value");
+        this.timeFactorInput = document.querySelector("#time-factor-value");
+        this.timeFactorInput.value = this.game.targetTimeFactor.toFixed(2);
+        this.timeFactorInput.addEventListener("input", this.onTimeFactorInput);
+        this.timeFactorInputContainer = this.timeFactorInput.parentElement;
+        this.saveButton = document.querySelector("#toolbar-save");
+        this.saveButton.addEventListener("click", this.onSave);
+        this.loadButton = document.querySelector("#toolbar-load");
+        this.loadButton.addEventListener("click", this.onLoad);
+        this.loadInput = document.querySelector("#load-input");
+        this.loadInput.addEventListener("input", this.onLoadInput);
+        this.loadInputContainer = this.loadInput.parentElement;
+        this.soundButton = document.querySelector("#toolbar-sound");
+        this.soundButton.addEventListener("click", this.onSoundButton);
+        this.soundInput = document.querySelector("#sound-value");
+        this.soundInput.value = this.game.mainVolume.toFixed(2);
+        this.soundInput.addEventListener("input", this.onSoundInput);
+        this.soundInputContainer = this.soundInput.parentElement;
+        this.zoomButton = document.querySelector("#toolbar-zoom");
+        this.zoomButton.addEventListener("click", this.onZoomButton);
+        this.zoomInput = document.querySelector("#zoom-value");
+        this.zoomInput.value = this.game.getCameraZoomFactor().toFixed(3);
+        this.zoomInput.addEventListener("input", this.onZoomInput);
+        this.zoomInputContainer = this.zoomInput.parentElement;
+        this.backButton = document.querySelector("#toolbar-back");
+        this.backButton.addEventListener("click", this.onBack);
+        this.resize();
+        this.game.canvas.addEventListener("pointerdown", this.closeAllDropdowns);
+        this.game.scene.onBeforeRenderObservable.add(this._udpate);
+    }
+    dispose() {
+        this.game.canvas.removeEventListener("pointerdown", this.closeAllDropdowns);
+        this.game.scene.onBeforeRenderObservable.removeCallback(this._udpate);
+    }
+    updateButtonsVisibility() {
+        if (this.game.mode === GameMode.MainMenu) {
+            this.saveButton.style.display = "none";
+            this.loadButton.style.display = "none";
+            this.loadInputShown = false;
+            this.backButton.style.display = "none";
+        }
+        else if (this.game.mode === GameMode.Credit) {
+            this.saveButton.style.display = "none";
+            this.loadButton.style.display = "none";
+            this.loadInputShown = false;
+            this.backButton.style.display = "";
+        }
+        else if (this.game.mode === GameMode.CreateMode) {
+            this.saveButton.style.display = "";
+            this.loadButton.style.display = "";
+            this.backButton.style.display = "";
+        }
+        else if (this.game.mode === GameMode.DemoMode) {
+            this.saveButton.style.display = "none";
+            this.loadButton.style.display = "none";
+            this.loadInputShown = false;
+            this.backButton.style.display = "";
+        }
+    }
+    resize() {
+        this.updateButtonsVisibility();
+        let ratio = this.game.engine.getRenderWidth() / this.game.engine.getRenderHeight();
+        this.container.style.bottom = "10px";
+        if (ratio < 1) {
+            let objectsElement = document.getElementById("machine-editor-objects");
+            if (objectsElement.style.display != "none") {
+                let h = objectsElement.getBoundingClientRect().height;
+                this.container.style.bottom = (h + 10).toFixed(0) + "px";
+            }
+        }
+        let containerWidth = this.container.clientWidth;
+        this.container.style.left = ((this.game.engine.getRenderWidth() - containerWidth) * 0.5) + "px";
+        this.timeFactorInputContainer.style.display = this.timeFactorInputShown ? "" : "none";
+        let rectButton = this.timeFactorButton.getBoundingClientRect();
+        let rectContainer = this.timeFactorInputContainer.getBoundingClientRect();
+        this.timeFactorInputContainer.style.left = (rectButton.left).toFixed(0) + "px";
+        this.timeFactorInputContainer.style.top = (rectButton.top - rectContainer.height - 8).toFixed(0) + "px";
+        this.loadInputContainer.style.display = this.loadInputShown ? "" : "none";
+        rectButton = this.loadButton.getBoundingClientRect();
+        rectContainer = this.loadInputContainer.getBoundingClientRect();
+        this.loadInputContainer.style.left = (rectButton.left).toFixed(0) + "px";
+        this.loadInputContainer.style.top = (rectButton.top - rectContainer.height - 8).toFixed(0) + "px";
+        this.soundInputContainer.style.display = this.soundInputShown ? "" : "none";
+        rectButton = this.soundButton.getBoundingClientRect();
+        rectContainer = this.soundInputContainer.getBoundingClientRect();
+        this.soundInputContainer.style.left = (rectButton.left).toFixed(0) + "px";
+        this.soundInputContainer.style.top = (rectButton.top - rectContainer.height - 8).toFixed(0) + "px";
+        this.zoomInputContainer.style.display = this.zoomInputShown ? "" : "none";
+        rectButton = this.zoomButton.getBoundingClientRect();
+        rectContainer = this.zoomInputContainer.getBoundingClientRect();
+        this.zoomInputContainer.style.left = (rectButton.left).toFixed(0) + "px";
+        this.zoomInputContainer.style.top = (rectButton.top - rectContainer.height - 8).toFixed(0) + "px";
     }
 }
