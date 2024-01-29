@@ -152,6 +152,16 @@ var Nabu;
         return exponent + 1;
     }
     Nabu.CeilPow2Exponent = CeilPow2Exponent;
+    function Step(from, to, step) {
+        if (Math.abs(from - to) <= step) {
+            return to;
+        }
+        if (to < from) {
+            step *= -1;
+        }
+        return from + step;
+    }
+    Nabu.Step = Step;
     function StepAngle(from, to, step) {
         while (from < 0) {
             from += 2 * Math.PI;

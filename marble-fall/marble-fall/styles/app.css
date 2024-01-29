@@ -26,6 +26,254 @@ body {
     border: 1px solid white;
 }
 
+#screenshot-frame {
+    pointer-events: none;
+    width: min(100vw, 100vh);
+    height: min(100vw, 100vh);
+    position: fixed;
+    left: calc((100vw - min(100vw, 100vh)) * 0.5);
+    top: calc((100vh - min(100vw, 100vh)) * 0.5);
+    outline: 1px solid white;
+}
+
+#logo {
+    position: fixed;
+    top: 0;
+    width: calc(min(100vh, 100vw) * 0.95);
+    left: calc((100vw - min(100vh, 100vw) * 0.95) * 0.5);
+    z-index: 2;
+}
+
+#logo-banner {
+    position: fixed;
+    width: 100%;
+    height: calc(min(100vh, 100vw) * 0.95 / 5.5);
+    left: 0;
+    top: calc(min(100vh, 100vw) * 0.95 / 10);
+    background-color: rgba(39, 43, 46, 60%);
+    margin: 0;
+    padding: 0;
+}
+
+.logo-title {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 100px;
+    font-weight: bold;
+    letter-spacing: -0.06em;
+}
+
+#logo-title-back {
+    fill: black;
+    stroke: black;
+    stroke-width: 8px;
+}
+
+#logo-title {
+    fill: url(#steel-gradient);
+    stroke: white;
+    stroke-width: 1px;
+}
+
+.logo-subtitle {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 70px;
+    font-weight: bold;
+    letter-spacing: 0;
+    fill: white;
+}
+
+#logo-subtitle-back {
+    fill: black;
+    stroke: black;
+    stroke-width: 8px;
+}
+
+#logo-subtitle {
+    fill: url(#copper-gradient);
+    stroke: white;
+    stroke-width: 1px;
+}
+
+.page {
+    position: fixed;
+    top: calc(min(100vh, 100vw) * 0.95 * 350 / 1000);
+    left: calc((100vw - min(100vh, 100vw)) * 0.5);
+    width: min(100vh, 100vw);
+    height: calc(100vh - calc(min(100vh, 100vw) * 0.95 * 350 / 1000) - 12vh);
+    z-index: 2;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+}
+
+.panel {
+    background-color: rgba(39, 43, 46, 80%);
+    outline: 0.1vh solid white;
+    border-radius: 2vh;
+    margin: 0;
+    padding: 0;
+    color: white;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.panel:hover { 
+    background-color: rgba(78, 86, 92, 90%);
+}
+
+.panel .label {
+    text-align: right;
+    display: block;
+    margin: 10%;
+    font-size: 3vh;
+}
+
+.panel .label-2 {
+    text-align: left;
+    display: block;
+    position: absolute;
+    bottom: 2vh;
+    font-size: 2vh;
+    background-color: black;
+    padding: 0.2vh 1vh 0.2vh 3vh;
+}
+
+.panel.create .label {
+    text-align: left;
+    display: block;
+    margin: 3vh;
+    font-size: 6vh;
+}
+
+.panel.option .label {
+    text-align: left;
+    display: block;
+    margin: 2vh;
+    font-size: 2vh;
+}
+
+.panel.credit .label {
+    text-align: left;
+    display: block;
+    margin: 2vh;
+    font-size: 2vh;
+}
+
+.page {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.page .background {
+    display: inline-block;
+    background-color: rgba(39, 43, 46, 98%);
+    width: 90%;
+    padding: 0.5vh 2vh 3vh 2vh;
+    height: auto;
+    outline: 1px solid white;
+}
+
+#credits img {
+    display: inline-block;
+    height: 10vh;
+    margin: 1vh;
+}
+
+.page h1 {
+    font-size: 3.5vh;
+    margin: 1vh;
+    margin-bottom: 3vh;
+}
+
+.page h2 {
+    font-size: 3vh;
+    margin: 0.8vh;
+}
+
+.page h3 {
+    font-size: 2.5vh;
+    margin: 0.5vh;
+}
+
+.page h4 {
+    font-size: 2vh;
+    margin: 0.2vh;
+}
+
+#credits .label {
+    font-style: italic;
+    font-weight: lighter;
+}
+
+#credits p {
+    font-size: 1.5vh;
+    font-weight: lighter;
+}
+
+#credits a {
+    margin-left: 1vh;
+    color: #E0E0E0;
+}
+
+#credits a:link { 
+    text-decoration: none; 
+}
+
+#credits a:visited { 
+    text-decoration: none; 
+}
+
+#credits a:hover { 
+    text-decoration: none; 
+}
+
+#credits a:active { 
+    text-decoration: none; 
+}
+
+#options .line {
+    height: 2vh;
+    margin: 0.4vh;
+}
+
+#options .label {
+    font-family: monospace;
+    font-size: 1.5vh;
+    display: inline-block;
+    text-align: right;
+    padding-right: 1vh;
+    width: 50%;
+    height: 100%;
+}
+
+#options .value {
+    font-family: monospace;
+    font-size: 1.5vh;
+    display: inline-block;
+    text-align: left;
+    padding-left: 1vh;
+    width: 35%;
+    height: 100%;
+    border: 1px solid rgba(255, 255, 255, 20%);
+}
+
+#options .btn {
+    display: inline-block;
+    width: 3vh;
+    outline: none;
+    text-align: center;
+    vertical-align: top;
+    background-color: rgba(0, 0, 0, 20%);;
+}
+
+#options .val {
+    display: inline-block;
+    width: 5vh;
+    outline: none;
+    text-align: center;
+    vertical-align: top;
+}
+
 #render-canvas.full-screen {
     width: 100%;
     height: 100%;
@@ -43,113 +291,9 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-#track-editor-menu {
-    padding: 10px;
-    top: 20px;
-    left: 20px;
-    width: 400px;
-}
-
-.line {
-    height: 30px;
-}
-
-.separator {
-    margin-top: 5px;
-    margin-bottom: 10px;
-    border-top: 1px solid black;
-    height: 1px;
-}
-
-.line-flex {
-    height: 30px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-}
-
-.paginated-title {
-    display: flex;
-    flex-direction: row;
-}
-
-.label-s {
-    display: inline-block;
-    width: 35px;
-    text-align: right;
-    font-size: 14px;
-    color: rgb(40, 40, 40);
-}
-
-.number-val {
-    display: inline-block;
-    width: 55px;
-    border: 1px solid rgb(80, 80, 80);
-    border-radius: 3px;
-    text-align: right;
-    padding-right: 3px;
-    font-size: 14px;
-}
-
-.btn-l {
-    display: inline-block;
-    width: 100%;
-    height: 25px;
-}
-
-.btn-m {
-    display: inline-block;
-    width: 120px;
-    height: 25px;
-}
-
-.btn-s {
-    display: inline-block;
-    width: 80px;
-    height: 25px;
-}
-
-.btn-xs {
-    display: inline-block;
-    width: 25px;
-    height: 25px;
-}
-
-.spacer {
-    visibility: hidden;
-}
-
-.title {
-    display: inline-block;
-    width: 100%;
-    font-weight: bold;
-    text-align: center;
-}
-
-.title.t1 {
-    font-size: 26px;
-}
-
-.title.t2 {
-    font-size: 22px;
-}
-
-.paginated-title .title {
-    flex: auto;
-    text-align: center;
-}
-
-input-vec3 {
-    display: inline-block;
-    width: 300px;
-}
-input-number {
-    display: inline-block;
-    width: 100px;
-}
-
-
 :root {
+    --ui-size: 100%;
+    --button-xxs-size: 2vh;
     --button-xs-size: 3vh;
     --half-button-xs-size: calc(var(--button-xs-size) * 0.5);
     --button-s-size: 4vh;
@@ -161,9 +305,59 @@ input-number {
 
 #toolbar {
     position: fixed;
-    bottom: 10px;
+    bottom: 1vh;
     left: 50px;
     z-index: 3;
+}
+
+#machine-editor-part-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 3;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    background-color: rgba(39, 43, 46, 75%);
+    padding: 1vh 2vh 1vh 2vh;
+    border-bottom-left-radius: 2vh;
+    border-left: 1px solid white;
+    border-bottom: 1px solid white;
+    width: 18vh;
+    transform-origin: top right;
+    transform: scale(var(--ui-size));
+}
+
+#machine-editor-part-menu .line {
+    height: 3vh;
+    font-size: 2vh;
+}
+
+#machine-editor-part-menu .label {
+    display: inline-block;
+    color: rgba(255, 255, 255, 70%);
+    font-size: 1.5vh;
+    width: 6vh;
+}
+
+#machine-editor-part-menu .value {
+    display: inline-block;
+    font-size: 1.6vh;
+    width: 2.4vh;
+    text-align: center;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+#machine-editor-part-menu-show {
+    position: absolute;
+    top: 0.5vh;
+    right: 0.5vh;
+}
+
+#machine-editor-part-menu-hide {
+    position: absolute;
+    top: 0.5vh;
+    right: 0.5vh;
 }
 
 .btn {
@@ -175,8 +369,13 @@ input-number {
     outline: 1px solid white;
     color: white;
     font-weight: bold;
-    margin-left: 2px;
-    margin-right: 2px;
+    margin: 2px;
+}
+
+.btn.xxs {
+    width: var(--button-xxs-size);
+    height: var(--button-xxs-size);
+    border-radius: var(--button-xxs-size);
 }
 
 .btn.xs {
@@ -197,6 +396,13 @@ input-number {
     border-radius: var(--button-height);
 }
 
+.btn.xxs .label {
+    position: absolute;
+    top: var(--half-button-xxs-size);
+    left: var(--half-button-xxs-size);
+    transform: translate(-50%, -50%);
+}
+
 .btn.xs .label {
     position: absolute;
     top: var(--half-button-xs-size);
@@ -215,7 +421,7 @@ input-number {
     position: absolute;
     top: var(--half-button-height);
     left: var(--half-button-height);
-    transform: translate(-50%, -50%);
+    transform: translate(calc(var(--half-button-height) * -0.5), -50%);
 }
 
 .btn .value {
@@ -227,6 +433,15 @@ input-number {
     color: rgb(189, 189, 189);
     text-align: right;
     font-size: calc(var(--half-button-height) * 0.7);
+}
+
+.value-xs {
+    display: inline-block;
+    font-size: calc(var(--button-xs-size) * 0.7);
+    width: calc(var(--button-xs-size) * 4);
+    margin: calc(var(--button-xs-size) * 0.2);
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
 }
 
 .btn svg {

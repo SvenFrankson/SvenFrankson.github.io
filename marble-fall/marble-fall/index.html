@@ -12,6 +12,104 @@
 		<link rel="stylesheet" type="text/css" href="./styles/machine-editor.css">
 	</head>
 	<body>
+		<div id="main-menu" class="page" style="opacity: 0;">
+			<div class="panel create">
+				<span class="label">&gt; CREATE</span>
+				<span class="label-2">Make your own circuit !</span>
+			</div>
+			<div class="panel demo">
+				<span class="label">&gt; DEMO I</span>
+				<span class="label-2">Tiny track</span>
+			</div>
+			<div class="panel demo">
+				<span class="label">&gt; DEMO II</span>
+				<span class="label-2">Simple curves</span>
+			</div>
+			<div class="panel demo">
+				<span class="label">&gt; DEMO III</span>
+				<span class="label-2">Endless loops</span>
+			</div>
+			<div class="panel demo">
+				<span class="label">&gt; DEMO IV</span>
+				<span class="label-2">Multiple branches</span>
+			</div>
+			<div class="panel demo">
+				<span class="label">&gt; DEMO V</span>
+				<span class="label-2">Large tornado</span>
+			</div>
+			<div class="panel option"><span class="label">&gt; OPTION</span></div>
+			<div class="panel credit"><span class="label">&gt; CREDIT</span></div>
+		</div>
+		<div id="options" class="page" style="opacity: 0;">
+			<div id="options" class="background">
+				<h2 style="opacity: 0.5;">Options</h2>
+				<h3>Controls</h3>
+				<h4>Machine Editor</h4>
+				<div class="line">
+					<span class="label">move pieces</span>
+					<span class="value">WASD</span>
+				</div>
+				<div class="line">
+					<span class="label">multiple selection</span>
+					<span class="value">LShift + Clic</span>
+				</div>
+				<div class="line">
+					<span class="label">delete pieces</span>
+					<span class="value">X (Del)</span>
+				</div>
+				<div class="line">
+					<span class="label">mirror piece</span>
+					<span class="value">M</span>
+				</div>
+				<div class="line">
+					<span class="label">camera focus pieces</span>
+					<span class="value">Space</span>
+				</div>
+				<div class="line">
+					<span class="label">select all</span>
+					<span class="value">LCtrl + A</span>
+				</div>
+				<h3>Accessibility</h3>
+				<h4>Machine Editor</h4>
+				<div class="line">
+					<span class="label">piece menu size</span>
+					<span class="value">
+						<span id="ui-size-minus" class="btn">-</span>		
+						<span id="ui-size-val" class="val"></span>
+						<span id="ui-size-plus" class="btn">+</span>	
+					</span>
+				</div>
+				<div class="line">
+					<span class="label">handle size</span>
+					<span class="value">
+						<span id="handle-size-minus" class="btn">-</span>		
+						<span id="handle-size-val" class="val"></span>
+						<span id="handle-size-plus" class="btn">+</span>	
+					</span>
+				</div>
+				<h3>Performances</h3>
+				<div class="line">
+					<span class="label">graphic quality</span>
+					<span class="value">
+						<span id="graphic-q-minus" class="btn">-</span>		
+						<span id="graphic-q-val" class="val"></span>
+						<span id="graphic-q-plus" class="btn">+</span>	
+					</span>
+				</div>
+			</div>
+		</div>
+		<div id="credits" class="page" style="opacity: 0;">
+			<div id="credits" class="background">
+				<h2 style="opacity: 0.5;">Credit</h2>
+				<h2><span class="label">Concept, Art & Code</span></h1>
+				<h1>Sven Taton</h1>
+				<a href="https://svenfrankson.github.io/" target="_blank"><img src="./datas/textures/logo-white.svg"/></a>
+				<h4>Marble Run Simulator Source Code <a href="https://github.com/SvenFrankson/marble-fall" target="_blank">&#10697</a></h4>
+				<a href="https://www.babylonjs.com/" target="_blank"><img src="./datas/textures/babylonjs_identity_color.svg"/></a>
+				<p>Wood material from TextureCan <a href="https://www.texturecan.com/details/146/" target="_blank">&#10697</a></p>
+				<p style="text-align: right;">&copy; 2024 Sven Taton</p>
+			</div>
+		</div>
 		<div id="toolbar" style="display: none">
 			<button id="toolbar-play" class="btn s" title="Play">
 				<svg class="label" viewBox="0 0 100 100">
@@ -31,6 +129,26 @@
 					<path d="M25 25 L75 25 L75 75 L25 75 Z" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"></path>
 				</svg>
 			</button>
+
+			<button id="toolbar-cam-mode" class="btn s" title="Volume">
+				<svg class="label" viewBox="0 0 100 100">
+					<path d="M10 25 L60 25 L60 75 L10 75 Z" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path>
+					<path d="M75 60 L90 70 L90 30 L75 40 Z" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path>
+				</svg>
+			</button>
+			<div class="dropdown">
+				<button id="toolbar-cam-mode-prev" class="btn xs" title="Previous Cam Mode">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M70 25 L20 50 L70 80" fill="none" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				</button>
+				<span id="toolbar-cam-mode-value" class="value-xs">Landscape</span>
+				<button id="toolbar-cam-mode-next" class="btn xs" title="Next Cam Mode">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M30 25 L80 50 L30 80" fill="none" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				</button>	
+			</div>
 
 			<button id="toolbar-time-factor" class="btn m" title="Time factor">
 				<svg class="label" viewBox="0 0 100 100">
@@ -82,126 +200,172 @@
 				<input id="zoom-value" type="range" orient="vertical" min="0" max="1" step ="0.001"/>	
 			</div>
 
+			<button id="toolbar-layer" class="btn m"  title="Layer" style="display: none">
+				<svg class="label" viewBox="0 0 240 100">
+					<path d="M15 15 L75 5 L75 65 L15 75 Z" fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path>
+					<path d="M35 30 L95 20 L95 80 L35 90 Z" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path>
+					<path d="M160 25 L180 5 L200 25" fill="none" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"></path>
+					<path d="M160 75 L180 95 L200 75" fill="none" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"></path>
+					<path d="M130 50 L230 50" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+				</svg>
+			</button>
+
 			<button id="toolbar-back" class="btn s"  title="Back to main menu">
 				<svg class="label" viewBox="0 0 100 100">
 					<path d="M5 45 L25 30 L25 60 Z" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"></path>
 					<path d="M10 45 L80 45 L80 75" fill="none" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"></path>
 				</svg>
 			</button>
-		</div>
-		<img id="blackboard-tex" src="./datas/textures/blackboard.png" style="display: none;"></img>
-		<div id="track-editor-menu" class="menu" style="display: none;">
-			<div class="line">
-				<span class="title t1">Track Editor</span>
-			</div>
-			<div class="line paginated-title">
-				<button id="prev-track" class="btn-xs">&lt;</button>
-				<span class="title t2">Track N</span>
-				<button id="next-track" class="btn-xs">&gt;</button>
-			</div>
-			<div class="line">
-				<span class="label">Camera</span>
-				<button class="btn-xs spacer">&nbsp;</button>
-				<button id="btn-cam-top" class="btn-xs">T</button>
-				<button class="btn-xs spacer">&nbsp;</button>
-			</div>
-			<div class="line">
-				<span class="label"></span>
-				<button id="btn-cam-left" class="btn-xs">L</button>
-				<button id="btn-cam-face" class="btn-xs">F</button>
-				<button id="btn-cam-right" class="btn-xs">R</button>
-			</div>
-			<div class="line">
-				<span class="label"></span>
-				<button class="btn-xs spacer">&nbsp;</button>
-				<button id="btn-cam-bottom" class="btn-xs">B</button>
-				<button class="btn-xs spacer">&nbsp;</button>
-			</div>
-			<div class="line-flex">
-				<span class="label">Cam Mode</span>
-				<button id="btn-cam-ortho" class="btn-m">Orthographic</button>
-				<button id="btn-cam-perspective" class="btn-m">Perspective</button>
-			</div>
-			<div class="line-flex">
-				<span class="label">Cam Focus</span>
-				<button id="btn-focus-point" class="btn-m">TrackPoint</button>
-				<button id="btn-center-track" class="btn-m">Center</button>
-			</div>
-			<div class="line-flex">
-				<span class="label">Display Mode</span>
-				<button id="btn-display-wire" class="btn-m">Wire</button>
-				<button id="btn-display-path" class="btn-m">Path</button>
-			</div>
-			<div class="line">
-				<span class="label">Helper</span>
-				<span class="label-s">circle</span>
-				<button id="btn-show-helper-circle" class="btn-s">Show</button>
-				<span class="label-s">radius</span>
-				<input-number id="helper-circle-radius" decimals="0" step="1"></input-number>
-			</div>
-			<div class="line">
-				<span class="label"></span>
-				<span class="label-s">grid</span>
-				<button id="btn-show-helper-grid" class="btn-s">Show</button>
-				<span class="label-s">size</span>
-				<input-number id="helper-grid-size" decimals="0" step="1"></input-number>
-			</div>
-			<div class="line-flex">
-				<button id="load" class="btn-m">Load</button>
-				<button id="save" class="btn-m">Save</button>
-			</div>
-			
-			<div class="separator"></div>
 
-			<div class="line paginated-title">
-				<button id="prev-trackpoint" class="btn-xs">&lt;</button>
-				<span class="title t2">TrackPoint N</span>
-				<button id="next-trackpoint" class="btn-xs">&gt;</button>
+			<button id="toolbar-screenshot" class="btn s"  title="Take circuit screenshot" style="display: none">
+				<svg class="label" viewBox="0 0 100 100">
+					<circle cx="80" cy="50" r="15" fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></circle>
+					<circle cx="65" cy="50" r="30" fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></circle>
+					<circle cx="50" cy="50" r="45" fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></circle>
+				</svg>
+			</button>
+		</div>
+
+		<div id="machine-editor-part-menu" style="display: none">
+			<button id="machine-editor-part-menu-show" class="btn xxs"  title="Back to main menu">
+				<svg class="label" viewBox="0 0 100 100">
+					<path d="M25 20 L50 70 L80 20" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+				</svg>
+			</button>
+			<button id="machine-editor-part-menu-hide" class="btn xxs"  title="Back to main menu">
+				<svg class="label" viewBox="0 0 100 100">
+					<path d="M25 70 L50 20 L80 70" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+				</svg>
+			</button>
+
+			<div id="machine-editor-part-menu-title" class="line">
+				<span></span>
 			</div>
-			<div class="line">
-				<span class="label">Position</span>
-				<input-vec3 id="active-trackpoint-pos"></input-vec3>
+			<div id="machine-editor-part-menu-ijk" class="line">
+				<span class="label">ijk</span>
+				<span class="value i">0</span>
+				<span class="value j">0</span>
+				<span class="value k">0</span>
 			</div>
-			<div class="line">
-				<span class="label">Normal</span>
-				<input-vec3 id="active-trackpoint-normal"></input-vec3>
+			<div id="machine-editor-part-menu-k" class="line">
+				<span class="label">k</span>
+				<span class="value k">0</span>
 			</div>
-			<div class="line">
-				<span class="label">Tangent</span>
-				<span class="label-s">in</span>
-				<input-number id="active-trackpoint-tan-in"></input-number>
-				<span class="label-s">out</span>
-				<input-number id="active-trackpoint-tan-out"></input-number>
+			<div id="machine-editor-part-menu-width" class="line">
+				<span class="label">width</span>
+				
+				<button class="btn xxs minus">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M20 50 L80 50" fill="none" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				</button>
+
+				<span class="value">1</span>
+				
+				<button class="btn xxs plus">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M20 50 L80 50 M50 20 L50 80" fill="none" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				</button>
 			</div>
-			<div class="line">
-				<span class="label">Slope</span>
-				<span class="label-s">prev</span>
-				<span id="slope-prev" class="number-val">0</span>
-				<span class="label-s">curr</span>
-				<span id="slope-curr" class="number-val">0</span>
-				<span class="label-s">next</span>
-				<span id="slope-next" class="number-val">0</span>
+			<div id="machine-editor-part-menu-height" class="line">
+				<span class="label">height</span>
+				
+				<button class="btn xxs minus">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M20 50 L80 50" fill="none" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				</button>
+
+				<span class="value"">1</span>
+				
+				<button class="btn xxs plus">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M20 50 L80 50 M50 20 L50 80" fill="none" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				</button>
 			</div>
-			<div class="line">
-				<span class="label"></span>
-				<span class="label-s">global</span>
-				<span id="slope-global" class="number-val">0</span>
+			<div id="machine-editor-part-menu-depth" class="line">
+				<span class="label">depth</span>
+				
+				<button class="btn xxs minus">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M20 50 L80 50" fill="none" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				</button>
+
+				<span class="value"">1</span>
+				
+				<button class="btn xxs plus">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M20 50 L80 50 M50 20 L50 80" fill="none" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				</button>
 			</div>
-			<div class="line">
-				<span class="label">Bank</span>
-				<span id="active-trackpoint-bank" class="number-val">0</span>
+			<div id="machine-editor-part-menu-mirrorX" class="line">
+				<span class="label">mirrorX</span>
+				
+				<button class="btn xxs">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M25 30 L10 50 L25 70 Z" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"></path>
+						<path d="M75 30 L90 50 L75 70 Z" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"></path>
+						<path d="M15 50 L85 50" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				</button>
 			</div>
-			<div class="line-flex">
-				<button id="active-trackpoint-split" class="btn-l">Split</button>
-				<button id="active-trackpoint-delete" class="btn-l">Delete</button>
+			<div id="machine-editor-part-menu-mirrorZ" class="line">
+				<span class="label">mirrorZ</span>
+				
+				<button class="btn xxs">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M30 25 L50 10 L70 25 Z" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"></path>
+						<path d="M30 75 L50 90 L70 75 Z" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"></path>
+						<path d="M50 15 L50 85" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				</button>
+			</div>
+			<div id="machine-editor-part-menu-fill" class="line">
+				<span class="label">fill</span>
+				
+				<button class="btn xxs">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M35 20 L65 20" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+						<path d="M35 50 L65 50" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+						<path d="M35 80 L65 80" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				</button>
+			</div>
+			<div id="machine-editor-part-menu-focus" class="line">
+				<span class="label">focus</span>
+				
+				<button class="btn xxs">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M10 25 L10 10 L25 10" fill="none" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"></path>
+						<path d="M90 25 L90 10 L75 10" fill="none" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"></path>
+						<path d="M90 75 L90 90 L75 90" fill="none" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"></path>
+						<path d="M10 75 L10 90 L25 90" fill="none" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"></path>
+						<circle cx="50" cy="50" r="15" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></circle>
+					</svg>
+				</button>
+			</div>
+			<div id="machine-editor-part-menu-delete" class="line">
+				<span class="label">delete</span>
+				
+				<button class="btn xxs">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M25 25 L75 75 M25 75 L75 25" fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				</button>
 			</div>
 		</div>
-		<div id="machine-menu" class="menu">
-			<div id="machine-editor-objects" style="display:none">
+
+		<div id="machine-editor-menu" class="menu" style="display:none">
+			<div id="machine-editor-objects">
 				<div id="machine-editor-item-container">
 				</div>
 			</div>
 		</div>
         <canvas id="render-canvas" class="full-screen"></canvas>
+		<div id="screenshot-frame" style="display: none;"></div>
 	</body>
 </html>
