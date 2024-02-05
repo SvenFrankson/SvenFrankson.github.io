@@ -137,7 +137,7 @@ class Ball extends BABYLON.Mesh {
             let forcedDisplacement = BABYLON.Vector3.Zero();
             let canceledSpeed = BABYLON.Vector3.Zero();
             this.machine.parts.forEach(part => {
-                if (Mummu.AABBAABBIntersect(this.position.x - this.radius, this.position.x + this.radius, this.position.y - this.radius, this.position.y + this.radius, this.position.z - this.radius, this.position.z + this.radius, part.AABBMin.x - this.radius, part.AABBMax.x + this.radius, part.AABBMin.y - this.radius, part.AABBMax.y + this.radius, part.AABBMin.z - this.radius, part.AABBMax.z + this.radius)) {
+                if (Mummu.SphereAABBCheck(this.position, this.radius, part.AABBMin.x - this.radius, part.AABBMax.x + this.radius, part.AABBMin.y - this.radius, part.AABBMax.y + this.radius, part.AABBMin.z - this.radius, part.AABBMax.z + this.radius)) {
                     part.allWires.forEach(wire => {
                         let col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.5, !(part instanceof UTurnLarge));
                         if (col.hit) {
@@ -607,6 +607,7 @@ var logoCircuit = {
         { name: "ramp-2.1.2", i: -2, j: 1, k: 3, mirrorX: true, mirrorZ: false },
     ],
 };
+var test = { "balls": [{ "x": -0.5766096541939383, "y": 0.4087908683675662, "z": 0 }], "parts": [{ "name": "join", "i": -1, "j": -1, "k": 1, "mirrorX": false, "mirrorZ": false }, { "name": "split", "i": -1, "j": -3, "k": 0, "mirrorX": false, "mirrorZ": false }, { "name": "uturnlayer-0.2", "i": -2, "j": -1, "k": 0, "mirrorX": true, "mirrorZ": false }, { "name": "uturnlayer-0.2", "i": 0, "j": -1, "k": 0, "mirrorX": false, "mirrorZ": false }, { "name": "uturnlayer-0.2", "i": 0, "j": 0, "k": 1, "mirrorX": false, "mirrorZ": false }, { "name": "uturnlayer-0.2", "i": -1, "j": 0, "k": 2, "mirrorX": true, "mirrorZ": false }, { "name": "uturnlayer-2.4", "i": 0, "j": 0, "k": 0, "mirrorX": false, "mirrorZ": true }, { "name": "elevator-16", "i": -4, "j": -14, "k": 0, "mirrorX": true, "mirrorZ": false }, { "name": "ramp-3.0.1", "i": -3, "j": 2, "k": 0, "mirrorX": false, "mirrorZ": false }, { "name": "ramp-2.10.1", "i": -3, "j": -13, "k": 0, "mirrorX": false, "mirrorZ": false }] };
 class HelperShape {
     constructor() {
         this.show = true;
@@ -1343,7 +1344,7 @@ class MachineEditor {
                 this.game.focusMachineParts(...this._selectedObjects);
             }
         };
-        this.container = document.getElementById("machine-editor-menu");
+        this.container = document.getElementById("machine-editor-objects");
         this.itemContainer = this.container.querySelector("#machine-editor-item-container");
         this.layerMesh = BABYLON.MeshBuilder.CreatePlane("layer-mesh", { size: 100 });
         this.layerMesh.isVisible = false;
@@ -1462,7 +1463,7 @@ class MachineEditor {
         this.updateFloatingElements();
     }
     async instantiate() {
-        document.getElementById("machine-editor-menu").style.display = "block";
+        document.getElementById("machine-editor-objects").style.display = "block";
         this.game.toolbar.resize();
         this.machinePartEditorMenu.initialize();
         let ballItem = document.createElement("div");
@@ -1519,6 +1520,8 @@ class MachineEditor {
                 }
             });
         }
+        var r = document.querySelector(':root');
+        r.style.setProperty("--machine-editor-item-container-width", (Math.ceil(TrackNames.length / 2 + 1) * 16.8).toFixed(0) + "vw");
         document.addEventListener("keydown", this._onKeyDown);
         document.addEventListener("keyup", this._onKeyUp);
         this.game.canvas.addEventListener("pointerdown", this.pointerDown);
@@ -1761,7 +1764,7 @@ class MachineEditor {
         return button;
     }
     dispose() {
-        document.getElementById("machine-editor-menu").style.display = "none";
+        document.getElementById("machine-editor-objects").style.display = "none";
         this.setSelectedObject(undefined);
         this.game.toolbar.resize();
         if (this.machinePartEditorMenu) {
@@ -2047,6 +2050,26 @@ class Game {
         this.targetTimeFactor = 0.8;
         this.timeFactor = 0.1;
         this.physicDT = 0.0005;
+        this._pointerDownX = 0;
+        this._pointerDownY = 0;
+        this.onPointerDown = (event) => {
+            this._pointerDownX = this.scene.pointerX;
+            this._pointerDownY = this.scene.pointerY;
+        };
+        this.onPointerUp = (event) => {
+            if (this.cameraMode === CameraMode.Ball || this.cameraMode === CameraMode.Landscape) {
+                let dx = (this._pointerDownX - this.scene.pointerX);
+                let dy = (this._pointerDownY - this.scene.pointerY);
+                if (dx * dx + dy * dy > 10 * 10) {
+                    this.setCameraMode(CameraMode.None);
+                }
+            }
+        };
+        this.onWheelEvent = (event) => {
+            if (this.cameraMode === CameraMode.Ball || this.cameraMode === CameraMode.Landscape) {
+                this.setCameraMode(CameraMode.None);
+            }
+        };
         Game.Instance = this;
         this.canvas = document.getElementById(canvasElement);
         this.canvas.requestPointerLock = this.canvas.requestPointerLock || this.canvas.msRequestPointerLock || this.canvas.mozRequestPointerLock || this.canvas.webkitRequestPointerLock;
@@ -2071,7 +2094,7 @@ class Game {
         return this.scene;
     }
     get currentTimeFactor() {
-        return this.timeFactor * (this.mode === GameMode.MainMenu ? 0.7 : 1);
+        return this.timeFactor * (this.mode === GameMode.MainMenu ? 0.5 : 1);
     }
     async createScene() {
         this.scene = new BABYLON.Scene(this.engine);
@@ -2156,13 +2179,13 @@ class Game {
         this.camera.minZ = 0.01;
         this.camera.maxZ = 10;
         this.camera.wheelPrecision = 1000;
-        this.camera.panningSensibility = 2000;
-        this.camera.panningInertia *= 0.1;
+        this.camera.panningSensibility = 4000;
+        this.camera.panningInertia *= 0.5;
         this.camera.lowerRadiusLimit = 0.05;
         this.camera.upperRadiusLimit = 1.5;
         this.camera.angularSensibilityX = 2000;
         this.camera.angularSensibilityY = 2000;
-        this.camera.pinchPrecision = 10000;
+        this.camera.pinchPrecision = 5000;
         let alternateMenuCamMode = () => {
             if (this.menuCameraMode === CameraMode.Ball) {
                 this.menuCameraMode = CameraMode.Landscape;
@@ -2181,6 +2204,7 @@ class Game {
         this.machine = new Machine(this);
         this.machineEditor = new MachineEditor(this);
         this.machine.deserialize(demo1);
+        //this.machine.deserialize(test);
         await this.machine.instantiate();
         await this.machine.generateBaseMesh();
         let screenshotButton = document.querySelector("#toolbar-screenshot");
@@ -2199,6 +2223,9 @@ class Game {
         this.optionsPage.hide();
         this.creditsPage = new CreditsPage(this);
         this.creditsPage.hide();
+        this.topbar = new Topbar(this);
+        this.topbar.initialize();
+        this.topbar.resize();
         this.toolbar = new Toolbar(this);
         this.toolbar.initialize();
         this.toolbar.resize();
@@ -2234,6 +2261,8 @@ class Game {
         await this.setPageMode(GameMode.MainMenu);
         this.machine.play();
         document.addEventListener("keydown", async (event) => {
+            //await this.makeScreenshot("join");
+            //await this.makeScreenshot("split");
             if (event.code === "KeyP") {
                 let e = document.getElementById("screenshot-frame");
                 if (e.style.display != "block") {
@@ -2248,6 +2277,9 @@ class Game {
             //    await this.makeScreenshot(trackname);
             //}
         });
+        this.canvas.addEventListener("pointerdown", this.onPointerDown);
+        this.canvas.addEventListener("pointerup", this.onPointerUp);
+        this.canvas.addEventListener("wheel", this.onWheelEvent);
     }
     animate() {
         this.engine.runRenderLoop(() => {
@@ -2257,6 +2289,7 @@ class Game {
         window.addEventListener("resize", () => {
             this.screenRatio = this.engine.getRenderWidth() / this.engine.getRenderHeight();
             this.engine.resize();
+            this.topbar.resize();
             this.toolbar.resize();
             this.mainMenu.resize();
         });
@@ -2269,20 +2302,20 @@ class Game {
             let speed = 0.01;
             let camTarget = this.targetCamTarget;
             if (this.cameraMode === CameraMode.Ball && this.machine && this.machine.balls && this.machine.balls[0]) {
-                this._trackTargetCamSpeed = this._trackTargetCamSpeed * 0.9995 + 20 * 0.0005;
+                this._trackTargetCamSpeed = this._trackTargetCamSpeed * 0.9995 + 30 * 0.0005;
                 camTarget = this.machine.balls[0].position;
             }
             else if (this.cameraMode >= CameraMode.Focusing) {
-                this._trackTargetCamSpeed = this._trackTargetCamSpeed * 0.95 + 20 * 0.05;
-                speed = 0.5;
+                this._trackTargetCamSpeed = this._trackTargetCamSpeed * 0.995 + 20 * 0.005;
+                speed = 0.2;
             }
             else {
-                this._trackTargetCamSpeed = 0.1;
+                this._trackTargetCamSpeed = 0.2;
             }
             let target = BABYLON.Vector3.Lerp(this.camera.target, camTarget, this._trackTargetCamSpeed * dt);
             let alpha = Nabu.Step(this.camera.alpha, this.targetCamAlpha, Math.PI * speed * dt);
             let beta = Nabu.Step(this.camera.beta, this.targetCamBeta, Math.PI * speed * dt);
-            let radius = Nabu.Step(this.camera.radius, this.targetCamRadius, 5 * speed * dt);
+            let radius = Nabu.Step(this.camera.radius, this.targetCamRadius, 10 * speed * dt);
             this.camera.target.copyFrom(target);
             this.camera.alpha = alpha;
             this.camera.beta = beta;
@@ -2344,6 +2377,8 @@ class Game {
     async setPageMode(mode) {
         this.toolbar.closeAllDropdowns();
         this.machineEditor.dispose();
+        this.mode = mode;
+        this.topbar.resize();
         if (mode === GameMode.MainMenu) {
             this.setCameraMode(this.menuCameraMode);
             await this.optionsPage.hide();
@@ -2371,7 +2406,7 @@ class Game {
             await this.mainMenu.hide();
             await this.optionsPage.hide();
             await this.creditsPage.hide();
-            this.machineEditor.instantiate();
+            await this.machineEditor.instantiate();
         }
         if (mode === GameMode.DemoMode) {
             this.setCameraMode(CameraMode.Landscape);
@@ -2380,7 +2415,7 @@ class Game {
             await this.optionsPage.hide();
             await this.creditsPage.hide();
         }
-        this.mode = mode;
+        this.topbar.resize();
         this.toolbar.resize();
     }
     async makeScreenshot(objectName) {
@@ -2487,6 +2522,7 @@ class Game {
                 this.targetCamTarget.copyFrom(this.camera.target);
             }
         }
+        this.topbar.resize();
     }
     async focusMachineParts(...machineParts) {
         let start = new BABYLON.Vector3(Infinity, -Infinity, -Infinity);
@@ -2510,8 +2546,8 @@ class Game {
         let h = (start.y - end.y);
         let distH = 0.5 * h / (Math.tan(this.camera.fov * 0.5));
         if (this.screenRatio > 1) {
-            distW *= 2.5;
-            distH *= 1.5;
+            distW *= 3.5;
+            distH *= 2.5;
         }
         else {
             distW *= 1.5;
@@ -2695,6 +2731,11 @@ class Sound {
         }
     }
 }
+class Tools {
+    static V3Dir(angleInDegrees, length = 1) {
+        return new BABYLON.Vector3(Math.sin(angleInDegrees / 180 * Math.PI) * length, Math.cos(angleInDegrees / 180 * Math.PI) * length, 0);
+    }
+}
 class Wire extends BABYLON.Mesh {
     constructor(track) {
         super("wire");
@@ -2773,6 +2814,26 @@ class Wire extends BABYLON.Mesh {
                         path.push(this.path[i]);
                     }
                 }
+            }
+            if (this.startTipDir) {
+                let d = this.startTipDir.normalize().scaleInPlace(-1).scaleInPlace(this.track.wireGauge * 0.5);
+                Mummu.RotateInPlace(d, this.startTipNormal, -Math.PI / 2);
+                let tipPath = [d.add(this.startTipCenter)];
+                for (let i = 0; i < 8 - 1; i++) {
+                    Mummu.RotateInPlace(d, this.startTipNormal, Math.PI / 8);
+                    tipPath.push(d.add(this.startTipCenter));
+                }
+                path = [...tipPath, ...path];
+            }
+            if (this.endTipDir) {
+                let d = this.endTipDir.normalize().scaleInPlace(this.track.wireGauge * 0.5);
+                Mummu.RotateInPlace(d, this.endTipNormal, -Math.PI / 2);
+                let tipPath = [];
+                for (let i = 0; i < 8; i++) {
+                    Mummu.RotateInPlace(d, this.endTipNormal, Math.PI / 8);
+                    tipPath.push(d.add(this.endTipCenter));
+                }
+                path.push(...tipPath);
             }
             let wire = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
             wire.parent = this;
@@ -3326,6 +3387,7 @@ class MachinePart extends BABYLON.Mesh {
 var TrackNames = [
     "ramp-1.1.1",
     "join",
+    "flatjoin",
     "split",
     "uturn-s",
     "uturn-l",
@@ -3393,6 +3455,9 @@ class MachinePartFactory {
         }
         if (trackname === "join") {
             return new Join(this.machine, i, j, k, mirrorX);
+        }
+        if (trackname === "flatjoin") {
+            return new FlatJoin(this.machine, i, j, k, mirrorX);
         }
         if (trackname === "split") {
             return new Split(this.machine, i, j, k, mirrorX);
@@ -3539,6 +3604,8 @@ class Track {
     constructor(part) {
         this.part = part;
         this.trackpoints = [];
+        this.drawStartTip = false;
+        this.drawEndTip = false;
         this.summedLength = [0];
         this.totalLength = 0;
         this.globalSlope = 0;
@@ -3801,6 +3868,26 @@ class Track {
         this.AABBMax.z += this.part.wireSize * 0.5;
         BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMin, this.part.getWorldMatrix(), this.AABBMin);
         BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMax, this.part.getWorldMatrix(), this.AABBMax);
+        if (this.drawStartTip) {
+            this.wires[0].startTipCenter = this.trackpoints[0].position.clone();
+            this.wires[0].startTipNormal = this.trackpoints[0].normal.clone();
+            this.wires[0].startTipDir = this.trackpoints[0].dir.clone();
+        }
+        if (this.drawEndTip) {
+            this.wires[0].endTipCenter = this.trackpoints[this.trackpoints.length - 1].position.clone();
+            this.wires[0].endTipNormal = this.trackpoints[this.trackpoints.length - 1].normal.clone();
+            this.wires[0].endTipDir = this.trackpoints[this.trackpoints.length - 1].dir.clone();
+        }
+        /*
+        if (this.wires[1].drawStartTip) {
+            this.wires[1].startTipNormal = this.trackpoints[this.trackpoints.length - 1].normal;
+            this.wires[1].startTipDir = this.trackpoints[this.trackpoints.length - 1].dir;
+        }
+        if (this.wires[1].drawEndTip) {
+            this.wires[1].endTipNormal = this.trackpoints[this.trackpoints.length - 1].normal;
+            this.wires[1].endTipDir = this.trackpoints[this.trackpoints.length - 1].dir;
+        }
+        */
     }
     recomputeAbsolutePath() {
         this.wires.forEach(wire => {
@@ -3909,6 +3996,7 @@ class Elevator extends MachinePart {
             new TrackPoint(this.tracks[0], new BABYLON.Vector3(0 + 0.01, 0 - tileHeight, 0), n),
             new TrackPoint(this.tracks[0], new BABYLON.Vector3(-0.005, 0.035 - tileHeight, 0), (new BABYLON.Vector3(-1, 1, 0)).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize())
         ];
+        this.tracks[0].drawEndTip = true;
         this.tracks[1] = new Track(this);
         this.tracks[1].trackpoints = [
             new TrackPoint(this.tracks[1], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight, 0), dirLeft),
@@ -4079,13 +4167,62 @@ class Join extends MachinePart {
         let nJoin = (new BABYLON.Vector3(-1, 2, 0)).normalize();
         this.tracks[0].trackpoints = [
             new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(tileWidth * (this.w - 0.5), -tileHeight * this.h, 0), dir)
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth / 3, 0, 0), dir),
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(tileWidth / 3, -tileHeight, 0), dir),
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(tileWidth * 0.5, -tileHeight, 0), dir)
         ];
         this.tracks[1] = new Track(this);
         this.tracks[1].trackpoints = [
             new TrackPoint(this.tracks[1], new BABYLON.Vector3(tileWidth * 0.5, 0, 0), dir.scale(-1)),
             new TrackPoint(this.tracks[1], new BABYLON.Vector3(tileWidth * 0.25, -tileHeight * 0.25, 0), dirJoin)
         ];
+        let center = new BABYLON.Vector3(0.0135, 0.0165, 0);
+        let r = 0.02;
+        this.tracks[2] = new Track(this);
+        this.tracks[2].trackpoints = [
+            new TrackPoint(this.tracks[2], center.add(new BABYLON.Vector3(-r * Math.sqrt(3) / 2, -r * 1 / 2, 0)), new BABYLON.Vector3(0.5, -Math.sqrt(3) / 2, 0), new BABYLON.Vector3(-1, 0, 0)),
+            new TrackPoint(this.tracks[2], center.add(new BABYLON.Vector3(0, -r, 0))),
+            new TrackPoint(this.tracks[2], center.add(new BABYLON.Vector3(r * Math.sqrt(3) / 2, -r * 1 / 2, 0)), new BABYLON.Vector3(0.5, Math.sqrt(3) / 2, 0), new BABYLON.Vector3(1, 0, 0)),
+        ];
+        this.tracks[2].drawStartTip = true;
+        this.tracks[2].drawEndTip = true;
+        if (mirrorX) {
+            this.mirrorXTrackPointsInPlace();
+        }
+        this.generateWires();
+    }
+}
+class FlatJoin extends MachinePart {
+    constructor(machine, i, j, k, mirrorX) {
+        super(machine, i, j, k, {
+            mirrorX: mirrorX
+        });
+        this.xMirrorable = true;
+        this.partName = "flatjoin";
+        let dir = new BABYLON.Vector3(1, 0, 0);
+        dir.normalize();
+        let n = new BABYLON.Vector3(0, 1, 0);
+        n.normalize();
+        let dirJoin = (new BABYLON.Vector3(2, -1, 0)).normalize();
+        let nJoin = (new BABYLON.Vector3(1, 2, 0)).normalize();
+        this.tracks[0].trackpoints = [
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight, 0), dir),
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(tileWidth * 0.5, -tileHeight, 0), dir)
+        ];
+        this.tracks[1] = new Track(this);
+        this.tracks[1].trackpoints = [
+            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
+            new TrackPoint(this.tracks[1], new BABYLON.Vector3(-tileWidth * 0.25, -tileHeight * 0.25, 0), dirJoin)
+        ];
+        let center = new BABYLON.Vector3(-0.0135, 0.0165, 0);
+        let r = 0.02;
+        this.tracks[2] = new Track(this);
+        this.tracks[2].trackpoints = [
+            new TrackPoint(this.tracks[2], center.add(new BABYLON.Vector3(-r * Math.sqrt(3) / 2, -r * 1 / 2, 0)), new BABYLON.Vector3(0.5, -Math.sqrt(3) / 2, 0), new BABYLON.Vector3(-1, 0, 0)),
+            new TrackPoint(this.tracks[2], center.add(new BABYLON.Vector3(0 + 0.03, -r - 0.011, 0)), new BABYLON.Vector3(1, 0, 0), new BABYLON.Vector3(0, -1, 0)),
+        ];
+        this.tracks[2].drawStartTip = true;
+        this.tracks[2].drawEndTip = true;
         if (mirrorX) {
             this.mirrorXTrackPointsInPlace();
         }
@@ -4392,14 +4529,15 @@ class Split extends MachinePart {
         let n = new BABYLON.Vector3(0, 1, 0);
         n.normalize();
         let rCurb = this.pivotL * 0.3;
-        let pEnd = new BABYLON.Vector3(0, -tileHeight, 0);
-        pEnd.x -= this.pivotL / Math.SQRT2;
-        pEnd.y += this.pivotL / Math.SQRT2;
-        let dirEnd = (new BABYLON.Vector3(1, -1, 0)).normalize();
-        let nEnd = (new BABYLON.Vector3(1, 1, 0)).normalize();
+        let pEndLeft = new BABYLON.Vector3(0, -tileHeight, 0);
+        pEndLeft.x -= this.pivotL / Math.SQRT2;
+        pEndLeft.y += this.pivotL / Math.SQRT2;
+        let pEndRight = pEndLeft.multiplyByFloats(-1, 1, 1);
+        let dirEnd = Tools.V3Dir(135);
+        let nEnd = Tools.V3Dir(45);
         this.tracks[0].trackpoints = [
             new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
-            new TrackPoint(this.tracks[0], pEnd.subtract(dirEnd.scale(0.001)), dirEnd)
+            new TrackPoint(this.tracks[0], pEndLeft.subtract(dirEnd.scale(0.001)), dirEnd)
         ];
         this.tracks[1] = new Track(this);
         this.tracks[1].trackpoints = [
@@ -4411,8 +4549,16 @@ class Split extends MachinePart {
         this.tracks[2] = new Track(this);
         this.tracks[2].trackpoints = [
             new TrackPoint(this.tracks[2], new BABYLON.Vector3(tileWidth * 0.5, 0, 0), dir.multiplyByFloats(-1, 1, 1)),
-            new TrackPoint(this.tracks[2], pEnd.subtract(dirEnd.scale(0.001)).multiplyByFloats(-1, 1, 1), dirEnd.multiplyByFloats(-1, 1, 1))
+            new TrackPoint(this.tracks[2], pEndLeft.subtract(dirEnd.scale(0.001)).multiplyByFloats(-1, 1, 1), dirEnd.multiplyByFloats(-1, 1, 1))
         ];
+        this.tracks[3] = new Track(this);
+        this.tracks[3].trackpoints = [
+            new TrackPoint(this.tracks[3], pEndLeft.add(Tools.V3Dir(315, 0.02)).add(Tools.V3Dir(45, 0.014)), Tools.V3Dir(150), new BABYLON.Vector3(0, -1, 0)),
+            new TrackPoint(this.tracks[3], new BABYLON.Vector3(0, -0.003, 0)),
+            new TrackPoint(this.tracks[3], pEndRight.add(Tools.V3Dir(45, 0.02)).add(Tools.V3Dir(315, 0.014)), Tools.V3Dir(30), new BABYLON.Vector3(0, -1, 0))
+        ];
+        this.tracks[3].drawStartTip = true;
+        this.tracks[3].drawEndTip = true;
         if (mirrorX) {
             this.mirrorXTrackPointsInPlace();
         }
@@ -5486,7 +5632,6 @@ class Toolbar {
     }
     updateButtonsVisibility() {
         if (this.game.mode === GameMode.MainMenu) {
-            this.camButton.style.display = "none";
             this.saveButton.style.display = "none";
             this.loadButton.style.display = "none";
             this.loadInputShown = false;
@@ -5505,18 +5650,17 @@ class Toolbar {
             this.backButton.style.display = "";
         }
         else if (this.game.mode === GameMode.CreateMode) {
-            this.camButton.style.display = "";
             this.saveButton.style.display = "";
             this.loadButton.style.display = "";
             this.backButton.style.display = "";
         }
         else if (this.game.mode === GameMode.DemoMode) {
-            this.camButton.style.display = "";
             this.saveButton.style.display = "none";
             this.loadButton.style.display = "none";
             this.loadInputShown = false;
             this.backButton.style.display = "";
         }
+        this.camButton.style.display = "none";
     }
     resize() {
         this.updateButtonsVisibility();
@@ -5556,5 +5700,68 @@ class Toolbar {
         rectContainer = this.zoomInputContainer.getBoundingClientRect();
         this.zoomInputContainer.style.left = (rectButton.left).toFixed(0) + "px";
         this.zoomInputContainer.style.top = (rectButton.top - rectContainer.height - margin).toFixed(0) + "px";
+    }
+}
+class Topbar {
+    constructor(game) {
+        this.game = game;
+        this.camModeButtons = [];
+        this._udpate = () => {
+        };
+    }
+    initialize() {
+        this.container = document.querySelector("#topbar");
+        this.container.style.display = "block";
+        this.camModeButtons[CameraMode.None] = this.container.querySelector(".cam-mode-none");
+        this.camModeButtons[CameraMode.Landscape] = this.container.querySelector(".cam-mode-landscape");
+        this.camModeButtons[CameraMode.Ball] = this.container.querySelector(".cam-mode-ball");
+        this.camModeButtons[CameraMode.Selected] = this.container.querySelector(".cam-mode-selected");
+        for (let i = CameraMode.None; i <= CameraMode.Selected; i++) {
+            let mode = i;
+            this.camModeButtons[mode].onclick = () => {
+                this.game.setCameraMode(mode);
+                this.resize();
+            };
+        }
+        this.game.scene.onBeforeRenderObservable.add(this._udpate);
+    }
+    dispose() {
+        this.game.scene.onBeforeRenderObservable.removeCallback(this._udpate);
+    }
+    updateButtonsVisibility() {
+        if (this.game.mode === GameMode.CreateMode || this.game.mode === GameMode.DemoMode) {
+            this.container.style.display = "block";
+            if (this.game.mode === GameMode.CreateMode) {
+                this.camModeButtons[CameraMode.Selected].style.display = "";
+            }
+            else {
+                this.camModeButtons[CameraMode.Selected].style.display = "none";
+            }
+        }
+        else {
+            this.container.style.display = "none";
+        }
+    }
+    resize() {
+        this.updateButtonsVisibility();
+        if (this.game.screenRatio > 1) {
+            let objectsElement = document.getElementById("machine-editor-objects");
+            if (objectsElement.style.display != "none") {
+                let w = objectsElement.getBoundingClientRect().width;
+                this.container.style.left = w.toFixed(0) + "px";
+                this.container.style.width = "";
+            }
+            else {
+                this.container.style.left = "0";
+            }
+        }
+        else {
+            this.container.style.left = "0px";
+            this.container.style.width = "13.5vh";
+        }
+        this.camModeButtons.forEach(button => {
+            button.classList.remove("active");
+        });
+        this.camModeButtons[this.game.cameraMode].classList.add("active");
     }
 }

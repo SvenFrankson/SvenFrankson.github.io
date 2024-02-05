@@ -132,6 +132,10 @@ var Nabu;
     for (let i = 0; i < 20; i++) {
         Pow2Values[i] = Math.pow(2, i);
     }
+    function MinMax(n, min, max) {
+        return Math.min(Math.max(n, min), max);
+    }
+    Nabu.MinMax = MinMax;
     function Pow2(n) {
         return Pow2Values[n];
     }

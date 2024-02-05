@@ -154,37 +154,326 @@ var Mummu;
 })(Mummu || (Mummu = {}));
 var Mummu;
 (function (Mummu) {
+    class PlaneCollider {
+        constructor(point, normal) {
+            this.point = point;
+            this.normal = normal;
+            if (this.normal.lengthSquared() != 1) {
+                this.normal = this.normal.clone().normalize();
+            }
+        }
+        static CreateFromBJSPlane(plane) {
+            plane.computeWorldMatrix(true);
+            return new PlaneCollider(plane.position, plane.forward.scale(-1));
+        }
+        static CreateFromPoints(p1, p2, p3) {
+            let l1 = p2.subtract(p1);
+            let l2 = p3.subtract(p1);
+            return new PlaneCollider(p1, BABYLON.Vector3.Cross(l1, l2));
+        }
+    }
+    Mummu.PlaneCollider = PlaneCollider;
+    class SphereCollider {
+        constructor(center, radius) {
+            this.center = center;
+            this.radius = radius;
+        }
+    }
+    Mummu.SphereCollider = SphereCollider;
+})(Mummu || (Mummu = {}));
+/// <reference path="../lib/babylon.d.ts"/>
+var Mummu;
+(function (Mummu) {
+    function DrawDebugLine(from, to, frames = Infinity, color, scene) {
+        if (!scene) {
+            scene = BABYLON.Engine.Instances[0]?.scenes[0];
+        }
+        if (scene) {
+            let colors;
+            if (color) {
+                colors = [
+                    color.toColor4(),
+                    color.toColor4()
+                ];
+            }
+            let line = BABYLON.MeshBuilder.CreateLines("debug-line", {
+                points: [from, to],
+                colors: colors
+            });
+            if (isFinite(frames)) {
+                let frameCount = frames;
+                let disposeTimer = () => {
+                    frameCount--;
+                    if (frameCount <= 0) {
+                        line.dispose();
+                    }
+                    else {
+                        requestAnimationFrame(disposeTimer);
+                    }
+                };
+                requestAnimationFrame(disposeTimer);
+            }
+            return line;
+        }
+    }
+    Mummu.DrawDebugLine = DrawDebugLine;
+    function DrawDebugHit(point, normal, frames = Infinity, color, scene) {
+        if (!scene) {
+            scene = BABYLON.Engine.Instances[0]?.scenes[0];
+        }
+        if (scene) {
+            let colors;
+            if (color) {
+                colors = [
+                    [
+                        color.toColor4(),
+                        color.toColor4(),
+                        color.toColor4()
+                    ],
+                    [
+                        color.toColor4(),
+                        color.toColor4()
+                    ],
+                    [
+                        color.toColor4(),
+                        color.toColor4()
+                    ],
+                    [
+                        color.toColor4(),
+                        color.toColor4()
+                    ]
+                ];
+            }
+            let f1 = BABYLON.Vector3.Cross(normal, new BABYLON.Vector3(Math.random(), Math.random(), Math.random())).normalize().scaleInPlace(0.01);
+            let f2 = Mummu.Rotate(f1, normal, 2 * Math.PI / 3);
+            let f3 = Mummu.Rotate(f2, normal, 2 * Math.PI / 3);
+            f1.addInPlace(point);
+            f2.addInPlace(point);
+            f3.addInPlace(point);
+            let p = point.add(normal.scale(0.1));
+            let line = BABYLON.MeshBuilder.CreateLineSystem("debug-points", {
+                lines: [
+                    [f1, f2, f3],
+                    [f1, p],
+                    [f2, p],
+                    [f3, p]
+                ],
+                colors: colors
+            }, scene);
+            if (isFinite(frames)) {
+                let frameCount = frames;
+                let disposeTimer = () => {
+                    frameCount--;
+                    if (frameCount <= 0) {
+                        line.dispose();
+                    }
+                    else {
+                        requestAnimationFrame(disposeTimer);
+                    }
+                };
+                requestAnimationFrame(disposeTimer);
+            }
+            return line;
+        }
+    }
+    Mummu.DrawDebugHit = DrawDebugHit;
+    function DrawDebugPoint(points, frames = Infinity, color, scene) {
+        if (!scene) {
+            scene = BABYLON.Engine.Instances[0]?.scenes[0];
+        }
+        if (scene) {
+            let colors;
+            if (color) {
+                colors = [
+                    [
+                        color.toColor4(),
+                        color.toColor4()
+                    ],
+                    [
+                        color.toColor4(),
+                        color.toColor4()
+                    ],
+                    [
+                        color.toColor4(),
+                        color.toColor4()
+                    ]
+                ];
+            }
+            let line = BABYLON.MeshBuilder.CreateLineSystem("debug-points", {
+                lines: [
+                    [
+                        points.add(new BABYLON.Vector3(-0.1, 0, 0)),
+                        points.add(new BABYLON.Vector3(0.1, 0, 0))
+                    ],
+                    [
+                        points.add(new BABYLON.Vector3(0, -0.1, 0)),
+                        points.add(new BABYLON.Vector3(0, 0.1, 0))
+                    ],
+                    [
+                        points.add(new BABYLON.Vector3(0, 0, -0.1)),
+                        points.add(new BABYLON.Vector3(0, 0, 0.1))
+                    ]
+                ],
+                colors: colors
+            }, scene);
+            if (isFinite(frames)) {
+                let frameCount = frames;
+                let disposeTimer = () => {
+                    frameCount--;
+                    if (frameCount <= 0) {
+                        line.dispose();
+                    }
+                    else {
+                        requestAnimationFrame(disposeTimer);
+                    }
+                };
+                requestAnimationFrame(disposeTimer);
+            }
+            return line;
+        }
+    }
+    Mummu.DrawDebugPoint = DrawDebugPoint;
+    function DrawDebugTriangle(p1, p2, p3, frames = Infinity, color, scene) {
+        if (!scene) {
+            scene = BABYLON.Engine.Instances[0]?.scenes[0];
+        }
+        if (scene) {
+            let colors;
+            if (color) {
+                colors = [
+                    color.toColor4(),
+                    color.toColor4(),
+                    color.toColor4(),
+                    color.toColor4()
+                ];
+            }
+            let line = BABYLON.MeshBuilder.CreateLines("debug-triangle", {
+                points: [p1, p2, p3, p1],
+                colors: colors
+            });
+            if (isFinite(frames)) {
+                let frameCount = frames;
+                let disposeTimer = () => {
+                    frameCount--;
+                    if (frameCount <= 0) {
+                        line.dispose();
+                    }
+                    else {
+                        requestAnimationFrame(disposeTimer);
+                    }
+                };
+                requestAnimationFrame(disposeTimer);
+            }
+            return line;
+        }
+    }
+    Mummu.DrawDebugTriangle = DrawDebugTriangle;
+})(Mummu || (Mummu = {}));
+var Mummu;
+(function (Mummu) {
     class Intersection {
         constructor() {
             this.hit = false;
             this.depth = 0;
         }
     }
-    function AABBAABBIntersect(x1Min, x1Max, y1Min, y1Max, z1Min, z1Max, x2Min, x2Max, y2Min, y2Max, z2Min, z2Max) {
+    function SphereTriangleCheck(cSphere, rSphere, p1, p2, p3) {
+        return SphereAABBCheck(cSphere, rSphere, Math.min(p1.x, p2.x, p3.x), Math.max(p1.x, p2.x, p3.x), Math.min(p1.y, p2.y, p3.y), Math.max(p1.y, p2.y, p3.y), Math.min(p1.z, p2.z, p3.z), Math.max(p1.z, p2.z, p3.z));
+    }
+    Mummu.SphereTriangleCheck = SphereTriangleCheck;
+    function SphereAABBCheck(cSphere, rSphere, arg1, arg2, y2Min, y2Max, z2Min, z2Max) {
+        let x2Min;
+        let x2Max;
+        if (arg1 instanceof BABYLON.Vector3) {
+            x2Min = arg1.x;
+            x2Max = arg2.x;
+            y2Min = arg1.y;
+            y2Max = arg2.y;
+            z2Min = arg1.z;
+            z2Max = arg2.z;
+        }
+        else {
+            x2Min = arg1;
+            x2Max = arg2;
+        }
+        return AABBAABBCheck(cSphere.x - rSphere, cSphere.x + rSphere, cSphere.y - rSphere, cSphere.y + rSphere, cSphere.z - rSphere, cSphere.z + rSphere, x2Min, x2Max, y2Min, y2Max, z2Min, z2Max);
+    }
+    Mummu.SphereAABBCheck = SphereAABBCheck;
+    function AABBAABBCheck(arg1, arg2, arg3, arg4, z1Min, z1Max, x2Min, x2Max, y2Min, y2Max, z2Min, z2Max) {
+        let x1Min;
+        let x1Max;
+        let y1Min;
+        let y1Max;
+        if (arg1 instanceof BABYLON.Vector3) {
+            x1Min = arg1.x;
+            x1Max = arg2.x;
+            y1Min = arg1.y;
+            y1Max = arg2.y;
+            z1Min = arg1.z;
+            z1Max = arg2.z;
+            x2Min = arg3.x;
+            x2Max = arg4.x;
+            y2Min = arg3.y;
+            y2Max = arg4.y;
+            z2Min = arg3.z;
+            z2Max = arg4.z;
+        }
+        else {
+            x1Min = arg1;
+            x1Max = arg2;
+            y1Min = arg3;
+            y1Max = arg4;
+        }
         if (x1Min > x2Max) {
             return false;
         }
-        if (x1Max < x1Min) {
+        if (x1Max < x2Min) {
             return false;
         }
         if (y1Min > y2Max) {
             return false;
         }
-        if (y1Max < y1Min) {
+        if (y1Max < y2Min) {
             return false;
         }
         if (z1Min > z2Max) {
             return false;
         }
-        if (z1Max < z1Min) {
+        if (z1Max < z2Min) {
             return false;
         }
         return true;
     }
-    Mummu.AABBAABBIntersect = AABBAABBIntersect;
+    Mummu.AABBAABBCheck = AABBAABBCheck;
+    function SpherePlaneIntersection(arg1, arg2, pPlane, nPlane) {
+        let cSphere;
+        let rSphere;
+        if (arg1 instanceof BABYLON.Vector3) {
+            cSphere = arg1;
+            rSphere = arg2;
+        }
+        else {
+            cSphere = arg1.center;
+            rSphere = arg1.radius;
+            pPlane = arg2.point;
+            nPlane = arg2.normal;
+        }
+        let intersection = new Intersection();
+        let proj = Mummu.ProjectPointOnPlane(cSphere, pPlane, nPlane);
+        let sqrDist = BABYLON.Vector3.DistanceSquared(cSphere, proj);
+        if (sqrDist <= rSphere * rSphere) {
+            let dist = Math.sqrt(sqrDist);
+            intersection.hit = true;
+            intersection.depth = rSphere - dist;
+            intersection.point = proj;
+            intersection.normal = nPlane.clone();
+        }
+        return intersection;
+    }
+    Mummu.SpherePlaneIntersection = SpherePlaneIntersection;
     function SphereCapsuleIntersection(cSphere, rSphere, c1Capsule, c2Capsule, rCapsule) {
         let intersection = new Intersection();
-        if (AABBAABBIntersect(cSphere.x - rSphere, cSphere.x + rSphere, cSphere.y - rSphere, cSphere.y + rSphere, cSphere.z - rSphere, cSphere.z + rSphere, Math.min(c1Capsule.x, c2Capsule.x) - rCapsule, Math.max(c1Capsule.x, c2Capsule.x) + rCapsule, Math.min(c1Capsule.y, c2Capsule.y) - rCapsule, Math.max(c1Capsule.y, c2Capsule.y) + rCapsule, Math.min(c1Capsule.z, c2Capsule.z) - rCapsule, Math.max(c1Capsule.z, c2Capsule.z) + rCapsule)) {
+        if (SphereAABBCheck(cSphere, rSphere, Math.min(c1Capsule.x, c2Capsule.x) - rCapsule, Math.max(c1Capsule.x, c2Capsule.x) + rCapsule, Math.min(c1Capsule.y, c2Capsule.y) - rCapsule, Math.max(c1Capsule.y, c2Capsule.y) + rCapsule, Math.min(c1Capsule.z, c2Capsule.z) - rCapsule, Math.max(c1Capsule.z, c2Capsule.z) + rCapsule)) {
             let dist = Mummu.DistancePointSegment(cSphere, c1Capsule, c2Capsule);
             let depth = (rSphere + rCapsule) - dist;
             if (depth > 0) {
@@ -218,6 +507,198 @@ var Mummu;
         return intersection;
     }
     Mummu.SphereWireIntersection = SphereWireIntersection;
+    function SphereTriangleIntersection(arg1, arg2, arg3, arg4, arg5) {
+        let intersection = new Intersection();
+        let cSphere;
+        let rSphere;
+        let p1;
+        let p2;
+        let p3;
+        if (arg1 instanceof BABYLON.Vector3) {
+            cSphere = arg1;
+            rSphere = arg2;
+            p1 = arg3;
+            p2 = arg4;
+            p3 = arg5;
+        }
+        else {
+            cSphere = arg1.center;
+            rSphere = arg1.radius;
+            p1 = arg2;
+            p2 = arg3;
+            p3 = arg4;
+        }
+        if (SphereTriangleCheck(cSphere, rSphere, p1, p2, p3)) {
+            let plane = Mummu.PlaneCollider.CreateFromPoints(p1, p2, p3);
+            let proj = Mummu.ProjectPointOnPlane(cSphere, plane.point, plane.normal);
+            let sqrDist = BABYLON.Vector3.DistanceSquared(cSphere, proj);
+            if (sqrDist <= rSphere * rSphere) {
+                let barycentric = Mummu.Barycentric(cSphere, p1, p2, p3);
+                if (barycentric.u < 0 || barycentric.u > 1 || barycentric.v < 0 || barycentric.v > 1 || barycentric.w < 0 || barycentric.w > 1) {
+                    let proj1 = Mummu.ProjectPointOnSegment(proj, p1, p2);
+                    let sqrDist1 = BABYLON.Vector3.DistanceSquared(proj, proj1);
+                    let proj2 = Mummu.ProjectPointOnSegment(proj, p2, p3);
+                    let sqrDist2 = BABYLON.Vector3.DistanceSquared(proj, proj2);
+                    let proj3 = Mummu.ProjectPointOnSegment(proj, p3, p1);
+                    let sqrDist3 = BABYLON.Vector3.DistanceSquared(proj, proj3);
+                    if (sqrDist1 <= sqrDist2 && sqrDist1 <= sqrDist3) {
+                        proj = proj1;
+                    }
+                    else if (sqrDist2 <= sqrDist1 && sqrDist2 <= sqrDist3) {
+                        proj = proj2;
+                    }
+                    else if (sqrDist3 <= sqrDist1 && sqrDist3 <= sqrDist2) {
+                        proj = proj3;
+                    }
+                }
+                sqrDist = BABYLON.Vector3.DistanceSquared(cSphere, proj);
+                if (sqrDist <= rSphere * rSphere) {
+                    let dist = Math.sqrt(sqrDist);
+                    intersection.hit = true;
+                    intersection.point = proj;
+                    intersection.normal = cSphere.subtract(proj).normalize();
+                    intersection.depth = rSphere - dist;
+                }
+            }
+        }
+        return intersection;
+    }
+    Mummu.SphereTriangleIntersection = SphereTriangleIntersection;
+    function SphereMeshIntersection(cSphere, rSphere, mesh) {
+        let intersection = new Intersection();
+        let bbox = mesh.getBoundingInfo();
+        let scale = BABYLON.Vector3.One();
+        mesh.getWorldMatrix().decompose(scale, BABYLON.Quaternion.Identity(), BABYLON.Vector3.Zero());
+        let localCSphere = BABYLON.Vector3.TransformCoordinates(cSphere, mesh.getWorldMatrix().clone().invert());
+        let localRadius = rSphere / scale.x;
+        if (SphereAABBCheck(localCSphere, localRadius, bbox.minimum, bbox.maximum)) {
+            let positions = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+            let indices = mesh.getIndices();
+            let p1 = BABYLON.Vector3.Zero();
+            let p2 = BABYLON.Vector3.Zero();
+            let p3 = BABYLON.Vector3.Zero();
+            for (let i = 0; i < indices.length / 3; i++) {
+                let i1 = indices[3 * i];
+                let i2 = indices[3 * i + 1];
+                let i3 = indices[3 * i + 2];
+                p1.x = positions[3 * i1];
+                p1.y = positions[3 * i1 + 1];
+                p1.z = positions[3 * i1 + 2];
+                p2.x = positions[3 * i2];
+                p2.y = positions[3 * i2 + 1];
+                p2.z = positions[3 * i2 + 2];
+                p3.x = positions[3 * i3];
+                p3.y = positions[3 * i3 + 1];
+                p3.z = positions[3 * i3 + 2];
+                let triIntersection = SphereTriangleIntersection(localCSphere, localRadius, p1, p2, p3);
+                if (triIntersection.hit) {
+                    if (!intersection || triIntersection.depth > intersection.depth) {
+                        intersection = triIntersection;
+                    }
+                }
+            }
+            if (intersection.hit) {
+                BABYLON.Vector3.TransformCoordinatesToRef(intersection.point, mesh.getWorldMatrix(), intersection.point);
+                BABYLON.Vector3.TransformNormalToRef(intersection.normal, mesh.getWorldMatrix(), intersection.normal);
+            }
+        }
+        return intersection;
+    }
+    Mummu.SphereMeshIntersection = SphereMeshIntersection;
+})(Mummu || (Mummu = {}));
+/// <reference path="../lib/babylon.d.ts"/>
+var Mummu;
+(function (Mummu) {
+    var TmpVec3 = [
+        BABYLON.Vector3.Zero(),
+        BABYLON.Vector3.Zero(),
+        BABYLON.Vector3.Zero(),
+        BABYLON.Vector3.Zero(),
+        BABYLON.Vector3.Zero()
+    ];
+    var TmpQuat = [
+        BABYLON.Quaternion.Identity()
+    ];
+    function QuaternionFromXYAxis(x, y) {
+        let q = BABYLON.Quaternion.Identity();
+        QuaternionFromXYAxisToRef(x, y, q);
+        return q;
+    }
+    Mummu.QuaternionFromXYAxis = QuaternionFromXYAxis;
+    function QuaternionFromXYAxisToRef(x, y, ref) {
+        let xAxis = TmpVec3[0].copyFrom(x);
+        let yAxis = TmpVec3[1].copyFrom(y);
+        let zAxis = TmpVec3[2];
+        BABYLON.Vector3.CrossToRef(xAxis, yAxis, zAxis);
+        BABYLON.Vector3.CrossToRef(zAxis, xAxis, yAxis);
+        BABYLON.Quaternion.RotationQuaternionFromAxisToRef(xAxis, yAxis, zAxis, ref);
+        return ref;
+    }
+    Mummu.QuaternionFromXYAxisToRef = QuaternionFromXYAxisToRef;
+    function QuaternionFromXZAxis(x, z) {
+        let q = BABYLON.Quaternion.Identity();
+        QuaternionFromXZAxisToRef(x, z, q);
+        return q;
+    }
+    Mummu.QuaternionFromXZAxis = QuaternionFromXZAxis;
+    function QuaternionFromXZAxisToRef(x, z, ref) {
+        let xAxis = TmpVec3[0].copyFrom(x);
+        let yAxis = TmpVec3[1];
+        let zAxis = TmpVec3[2].copyFrom(z);
+        BABYLON.Vector3.CrossToRef(zAxis, xAxis, yAxis);
+        BABYLON.Vector3.CrossToRef(xAxis, yAxis, zAxis);
+        BABYLON.Quaternion.RotationQuaternionFromAxisToRef(xAxis, yAxis, zAxis, ref);
+        return ref;
+    }
+    Mummu.QuaternionFromXZAxisToRef = QuaternionFromXZAxisToRef;
+    function QuaternionFromYZAxis(y, z) {
+        let q = BABYLON.Quaternion.Identity();
+        QuaternionFromYZAxisToRef(y, z, q);
+        return q;
+    }
+    Mummu.QuaternionFromYZAxis = QuaternionFromYZAxis;
+    function QuaternionFromYZAxisToRef(y, z, ref) {
+        let xAxis = TmpVec3[0];
+        let yAxis = TmpVec3[1].copyFrom(y);
+        let zAxis = TmpVec3[2].copyFrom(z);
+        BABYLON.Vector3.CrossToRef(yAxis, zAxis, xAxis);
+        BABYLON.Vector3.CrossToRef(xAxis, yAxis, zAxis);
+        BABYLON.Quaternion.RotationQuaternionFromAxisToRef(xAxis, yAxis, zAxis, ref);
+        return ref;
+    }
+    Mummu.QuaternionFromYZAxisToRef = QuaternionFromYZAxisToRef;
+    function QuaternionFromZXAxis(z, x) {
+        let q = BABYLON.Quaternion.Identity();
+        QuaternionFromZXAxisToRef(z, x, q);
+        return q;
+    }
+    Mummu.QuaternionFromZXAxis = QuaternionFromZXAxis;
+    function QuaternionFromZXAxisToRef(z, x, ref) {
+        let xAxis = TmpVec3[0].copyFrom(x);
+        let yAxis = TmpVec3[1];
+        let zAxis = TmpVec3[2].copyFrom(z);
+        BABYLON.Vector3.CrossToRef(zAxis, xAxis, yAxis);
+        BABYLON.Vector3.CrossToRef(yAxis, zAxis, xAxis);
+        BABYLON.Quaternion.RotationQuaternionFromAxisToRef(xAxis, yAxis, zAxis, ref);
+        return ref;
+    }
+    Mummu.QuaternionFromZXAxisToRef = QuaternionFromZXAxisToRef;
+    function QuaternionFromZYAxis(z, y) {
+        let q = BABYLON.Quaternion.Identity();
+        QuaternionFromZYAxisToRef(z, y, q);
+        return q;
+    }
+    Mummu.QuaternionFromZYAxis = QuaternionFromZYAxis;
+    function QuaternionFromZYAxisToRef(z, y, ref) {
+        let xAxis = TmpVec3[0];
+        let yAxis = TmpVec3[1].copyFrom(y);
+        let zAxis = TmpVec3[2].copyFrom(z);
+        BABYLON.Vector3.CrossToRef(yAxis, zAxis, xAxis);
+        BABYLON.Vector3.CrossToRef(zAxis, xAxis, yAxis);
+        BABYLON.Quaternion.RotationQuaternionFromAxisToRef(xAxis, yAxis, zAxis, ref);
+        return ref;
+    }
+    Mummu.QuaternionFromZYAxisToRef = QuaternionFromZYAxisToRef;
 })(Mummu || (Mummu = {}));
 var Mummu;
 (function (Mummu) {
@@ -303,14 +784,18 @@ var Mummu;
                                 let Y = Math.floor(i / prop.size);
                                 let a = data.data[4 * i + 3];
                                 if (a > 127) {
-                                    for (let x = X - w; x <= X + w; x++) {
-                                        for (let y = Y - w; y <= Y + w; y++) {
-                                            if (x >= 0 && x < prop.size && y >= 0 && y < prop.size) {
-                                                let index = x + y * prop.size;
-                                                outlineData[4 * index] = 0;
-                                                outlineData[4 * index + 1] = 0;
-                                                outlineData[4 * index + 2] = 0;
-                                                outlineData[4 * index + 3] = 255;
+                                    for (let xx = -w; xx <= w; xx++) {
+                                        for (let yy = -w; yy <= w; yy++) {
+                                            if (xx * xx + yy * yy <= w * w) {
+                                                let x = X + xx;
+                                                let y = Y + yy;
+                                                if (x >= 0 && x < prop.size && y >= 0 && y < prop.size) {
+                                                    let index = x + y * prop.size;
+                                                    outlineData[4 * index] = 0;
+                                                    outlineData[4 * index + 1] = 0;
+                                                    outlineData[4 * index + 2] = 0;
+                                                    outlineData[4 * index + 3] = 255;
+                                                }
                                             }
                                         }
                                     }
@@ -353,9 +838,29 @@ var Mummu;
         BABYLON.Quaternion.Identity()
     ];
     function IsFinite(v) {
-        return isFinite(v.x) && isFinite(v.y) && isFinite(v.z);
+        return v && isFinite(v.x) && isFinite(v.y) && isFinite(v.z);
     }
     Mummu.IsFinite = IsFinite;
+    function Barycentric(point, p1, p2, p3) {
+        let v0 = p2.subtract(p1);
+        let v1 = p3.subtract(p1);
+        let v2 = point.subtract(p1);
+        let d00 = BABYLON.Vector3.Dot(v0, v0);
+        let d01 = BABYLON.Vector3.Dot(v0, v1);
+        let d11 = BABYLON.Vector3.Dot(v1, v1);
+        let d20 = BABYLON.Vector3.Dot(v2, v0);
+        let d21 = BABYLON.Vector3.Dot(v2, v1);
+        let d = d00 * d11 - d01 * d01;
+        let v = (d11 * d20 - d01 * d21) / d;
+        let w = (d00 * d21 - d01 * d20) / d;
+        let u = 1 - v - w;
+        return {
+            u: u,
+            v: v,
+            w: w
+        };
+    }
+    Mummu.Barycentric = Barycentric;
     function ProjectPerpendicularAtToRef(v, at, out) {
         let k = (v.x * at.x + v.y * at.y + v.z * at.z);
         k = k / (at.x * at.x + at.y * at.y + at.z * at.z);
@@ -408,6 +913,20 @@ var Mummu;
         return angle;
     }
     Mummu.AngleFromToAround = AngleFromToAround;
+    function ProjectPointOnPlaneToRef(point, pPlane, nPlane, ref) {
+        ref.copyFrom(point).subtractInPlace(pPlane);
+        let dot = BABYLON.Vector3.Dot(ref, nPlane);
+        ref.copyFrom(nPlane).scaleInPlace(-dot);
+        ref.addInPlace(point);
+        return ref;
+    }
+    Mummu.ProjectPointOnPlaneToRef = ProjectPointOnPlaneToRef;
+    function ProjectPointOnPlane(point, pPlane, nPlane) {
+        let proj = BABYLON.Vector3.Zero();
+        ProjectPointOnPlaneToRef(point, pPlane, nPlane, proj);
+        return proj;
+    }
+    Mummu.ProjectPointOnPlane = ProjectPointOnPlane;
     function DistancePointLine(point, lineA, lineB) {
         let PA = TmpVec3[0];
         let dir = TmpVec3[1];
@@ -431,6 +950,12 @@ var Mummu;
         return ref;
     }
     Mummu.ProjectPointOnSegmentToRef = ProjectPointOnSegmentToRef;
+    function ProjectPointOnSegment(point, segA, segB) {
+        let proj = BABYLON.Vector3.Zero();
+        ProjectPointOnSegmentToRef(point, segA, segB, proj);
+        return proj;
+    }
+    Mummu.ProjectPointOnSegment = ProjectPointOnSegment;
     function DistancePointSegment(point, segA, segB) {
         let AP = TmpVec3[0];
         let dir = TmpVec3[1];
@@ -508,56 +1033,6 @@ var Mummu;
         return point;
     }
     Mummu.ForceDistanceFromOriginInPlace = ForceDistanceFromOriginInPlace;
-    function QuaternionFromXYAxisToRef(x, y, ref) {
-        let xAxis = TmpVec3[0].copyFrom(x);
-        let yAxis = TmpVec3[1].copyFrom(y);
-        let zAxis = TmpVec3[2];
-        BABYLON.Vector3.CrossToRef(xAxis, yAxis, zAxis);
-        BABYLON.Vector3.CrossToRef(zAxis, xAxis, yAxis);
-        BABYLON.Quaternion.RotationQuaternionFromAxisToRef(xAxis, yAxis, zAxis, ref);
-        return ref;
-    }
-    Mummu.QuaternionFromXYAxisToRef = QuaternionFromXYAxisToRef;
-    function QuaternionFromXZAxisToRef(x, z, ref) {
-        let xAxis = TmpVec3[0].copyFrom(x);
-        let yAxis = TmpVec3[1];
-        let zAxis = TmpVec3[2].copyFrom(z);
-        BABYLON.Vector3.CrossToRef(zAxis, xAxis, yAxis);
-        BABYLON.Vector3.CrossToRef(xAxis, yAxis, zAxis);
-        BABYLON.Quaternion.RotationQuaternionFromAxisToRef(xAxis, yAxis, zAxis, ref);
-        return ref;
-    }
-    Mummu.QuaternionFromXZAxisToRef = QuaternionFromXZAxisToRef;
-    function QuaternionFromYZAxisToRef(y, z, ref) {
-        let xAxis = TmpVec3[0];
-        let yAxis = TmpVec3[1].copyFrom(y);
-        let zAxis = TmpVec3[2].copyFrom(z);
-        BABYLON.Vector3.CrossToRef(yAxis, zAxis, xAxis);
-        BABYLON.Vector3.CrossToRef(xAxis, yAxis, zAxis);
-        BABYLON.Quaternion.RotationQuaternionFromAxisToRef(xAxis, yAxis, zAxis, ref);
-        return ref;
-    }
-    Mummu.QuaternionFromYZAxisToRef = QuaternionFromYZAxisToRef;
-    function QuaternionFromZXAxisToRef(z, x, ref) {
-        let xAxis = TmpVec3[0].copyFrom(x);
-        let yAxis = TmpVec3[1];
-        let zAxis = TmpVec3[2].copyFrom(z);
-        BABYLON.Vector3.CrossToRef(zAxis, xAxis, yAxis);
-        BABYLON.Vector3.CrossToRef(yAxis, zAxis, xAxis);
-        BABYLON.Quaternion.RotationQuaternionFromAxisToRef(xAxis, yAxis, zAxis, ref);
-        return ref;
-    }
-    Mummu.QuaternionFromZXAxisToRef = QuaternionFromZXAxisToRef;
-    function QuaternionFromZYAxisToRef(z, y, ref) {
-        let xAxis = TmpVec3[0];
-        let yAxis = TmpVec3[1].copyFrom(y);
-        let zAxis = TmpVec3[2].copyFrom(z);
-        BABYLON.Vector3.CrossToRef(yAxis, zAxis, xAxis);
-        BABYLON.Vector3.CrossToRef(zAxis, xAxis, yAxis);
-        BABYLON.Quaternion.RotationQuaternionFromAxisToRef(xAxis, yAxis, zAxis, ref);
-        return ref;
-    }
-    Mummu.QuaternionFromZYAxisToRef = QuaternionFromZYAxisToRef;
     function CatmullRomPathInPlace(path, inDir, outDir) {
         if (path.length >= 2) {
             let pFirst = TmpVec3[0];
@@ -698,7 +1173,6 @@ var Mummu;
                                 let subMaterial = loadedMesh.material.subMaterials[j];
                                 if (subMaterial instanceof BABYLON.PBRMaterial) {
                                     let color = subMaterial.albedoColor;
-                                    console.log(color);
                                     let subMesh = loadedMesh.subMeshes.find(sm => { return sm.materialIndex === j; });
                                     for (let k = 0; k < subMesh.verticesCount; k++) {
                                         let index = subMesh.verticesStart + k;
