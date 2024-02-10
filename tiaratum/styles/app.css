@@ -1,0 +1,275 @@
+html {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+    touch-action: none;
+}
+
+a:link { 
+    text-decoration: none; 
+}
+
+a:visited { 
+    text-decoration: none; 
+}
+
+a:hover { 
+    text-decoration: none; 
+}
+
+a:active { 
+    text-decoration: none; 
+}
+
+body {
+    background-color: black;
+}
+
+#render-canvas.square {
+    width: min(90vw, 90svh);
+    height: min(90vw, 90svh);
+    position: fixed;
+    left: calc((100vw - min(90vw, 90svh)) * 0.5);
+    top: calc((100svh - min(90vw, 90svh)) * 0.5);
+    outline: none;
+    border: 1px solid white;
+}
+
+#render-canvas.full-screen {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    outline: none;
+    border: none;
+    z-index: 0;
+}
+
+.page {
+    position: fixed;
+    top: calc((100svh - 90svh) * 0.5);
+    left: calc((100vw - min(90svh, 100vw)) * 0.5);
+    width: min(90svh, 100vw);
+    height: 90svh;
+    z-index: 2;
+    text-align: left;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    pointer-events: none;
+}
+
+.text-page {
+    background-color: rgba(39, 43, 46, 90%);
+    color: white;
+    padding: 5svh;
+    top: 0;
+    width: calc(min(90svh, 100vw) - 10svh);
+    height: 90svh;
+}
+
+.text-page h1 {
+    color: rgb(39, 43, 46);
+    background-color: white;
+    padding-right: 4vh;
+    text-align: right;
+}
+
+.text-page h2 {
+    color: rgb(39, 43, 46);
+    background-color: white;
+    padding-left: 2vh;
+}
+
+.panel {
+    background-color: rgba(39, 43, 46, 80%);
+    outline: 0.1vh solid white;
+    border-radius: 1vh;
+    color: white;
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+}
+
+.panel.selectable:hover {
+    background-color: rgba(88, 98, 104, 80%);
+}
+
+.panel .title {
+    font-family: Roboto;
+    font-weight: 400;
+    display: inline-block;
+    color: white;
+    background-color: rgba(27, 30, 32, 0.8);
+    width: calc(100% - 2vh);
+    margin-top: 1vh;
+    padding-left: 2vh;
+    padding-bottom: 0.5vh;
+    padding-top: 0.5vh;
+    font-size: 2.3vh;
+}
+
+.panel .text {
+    font-family: Roboto;
+    font-weight: lighter;
+    margin-right: 1.5vh;
+    margin-left: 1.5vh;
+    text-align: justify;
+}
+
+.panel .social-item {
+    display: block;
+    padding: 0.7vh;
+    padding-right: 2vh;
+    margin-top: 0.5svh;
+    margin-bottom: 0.5svh;
+    padding-left: 2svh;
+    font-family: Roboto;
+    background-color: rgba(41, 44, 46, 0.8);
+    color: white;
+    font-weight: normal;
+}
+
+.panel .social-item:hover {
+    background-color: rgba(88, 98, 104, 0.8);
+}
+
+.panel .social-icon {
+    display: inline-block;
+    height: 2vh;
+    margin-right: 2vh;
+    vertical-align: middle;
+}
+
+#language-selection {
+    background-color: rgba(39, 43, 46, 80%);
+    z-index: 2;
+    position: fixed;
+    right: 0;
+    top: 0;
+    color: white;
+    font-family: Roboto;
+    font-weight: lighter;
+    padding: 0.3vh;
+    padding-left: 1vh;
+    border-bottom-left-radius: 4px;
+    font-size: 1.5vh;
+}
+
+#language-selection button {
+    height: 3vh;
+    width: 4vh;
+    text-align: center;
+    padding: 0;
+    font-size: 1.5vh;
+    font-family: Roboto;
+    font-weight: bold;
+    margin-left: 0.25vh;
+    background-color: #808080;
+    border: 2px solid black;
+    border-radius: 4px;
+}
+
+#language-selection button.active {
+    background-color: white;
+}
+
+#home-button {
+    background-color: rgba(39, 43, 46, 80%);
+    z-index: 2;
+    position: fixed;
+    width: 10svh;
+    height: 4svh;
+    right: calc(50vw + 1svh);
+    bottom: 0;
+    color: white;
+    font-family: Roboto;
+    font-size: 2vh;
+    border: 0.1vh solid white;
+    border-bottom: none;
+    border-top-left-radius: 1svh;
+    border-top-right-radius: 1svh;
+}
+
+#credits-button {
+    background-color: rgba(39, 43, 46, 80%);
+    z-index: 2;
+    position: fixed;
+    width: 10svh;
+    height: 4svh;
+    left: calc(50vw + 1svh);
+    bottom: 0;
+    color: white;
+    font-family: Roboto;
+    font-size: 2vh;
+    border: 0.1vh solid white;
+    border-bottom: none;
+    border-top-left-radius: 1svh;
+    border-top-right-radius: 1svh;
+}
+
+#credits {
+    background-color: rgba(39, 43, 46, 80%);
+    z-index: 2;
+    position: fixed;
+    width: calc(0.40 * (min(90svh, 100vw)));
+    left: calc(50vw + 1svh);
+    bottom: 6svh;
+    color: white;
+    font-family: Roboto;
+    font-size: 2vh;
+    border: 0.1vh solid white;
+    border-radius: 1svh;
+}
+
+#close-credits-button {
+    position: absolute;
+    top: 0.5svh;
+    right: 0.5svh;
+    font-weight: 700;
+    border: none;
+    background: none;
+    border: none;
+    color: white
+}
+
+#credits .title {
+    margin-left: 2svh;
+    margin-top: 0.7svh;
+}
+
+#credits .label {
+    margin-top: 0.7svh;
+    margin-bottom: 0.7svh;
+    color: white;
+    font-size: calc(0.022 * (min(90svh, 100vw)));
+    text-align: center;
+    margin-left: 1svh;
+    margin-right: 1svh;
+}
+
+#credits .line {
+    margin-top: 0.7svh;
+    margin-bottom: 1svh;
+    color: white;
+    font-weight: 100;
+    text-align: right;
+    margin-left: 1svh;
+    margin-right: 1svh;
+    font-size: calc(0.02 * (min(90svh, 100vw)));
+    text-align: center;
+}
+
+.icon {
+    height: 3vh;
+    vertical-align: text-top;
+}
+
+.source-link {
+    height: 2.5vh;
+    margin-left: 1vh;
+    padding-top: 0.5vh;
+    display: inline-block;
+    vertical-align: text-top;
+    color: #3366cc;
+}

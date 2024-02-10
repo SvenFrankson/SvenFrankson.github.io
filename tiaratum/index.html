@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+        <title>Tiaratum Games</title>
+        <script src="./lib/babylon.max.js"></script>
+        <script src="./lib/babylonjs.loaders.js"></script>
+        <script src="./lib/nabu.js"></script>
+        <script src="./lib/mummu.js"></script>
+        <script src="./lib/sumuqan.js"></script>
+        <script src="./build/tiaratum.js"></script>
+        <link rel="stylesheet" type="text/css" href="./styles/fonts.css" />
+        <link rel="stylesheet" type="text/css" href="./styles/app.css" />
+    </head>
+    <body>
+        <div id="home" class="page home"></div>
+        <div id="source" class="page text-page">
+            <h1>SOURCES</h1>
+			<p lang="en">Work in progress. None of the projects features here is stable, their scopes and interfaces are subject to changes.</p>
+			<p lang="fr">Ces projets sont en cours de développement. Leurs fonctionnalités et les interfaces qu'ils exposent sont succeptibles de changer.</p>
+			<h2>Sumuqan</h2>
+            <a href="https://github.com/SvenFrankson/sumuqan" target="_blank"><img class="icon" src="./datas/textures/github-icon.png"/><span class="source-link">https://github.com/SvenFrankson/sumuqan</span></a>
+			<p lang="en">Sumuqan is a BabylonJS-based library providing methods to procedurally animate insect-like creatures.</p>
+			<p lang="en">It's what powers the Phasmida you see walking in the background.</p>
+			<p lang="fr">Sumuqan est une extension pour BabylonJS qui offre une méthode d'animation procédurale pour des créatures insectoides ou robotique.</p>
+			<p lang="fr">Les phasmes visibles en arrière-plan sont animés avec Sumuqan.</p>
+			<h2>Mummu</h2>
+            <a href="https://github.com/SvenFrankson/mummu" target="_blank"><img class="icon" src="./datas/textures/github-icon.png"/><span class="source-link">https://github.com/SvenFrankson/mummu</span></a>
+			<p lang="en">Mummu is a collection of tools for BabylonJS applications. Typescript-written, it targets a wide range of domains, from BABYLON.VertexData manipulation to Vector3, Quaternion and Spatial Intersections.</p>
+            <p lang="en">The intersection and collision code that is used for Physic in MarbleRunSimulator is in project Mummu.</p>
+			<p lang="fr">Mummu est une collection d'outils pour des applications utilisant BabylonJS. Ecrite en Typescript, elle couvre un large champ d'application, de la manipulation de BABYLON.VertexData à des méthodes de géométrie (Vector3, Quaternion et Intersections Spatiales)</p>
+            <p lang="fr">Le système de collision et d'intersection utilisé dans Marble Run Simulator est dans le projet Mummu.</p>
+            <h2>Nabu</h2>
+            <a href="https://github.com/SvenFrankson/nabu" target="_blank"><img class="icon" src="./datas/textures/github-icon.png"/><span class="source-link">https://github.com/SvenFrankson/nabu</span></a>
+			<p lang="en">Nabu is a Typescript written collection of simple tools for number manipulation (easing methods, simple maths) and data structures.</p>
+			<p lang="fr">Nabu est une collection d'outils simple pour la manipulation de nombre (easing) et de structures de données.</p>
+		</div>
+        <a href="#home"><button id="home-button">Home</button></a>
+        <a href="#credit"><button id="credits-button">Credits</button></a>
+        <a href="#phasmida"><div id="credits">
+            <button id="close-credits-button">X</button>
+            <div class="label">Concept, Art & Code</div>
+            <div class="line" style="font-weight: 300;">Sven Frankson</div>
+            <div class="label">Skybox</div>
+            <div class="line"><span style="color: white;">Based on</span>
+                <a href="https://sketchfab.com/3d-models/skybox-stylized-room-41f386740dbb4de7af2724734f98151f" target="_blank" style="color: white; font-weight: 300;">"Skybox Stylized Room"</a>
+                 by 
+                <a href="https://sketchfab.com/Van_Twinkle" target="_blank" style="color: white; font-weight: 300;">Van_Twinkle</a>
+                 licensed under 
+                <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" style="color: white; font-weight: 300;">CC-BY-4.0</a>
+            </div>
+        </div></a>
+        <div id="language-selection">
+            <span>lang</span>
+            <button id="language-select-en">EN</button>
+            <button id="language-select-fr">FR</button>
+        </div>
+        <canvas id="render-canvas" class="full-screen"></canvas>
+    </body>
+</html>
