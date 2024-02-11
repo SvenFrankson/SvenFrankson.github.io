@@ -1,2 +1,0 @@
-mklink /D "C:\Users\svent\Documents\sven-frankson\tiaratum\mummu" "C:\Users\svent\Documents\sven-frankson\mummu"
-mklink /D "C:\Users\svent\Documents\sven-frankson\tiaratum\nabu" "C:\Users\svent\Documents\sven-frankson\nabu"
