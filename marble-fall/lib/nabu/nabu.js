@@ -520,6 +520,12 @@ var Nabu;
             }
             return undefined;
         }
+        removeAt(i) {
+            if (i >= 0 && i < this._elements.length) {
+                let e = this._elements.splice(i, 1);
+                return e[0];
+            }
+        }
         contains(e) {
             return this._elements.indexOf(e) != -1;
         }
@@ -530,6 +536,9 @@ var Nabu;
         }
         sort(callback) {
             this._elements = this._elements.sort(callback);
+        }
+        cloneAsArray() {
+            return [...this._elements];
         }
     }
     Nabu.UniqueList = UniqueList;

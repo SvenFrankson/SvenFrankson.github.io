@@ -120,7 +120,7 @@ class Ball extends BABYLON.Mesh {
         this.marbleLoopSound.volume = 0;
     }
     update(dt) {
-        if (this.position.y < -10) {
+        if (this.position.y < this.machine.baseMeshMinY - 0.5) {
             return;
         }
         this._timer += dt * this.game.currentTimeFactor;
@@ -139,7 +139,7 @@ class Ball extends BABYLON.Mesh {
             this.machine.parts.forEach(part => {
                 if (Mummu.SphereAABBCheck(this.position, this.radius, part.AABBMin.x - this.radius, part.AABBMax.x + this.radius, part.AABBMin.y - this.radius, part.AABBMax.y + this.radius, part.AABBMin.z - this.radius, part.AABBMax.z + this.radius)) {
                     part.allWires.forEach(wire => {
-                        let col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.5, !(part instanceof UTurnLarge));
+                        let col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.5);
                         if (col.hit) {
                             let colDig = col.normal.scale(-1);
                             // Move away from collision
@@ -296,12 +296,12 @@ class Configuration {
 var simpleLoop = {
     balls: [{ x: 0.003999999664723874, y: -0.061500001311302184, z: 0 }],
     parts: [
-        { name: "uturnlayer-0.4", i: -3, j: 0, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "uturn-0.4", i: -3, j: 0, k: 0, mirrorX: true, mirrorZ: false },
         { name: "ramp-1.0.1", i: -1, j: 0, k: 0, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.4", i: -1, j: 0, k: 0, mirrorX: false, mirrorZ: true },
+        { name: "uturn-1.4", i: -1, j: 0, k: 0, mirrorX: false, mirrorZ: true },
         { name: "elevator-3", i: 0, j: -1, k: 0, mirrorX: false, mirrorZ: false },
         { name: "ramp-2.0.3", i: -2, j: 2, k: 0, mirrorX: false, mirrorZ: true },
-        { name: "uturnlayer-0.3", i: -3, j: 2, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "uturn-0.3", i: -3, j: 2, k: 0, mirrorX: true, mirrorZ: false },
         { name: "ramp-1.1.1", i: -2, j: 1, k: 0, mirrorX: true, mirrorZ: false },
     ],
 };
@@ -313,20 +313,20 @@ var demo1 = {
     ],
     parts: [
         { name: "ramp-3.1.1", i: -1, j: -6, k: 0, mirrorX: true, mirrorZ: false },
-        { name: "uturn-s", i: -2, j: 5, k: 1, mirrorX: true, mirrorZ: false },
-        { name: "uturn-s", i: -2, j: -5, k: 0, mirrorX: true, mirrorZ: false },
         { name: "elevator-12", i: 3, j: -7, k: 0, mirrorX: false, mirrorZ: false },
         { name: "ramp-1.0.1", i: 2, j: -6, k: 0, mirrorX: false, mirrorZ: false },
-        { name: "wave", i: -1, j: -4, k: 0, mirrorX: false, mirrorZ: false },
-        { name: "ramp-2.1.1", i: -1, j: -2, k: 0, mirrorX: true, mirrorZ: false },
-        { name: "uturn-l", i: 1, j: -3, k: 0, mirrorX: false, mirrorZ: false },
-        { name: "loop-1.2", i: -1, j: 1, k: 0, mirrorX: false, mirrorZ: true },
-        { name: "uturnlayer-0.3", i: -2, j: -1, k: 0, mirrorX: true, mirrorZ: false },
-        { name: "ramp-1.1.1", i: 2, j: 4, k: 0, mirrorX: false, mirrorZ: false },
+        { name: "loop-1.2.1", i: -1, j: 1, k: 0, mirrorX: false, mirrorZ: true },
+        { name: "uturn-0.3", i: -2, j: -1, k: 0, mirrorX: true },
+        { name: "ramp-1.1.1", i: 2, j: 4, k: 0 },
         { name: "ramp-3.2.2", i: -1, j: 4, k: 0, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-1.3", i: 2, j: 0, k: 0, mirrorX: false, mirrorZ: true },
+        { name: "uturn-1.3", i: 2, j: 0, k: 0, mirrorX: false, mirrorZ: true },
         { name: "ramp-3.1.1", i: -1, j: -1, k: 2, mirrorX: false, mirrorZ: false },
         { name: "ramp-2.4.1", i: 0, j: 1, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "uturn-0.2", i: -2, j: -5, k: 0, mirrorX: true },
+        { name: "wave-3.2.1", i: -1, j: -5, k: 1, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.2", i: 2, j: -3, k: 0 },
+        { name: "ramp-3.2.1", i: -1, j: -3, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "uturnsharp", i: -2, j: 5, k: 1, mirrorX: true },
     ],
 };
 var demoLoops = {
@@ -337,23 +337,28 @@ var demoLoops = {
         { x: 0.3039999976158142, y: 0.24932048881053925, z: 0 },
     ],
     parts: [
-        { name: "loop", i: -1, j: -8, k: 0, mirrorX: true, mirrorZ: false },
-        { name: "loop", i: -1, j: -6, k: 2, mirrorX: false, mirrorZ: false },
-        { name: "loop", i: -1, j: -4, k: 0, mirrorX: true, mirrorZ: false },
         { name: "elevator-17", i: 2, j: -9, k: 0, mirrorX: false, mirrorZ: false },
         { name: "ramp-1.0.1", i: 1, j: -8, k: 0, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.3", i: -2, j: -6, k: 0, mirrorX: true, mirrorZ: true },
-        { name: "uturnlayer-1.3", i: 1, j: -4, k: 0, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.3", i: -2, j: -2, k: 0, mirrorX: true, mirrorZ: true },
-        { name: "loop", i: -1, j: -2, k: 2, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.3", i: 1, j: 0, k: 0, mirrorX: false, mirrorZ: false },
-        { name: "loop", i: -1, j: 0, k: 0, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-1.3", i: -2, j: 2, k: 0, mirrorX: true, mirrorZ: true },
-        { name: "loop", i: -1, j: 2, k: 2, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.3", i: 1, j: 4, k: 0, mirrorX: false, mirrorZ: false },
-        { name: "loop", i: -1, j: 4, k: 0, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-0.3", i: -2, j: 7, k: 0, mirrorX: true, mirrorZ: true },
-        { name: "ramp-3.1.3", i: -1, j: 7, k: 0, mirrorX: false, mirrorZ: true },
+        { name: "loop-1.1.1", i: -1, j: -8, k: 0 },
+        { name: "ramp-1.4.1", i: 0, j: -8, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "loop-1.1.1", i: 0, j: -6, k: 2 },
+        { name: "uturn-1.3", i: -2, j: -4, k: 0, mirrorX: true },
+        { name: "ramp-1.1.1", i: -1, j: -3, k: 2 },
+        { name: "uturn-1.3", i: 1, j: -2, k: 0, mirrorX: false, mirrorZ: true },
+        { name: "ramp-1.1.1", i: 0, j: -1, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "loop-1.1.1", i: -1, j: -4, k: 0 },
+        { name: "uturn-1.3", i: -2, j: 0, k: 0, mirrorX: true },
+        { name: "ramp-1.1.1", i: -1, j: 1, k: 2 },
+        { name: "loop-1.1.1", i: 0, j: -2, k: 2 },
+        { name: "uturn-1.3", i: 1, j: 2, k: 0, mirrorX: false, mirrorZ: true },
+        { name: "ramp-1.1.1", i: 0, j: 3, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "loop-1.1.1", i: -1, j: 0, k: 0 },
+        { name: "uturn-1.3", i: -2, j: 4, k: 0, mirrorX: true },
+        { name: "ramp-1.1.1", i: -1, j: 5, k: 2 },
+        { name: "loop-1.1.1", i: 0, j: 2, k: 2 },
+        { name: "uturn-1.3", i: 1, j: 6, k: 0, mirrorX: false, mirrorZ: true },
+        { name: "uturnsharp", i: 0, j: 7, k: 0, mirrorX: true },
+        { name: "ramp-1.0.1", i: 1, j: 8, k: 0, mirrorX: false, mirrorZ: false },
     ],
 };
 var demo4 = {
@@ -414,27 +419,25 @@ var demo3 = {
         { name: "split", i: 0, j: -5, k: 0, mirrorX: false, mirrorZ: false },
         { name: "split", i: 0, j: -2, k: 2, mirrorX: false, mirrorZ: false },
         { name: "ramp-2.1.1", i: -2, j: -6, k: 0, mirrorX: false, mirrorZ: false },
-        { name: "loop", i: 1, j: -3, k: 0, mirrorX: false, mirrorZ: false },
         { name: "join", i: -1, j: 2, k: 1, mirrorX: false, mirrorZ: false },
-        { name: "loop", i: -2, j: 0, k: 2, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-0.3", i: -2, j: -2, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "uturn-0.3", i: -2, j: -2, k: 0, mirrorX: true },
         { name: "ramp-1.1.1", i: -1, j: -3, k: 0, mirrorX: true, mirrorZ: false },
         { name: "ramp-1.0.1", i: -1, j: -2, k: 2, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-0.3", i: 1, j: 0, k: 0, mirrorX: false, mirrorZ: true },
-        { name: "uturnlayer-1.2", i: -2, j: 1, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "uturn-0.3", i: 1, j: 0, k: 0, mirrorX: false, mirrorZ: true },
+        { name: "uturn-1.2", i: -2, j: 1, k: 0, mirrorX: true, mirrorZ: false },
         { name: "ramp-2.1.1", i: -1, j: 0, k: 0, mirrorX: true, mirrorZ: false },
         { name: "join", i: 0, j: 3, k: 1, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-0.3", i: 1, j: 3, k: 1, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-0.2", i: 1, j: 4, k: 0, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.3", i: 1, j: 3, k: 1, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.2", i: 1, j: 4, k: 0 },
         { name: "elevator-12", i: -3, j: -7, k: 0, mirrorX: true, mirrorZ: false },
-        { name: "ramp-1.1.1", i: -2, j: 4, k: 0, mirrorX: true, mirrorZ: false },
-        { name: "ramp-2.0.1", i: -1, j: 4, k: 0, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.2", i: 4, j: -1, k: 0, mirrorX: false, mirrorZ: true },
         { name: "ramp-2.3.1", i: 0, j: -1, k: 1, mirrorX: true, mirrorZ: false },
-        { name: "ramp-2.0.1", i: 2, j: -1, k: 1, mirrorX: false, mirrorZ: false },
-        { name: "ramp-1.0.1", i: 3, j: 0, k: 0, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.2", i: -3, j: 2, k: 2, mirrorX: true, mirrorZ: true },
-        { name: "ramp-3.1.1", i: -2, j: 2, k: 3, mirrorX: false, mirrorZ: false },
+        { name: "snake-1.2.3", i: 1, j: -3, k: 0, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.2", i: 2, j: -1, k: 1 },
+        { name: "loop-1.1.1", i: -2, j: 0, k: 2 },
+        { name: "ramp-1.4.1", i: -1, j: 0, k: 2, mirrorX: true, mirrorZ: false },
+        { name: "uturn-0.2", i: -3, j: 4, k: 2, mirrorX: true, mirrorZ: true },
+        { name: "ramp-3.1.1", i: -2, j: 3, k: 3, mirrorX: true, mirrorZ: false },
+        { name: "ramp-3.1.1", i: -2, j: 4, k: 0, mirrorX: true, mirrorZ: false },
     ],
 };
 var createDefault = {
@@ -463,16 +466,16 @@ var demo3D = {
         { x: 0.3756430183403636, y: 0.044253335357509804 },
     ],
     parts: [
-        { name: "uturnlayer-1.2", i: 0, j: -4, k: 1, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-1.2", i: 5, j: 0, k: 1, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.3", i: 1, j: -2, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "uturn-1.2", i: 0, j: -4, k: 1, mirrorX: true, mirrorZ: false },
+        { name: "uturn-1.2", i: 5, j: 0, k: 1, mirrorX: false, mirrorZ: false },
+        { name: "uturn-1.3", i: 1, j: -2, k: 0, mirrorX: true, mirrorZ: false },
         { name: "ramp-1.1.1", i: 2, j: -2, k: 0, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.2", i: 5, j: -5, k: 1, mirrorX: false, mirrorZ: false },
+        { name: "uturn-1.2", i: 5, j: -5, k: 1, mirrorX: false, mirrorZ: false },
         { name: "elevator-8", i: 3, j: -9, k: 0, mirrorX: false, mirrorZ: false },
         { name: "ramp-4.1.1", i: 1, j: -5, k: 2, mirrorX: true, mirrorZ: false },
         { name: "ramp-4.4.1", i: 1, j: -4, k: 1, mirrorX: false, mirrorZ: false },
         { name: "ramp-3.2.1", i: 2, j: -2, k: 2, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-2.3", i: 1, j: -7, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "uturn-2.3", i: 1, j: -7, k: 0, mirrorX: true, mirrorZ: false },
         { name: "ramp-1.1.1", i: 2, j: -8, k: 0, mirrorX: true, mirrorZ: false },
         { name: "ramp-3.1.2", i: 2, j: -6, k: 1, mirrorX: false, mirrorZ: true },
     ],
@@ -496,12 +499,12 @@ var demoLoop = {
         { name: "ramp-1.5.1", i: 2, j: -9, k: 1, mirrorX: false, mirrorZ: false },
         { name: "spiral", i: 0, j: -9, k: 1, mirrorX: true, mirrorZ: false },
         { name: "join", i: 1, j: -3, k: 3, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-1.4", i: -1, j: -2, k: 0, mirrorX: true, mirrorZ: true },
+        { name: "uturn-1.4", i: -1, j: -2, k: 0, mirrorX: true, mirrorZ: true },
         { name: "ramp-2.0.1", i: 1, j: -1, k: 0, mirrorX: false, mirrorZ: false },
         { name: "ramp-2.1.1", i: -1, j: -4, k: 3, mirrorX: false, mirrorZ: false },
         { name: "ramp-1.1.1", i: -1, j: -6, k: 1, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-1.3", i: -2, j: -5, k: 1, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-0.2", i: 4, j: -4, k: 2, mirrorX: false, mirrorZ: false },
+        { name: "uturn-1.3", i: -2, j: -5, k: 1, mirrorX: true, mirrorZ: false },
+        { name: "uturn-0.2", i: 4, j: -4, k: 2, mirrorX: false, mirrorZ: false },
         { name: "ramp-2.1.1", i: 2, j: -4, k: 3, mirrorX: true, mirrorZ: false },
     ],
 };
@@ -517,25 +520,25 @@ var demoXXL = {
         { name: "split", i: -1, j: -12, k: 4, mirrorX: false, mirrorZ: false },
         { name: "ramp-1.0.1", i: 0, j: -12, k: 4, mirrorX: false, mirrorZ: false },
         { name: "ramp-2.0.2", i: 0, j: -10, k: 4, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-0.3", i: 2, j: -10, k: 3, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.3", i: 2, j: -10, k: 3, mirrorX: false, mirrorZ: false },
         { name: "loop-1.2", i: 0, j: -9, k: 3, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-1.4", i: -3, j: -10, k: 4, mirrorX: true, mirrorZ: false },
+        { name: "uturn-1.4", i: -3, j: -10, k: 4, mirrorX: true, mirrorZ: false },
         { name: "ramp-1.5.1", i: 1, j: -10, k: 3, mirrorX: true, mirrorZ: false },
         { name: "join", i: 1, j: 0, k: 6, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-0.3", i: 0, j: 1, k: 4, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-1.5", i: 2, j: -1, k: 2, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.3", i: 0, j: 1, k: 4, mirrorX: true, mirrorZ: false },
+        { name: "uturn-1.5", i: 2, j: -1, k: 2, mirrorX: false, mirrorZ: false },
         { name: "elevator-14", i: 1, j: -13, k: 4, mirrorX: false, mirrorZ: false },
         { name: "ramp-1.3.1", i: 0, j: -6, k: 2, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.2", i: -4, j: -7, k: 2, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-1.5", i: -1, j: -1, k: 2, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-0.5", i: 0, j: -7, k: 2, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-1.6", i: 2, j: -8, k: 2, mirrorX: false, mirrorZ: true },
+        { name: "uturn-1.2", i: -4, j: -7, k: 2, mirrorX: true, mirrorZ: false },
+        { name: "uturn-1.5", i: -1, j: -1, k: 2, mirrorX: true, mirrorZ: false },
+        { name: "uturn-0.5", i: 0, j: -7, k: 2, mirrorX: true, mirrorZ: false },
+        { name: "uturn-1.6", i: 2, j: -8, k: 2, mirrorX: false, mirrorZ: true },
         { name: "ramp-3.1.1", i: -1, j: -9, k: 7, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.6", i: 2, j: -7, k: 1, mirrorX: false, mirrorZ: true },
-        { name: "uturnlayer-1.6", i: -4, j: -6, k: 1, mirrorX: true, mirrorZ: false },
+        { name: "uturn-1.6", i: 2, j: -7, k: 1, mirrorX: false, mirrorZ: true },
+        { name: "uturn-1.6", i: -4, j: -6, k: 1, mirrorX: true, mirrorZ: false },
         { name: "ramp-4.0.1", i: -2, j: -6, k: 1, mirrorX: false, mirrorZ: false },
         { name: "ramp-4.1.1", i: -2, j: -5, k: 6, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.5", i: 2, j: -4, k: 2, mirrorX: false, mirrorZ: true },
+        { name: "uturn-1.5", i: 2, j: -4, k: 2, mirrorX: false, mirrorZ: true },
         { name: "ramp-3.1.1", i: -3, j: -7, k: 2, mirrorX: false, mirrorZ: false },
         { name: "ramp-1.1.1", i: -1, j: -5, k: 4, mirrorX: true, mirrorZ: false },
         { name: "ramp-2.2.2", i: -3, j: -6, k: 3, mirrorX: false, mirrorZ: false },
@@ -552,21 +555,21 @@ var largeTornado = {
         { x: 0.15400000655651092, y: 0.1534900631904602, z: 0 },
     ],
     parts: [
-        { name: "uturnlayer-1.5", i: -1, j: -6, k: 0, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-1.5", i: 1, j: -5, k: 4, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.8", i: -2, j: -4, k: 1, mirrorX: true, mirrorZ: true },
-        { name: "uturnlayer-1.7", i: 1, j: -3, k: 1, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.7", i: -2, j: -2, k: 1, mirrorX: true, mirrorZ: true },
-        { name: "uturnlayer-1.6", i: 1, j: -1, k: 1, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.6", i: -1, j: 0, k: 1, mirrorX: true, mirrorZ: true },
-        { name: "uturnlayer-1.5", i: 1, j: 1, k: 1, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.5", i: -1, j: 2, k: 1, mirrorX: true, mirrorZ: true },
-        { name: "uturnlayer-1.4", i: 1, j: 3, k: 1, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.4", i: -1, j: 4, k: 1, mirrorX: true, mirrorZ: true },
+        { name: "uturn-1.5", i: -1, j: -6, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "uturn-1.5", i: 1, j: -5, k: 4, mirrorX: false, mirrorZ: false },
+        { name: "uturn-1.8", i: -2, j: -4, k: 1, mirrorX: true, mirrorZ: true },
+        { name: "uturn-1.7", i: 1, j: -3, k: 1, mirrorX: false, mirrorZ: false },
+        { name: "uturn-1.7", i: -2, j: -2, k: 1, mirrorX: true, mirrorZ: true },
+        { name: "uturn-1.6", i: 1, j: -1, k: 1, mirrorX: false, mirrorZ: false },
+        { name: "uturn-1.6", i: -1, j: 0, k: 1, mirrorX: true, mirrorZ: true },
+        { name: "uturn-1.5", i: 1, j: 1, k: 1, mirrorX: false, mirrorZ: false },
+        { name: "uturn-1.5", i: -1, j: 2, k: 1, mirrorX: true, mirrorZ: true },
+        { name: "uturn-1.4", i: 1, j: 3, k: 1, mirrorX: false, mirrorZ: false },
+        { name: "uturn-1.4", i: -1, j: 4, k: 1, mirrorX: true, mirrorZ: true },
         { name: "elevator-15", i: 1, j: -7, k: 0, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-1.5", i: 1, j: 5, k: 1, mirrorX: false, mirrorZ: false },
+        { name: "uturn-1.5", i: 1, j: 5, k: 1, mirrorX: false, mirrorZ: false },
         { name: "ramp-2.4.1", i: -1, j: 6, k: 5, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-0.5", i: -4, j: 10, k: 0, mirrorX: true, mirrorZ: true },
+        { name: "uturn-0.5", i: -4, j: 10, k: 0, mirrorX: true, mirrorZ: true },
         { name: "loop-1.2", i: -2, j: 6, k: 4, mirrorX: false, mirrorZ: false },
         { name: "ramp-2.2.1", i: -2, j: 8, k: 0, mirrorX: true, mirrorZ: false },
         { name: "ramp-1.0.1", i: 0, j: 8, k: 0, mirrorX: false, mirrorZ: false },
@@ -584,7 +587,7 @@ var twoLoops = {
         { name: "loop-2.2", i: -1, j: -2, k: 0, mirrorX: true, mirrorZ: false },
         { name: "loop-1.2", i: -2, j: 2, k: 0, mirrorX: false, mirrorZ: false },
         { name: "ramp-1.1.1", i: -3, j: 5, k: 0, mirrorX: false, mirrorZ: false },
-        { name: "uturnlayer-0.4", i: -5, j: 5, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "uturn-0.4", i: -5, j: 5, k: 0, mirrorX: true, mirrorZ: false },
         { name: "ramp-3.3.4", i: -3, j: 5, k: 0, mirrorX: false, mirrorZ: true },
         { name: "ramp-3.3.1", i: 0, j: 5, k: 0, mirrorX: true, mirrorZ: false },
         { name: "ramp-3.12.1", i: 1, j: -6, k: 0, mirrorX: true, mirrorZ: false },
@@ -598,16 +601,107 @@ var logoCircuit = {
         { x: -0.4920541867386349, y: -0.05544158273924758, z: -0.18 },
     ],
     parts: [
-        { name: "uturnlayer-0.4", i: -3, j: 0, k: 2, mirrorX: true, mirrorZ: false },
-        { name: "uturnlayer-1.4", i: -1, j: 0, k: 2, mirrorX: false, mirrorZ: true },
-        { name: "uturnlayer-0.3", i: -3, j: 2, k: 2, mirrorX: true, mirrorZ: false },
+        { name: "uturn-0.4", i: -3, j: 0, k: 2, mirrorX: true, mirrorZ: false },
+        { name: "uturn-1.4", i: -1, j: 0, k: 2, mirrorX: false, mirrorZ: true },
+        { name: "uturn-0.3", i: -3, j: 2, k: 2, mirrorX: true, mirrorZ: false },
         { name: "ramp-1.1.1", i: -2, j: 1, k: 2, mirrorX: true, mirrorZ: false },
         { name: "loop-1.2", i: -1, j: -4, k: 2, mirrorX: false, mirrorZ: false },
         { name: "uturn-s", i: 0, j: 0, k: 3, mirrorX: false, mirrorZ: false },
         { name: "ramp-2.1.2", i: -2, j: 1, k: 3, mirrorX: true, mirrorZ: false },
     ],
 };
-var test = { "balls": [{ "x": -0.5766096541939383, "y": 0.4087908683675662, "z": 0 }], "parts": [{ "name": "join", "i": -1, "j": -1, "k": 1, "mirrorX": false, "mirrorZ": false }, { "name": "split", "i": -1, "j": -3, "k": 0, "mirrorX": false, "mirrorZ": false }, { "name": "uturnlayer-0.2", "i": -2, "j": -1, "k": 0, "mirrorX": true, "mirrorZ": false }, { "name": "uturnlayer-0.2", "i": 0, "j": -1, "k": 0, "mirrorX": false, "mirrorZ": false }, { "name": "uturnlayer-0.2", "i": 0, "j": 0, "k": 1, "mirrorX": false, "mirrorZ": false }, { "name": "uturnlayer-0.2", "i": -1, "j": 0, "k": 2, "mirrorX": true, "mirrorZ": false }, { "name": "uturnlayer-2.4", "i": 0, "j": 0, "k": 0, "mirrorX": false, "mirrorZ": true }, { "name": "elevator-16", "i": -4, "j": -14, "k": 0, "mirrorX": true, "mirrorZ": false }, { "name": "ramp-3.0.1", "i": -3, "j": 2, "k": 0, "mirrorX": false, "mirrorZ": false }, { "name": "ramp-2.10.1", "i": -3, "j": -13, "k": 0, "mirrorX": false, "mirrorZ": false }] };
+var test = {
+    balls: [{ x: -0.5766096541939383, y: 0.4087908683675662, z: 0 }],
+    parts: [
+        { name: "join", i: -1, j: -1, k: 1, mirrorX: false, mirrorZ: false },
+        { name: "split", i: -1, j: -3, k: 0, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.2", i: -2, j: -1, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "uturn-0.2", i: 0, j: -1, k: 0, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.2", i: 0, j: 0, k: 1, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.2", i: -1, j: 0, k: 2, mirrorX: true, mirrorZ: false },
+        { name: "uturn-2.4", i: 0, j: 0, k: 0, mirrorX: false, mirrorZ: true },
+        { name: "elevator-16", i: -4, j: -14, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "ramp-3.0.1", i: -3, j: 2, k: 0, mirrorX: false, mirrorZ: false },
+        { name: "ramp-2.10.1", i: -3, j: -13, k: 0, mirrorX: false, mirrorZ: false },
+    ],
+};
+var test2 = {
+    balls: [{ x: 0.1470751372356046, y: -0.021790127870097292, z: -1.1102230246251565e-16 }],
+    parts: [
+        { name: "elevator-7", i: 1, j: -6, k: 0, mirrorZ: false },
+        { name: "loop-1.2", i: -1, j: -5, k: 1, mirrorZ: true },
+        { name: "ramp-1.4.2", i: 0, j: -5, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "uturn-0.2", i: -2, j: -1, k: 1, mirrorX: true, mirrorZ: false },
+        { name: "ramp-2.2.2", i: -1, j: -1, k: 0, mirrorX: false, mirrorZ: true },
+    ],
+};
+var deathLoop = {
+    balls: [
+        { x: 0.15400000655651092, y: -0.09149998760223389, z: 0 },
+        { x: 0.15400000655651092, y: -0.011062685012817383, z: 0 },
+        { x: 0.15400000655651092, y: 0.0693746473789215, z: 0 },
+        { x: 0.15400000655651092, y: 0.14981196486949921, z: 0 },
+        { x: 0.15400000655651092, y: 0.2302492823600769, z: 0 },
+        { x: 0.15400000655651092, y: 0.3106865849494934, z: 0 },
+        { x: 0.13336174356459699, y: -0.08357069912963007, z: 0 },
+        { x: 0.116171708005261, y: -0.08169939664358977, z: 0 },
+        { x: 0.09848493236671044, y: -0.07917683386823743, z: 0 },
+    ],
+    parts: [
+        { name: "ramp-3.13.1", i: -2, j: -10, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "elevator-14", i: 1, j: -11, k: 0, mirrorZ: false },
+        { name: "loop-1.5.2", i: -3, j: -1, k: 0, mirrorX: true },
+        { name: "loop-1.5.1", i: -4, j: -1, k: 0 },
+        { name: "uturn-0.3", i: -6, j: 2, k: 0, mirrorX: true },
+        { name: "uturn-0.2", i: -2, j: 1, k: 2 },
+        { name: "uturn-1.3", i: -3, j: 1, k: 3, mirrorX: true },
+        { name: "ramp-3.1.6", i: -2, j: 2, k: 0, mirrorX: false, mirrorZ: true },
+        { name: "ramp-3.1.1", i: -5, j: 1, k: 2, mirrorX: true, mirrorZ: false },
+        { name: "ramp-1.1.1", i: -5, j: 2, k: 0 },
+    ],
+};
+var test3 = {
+    balls: [{ x: 0.15141078307665115, y: -0.06119131474246342, z: 1.1102230246251565e-16 }],
+    parts: [
+        { name: "ramp-2.8.1", i: -1, j: -5, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "elevator-9", i: 1, j: -6, k: 0, mirrorZ: false },
+        { name: "ramp-2.0.1", i: -3, j: 3, k: 2, mirrorX: false, mirrorZ: false },
+        { name: "ramp-2.0.3", i: -1, j: 3, k: 0, mirrorX: false, mirrorZ: true },
+        { name: "ramp-1.0.1", i: -3, j: 3, k: 7, mirrorX: false, mirrorZ: false },
+        { name: "loop-1.8.1", i: -2, j: -1, k: 0, mirrorZ: true },
+        { name: "uturn-0.6", i: -5, j: 3, k: 2, mirrorX: true, mirrorZ: true },
+    ],
+};
+var popopo = {
+    balls: [
+        { x: 0.15400000655651092, y: 0.02849998736381531, z: 0 },
+        { x: 0.15400000655651092, y: 0.10534068608283996, z: 0 },
+        { x: 0.15400000655651092, y: 0.18218139970302583, z: 0 },
+        { x: 0.15400000655651092, y: 0.2590221133232117, z: 0 },
+        { x: 0.15400000655651092, y: 0.33586281204223634, z: 0 },
+    ],
+    parts: [
+        { name: "uturn-0.2", i: -2, j: -12, k: 0, mirrorX: true },
+        { name: "ramp-2.0.1", i: -1, j: -12, k: 0, mirrorX: false, mirrorZ: false },
+        { name: "loop-1.1.1", i: 1, j: -11, k: 1 },
+        { name: "uturn-0.2", i: -4, j: -5, k: 3, mirrorX: true },
+        { name: "ramp-2.5.1", i: -1, j: -12, k: 1, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.3", i: 2, j: -7, k: 1 },
+        { name: "split", i: -3, j: -7, k: 3, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.3", i: -2, j: -5, k: 3 },
+        { name: "ramp-1.3.1", i: -3, j: -5, k: 4, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.2", i: -5, j: -3, k: 5, mirrorX: true },
+        { name: "ramp-1.0.1", i: -2, j: -2, k: 4, mirrorX: false, mirrorZ: false },
+        { name: "flatjoin", i: -1, j: -3, k: 4, mirrorZ: false },
+        { name: "wave-2.2.1", i: -4, j: -5, k: 5, mirrorX: true, mirrorZ: false },
+        { name: "ramp-4.0.1", i: -2, j: -7, k: 3, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.2", i: -1, j: -3, k: 5 },
+        { name: "ramp-3.0.1", i: -4, j: -3, k: 6, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.2", i: -2, j: -3, k: 4, mirrorX: true },
+        { name: "elevator-12", i: 1, j: -13, k: 0, mirrorZ: false },
+        { name: "ramp-1.1.5", i: 0, j: -2, k: 0, mirrorX: false, mirrorZ: true },
+    ],
+};
 class HelperShape {
     constructor() {
         this.show = true;
@@ -889,7 +983,7 @@ class MachineEditor {
                     }
                     draggedTrack.setIsVisible(true);
                     draggedTrack.generateWires();
-                    draggedTrack.instantiate().then(() => {
+                    draggedTrack.instantiate(true).then(() => {
                         draggedTrack.recomputeAbsolutePath();
                         this.setSelectedObject(draggedTrack);
                         this.setDraggedObject(undefined);
@@ -994,7 +1088,7 @@ class MachineEditor {
             if (track instanceof MachinePart && track.yExtendable) {
                 let h = track.h + 1;
                 let j = track.j - 1;
-                let editedTrack = await this.editTrackInPlace(track, undefined, j, undefined, track.xExtendable ? track.w : undefined, h, track.zExtendable ? track.d : undefined);
+                let editedTrack = await this.editTrackInPlace(track, { j: j });
                 this.setSelectedObject(editedTrack);
             }
         };
@@ -1004,7 +1098,7 @@ class MachineEditor {
                 let h = track.h - 1;
                 let j = track.j + 1;
                 if (h >= 0) {
-                    let editedTrack = await this.editTrackInPlace(track, undefined, j, undefined, track.xExtendable ? track.w : undefined, h, track.zExtendable ? track.d : undefined);
+                    let editedTrack = await this.editTrackInPlace(track, { j: j });
                     this.setSelectedObject(editedTrack);
                 }
             }
@@ -1013,7 +1107,7 @@ class MachineEditor {
             let track = this.selectedObject;
             if (track instanceof MachinePart && track.xExtendable) {
                 let w = track.w + 1;
-                let editedTrack = await this.editTrackInPlace(track, undefined, undefined, undefined, w, track.yExtendable ? track.h : undefined, track.zExtendable ? track.d : undefined);
+                let editedTrack = await this.editTrackInPlace(track, { w: w });
                 this.setSelectedObject(editedTrack);
             }
         };
@@ -1022,7 +1116,7 @@ class MachineEditor {
             if (track instanceof MachinePart && track.xExtendable) {
                 let w = track.w - 1;
                 if (w >= 1) {
-                    let editedTrack = await this.editTrackInPlace(track, undefined, undefined, undefined, w, track.yExtendable ? track.h : undefined, track.zExtendable ? track.d : undefined);
+                    let editedTrack = await this.editTrackInPlace(track, { w: w });
                     this.setSelectedObject(editedTrack);
                 }
             }
@@ -1031,7 +1125,7 @@ class MachineEditor {
             let track = this.selectedObject;
             if (track instanceof MachinePart && track.yExtendable) {
                 let h = track.h + 1;
-                let editedTrack = await this.editTrackInPlace(track, undefined, undefined, undefined, track.xExtendable ? track.w : undefined, h, track.zExtendable ? track.d : undefined);
+                let editedTrack = await this.editTrackInPlace(track, { h: h });
                 this.setSelectedObject(editedTrack);
             }
         };
@@ -1040,7 +1134,7 @@ class MachineEditor {
             if (track instanceof MachinePart && track.yExtendable) {
                 let h = track.h - 1;
                 if (h >= 0) {
-                    let editedTrack = await this.editTrackInPlace(track, undefined, undefined, undefined, track.xExtendable ? track.w : undefined, h, track.zExtendable ? track.d : undefined);
+                    let editedTrack = await this.editTrackInPlace(track, { h: h });
                     this.setSelectedObject(editedTrack);
                 }
             }
@@ -1050,7 +1144,7 @@ class MachineEditor {
             if (track instanceof MachinePart && track.xExtendable) {
                 let i = track.i - 1;
                 let w = track.w + 1;
-                let editedTrack = await this.editTrackInPlace(track, i, undefined, undefined, w, track.yExtendable ? track.h : undefined, track.zExtendable ? track.d : undefined);
+                let editedTrack = await this.editTrackInPlace(track, { i: i });
                 this.setSelectedObject(editedTrack);
             }
         };
@@ -1060,7 +1154,7 @@ class MachineEditor {
                 let i = track.i + 1;
                 let w = track.w - 1;
                 if (w >= 1) {
-                    let editedTrack = await this.editTrackInPlace(track, i, undefined, undefined, w, track.yExtendable ? track.h : undefined, track.zExtendable ? track.d : undefined);
+                    let editedTrack = await this.editTrackInPlace(track, { i: i });
                     this.setSelectedObject(editedTrack);
                 }
             }
@@ -1069,7 +1163,7 @@ class MachineEditor {
             let track = this.selectedObject;
             if (track instanceof MachinePart && track.zExtendable) {
                 let d = track.d + 1;
-                let editedTrack = await this.editTrackInPlace(track, undefined, undefined, undefined, track.xExtendable ? track.w : undefined, track.yExtendable ? track.h : undefined, d);
+                let editedTrack = await this.editTrackInPlace(track, { d: d });
                 this.setSelectedObject(editedTrack);
             }
         };
@@ -1078,7 +1172,7 @@ class MachineEditor {
             if (track instanceof MachinePart && track.zExtendable) {
                 let d = track.d - 1;
                 if (d >= 1) {
-                    let editedTrack = await this.editTrackInPlace(track, undefined, undefined, undefined, track.xExtendable ? track.w : undefined, track.yExtendable ? track.h : undefined, d);
+                    let editedTrack = await this.editTrackInPlace(track, { d: d });
                     this.setSelectedObject(editedTrack);
                 }
             }
@@ -1105,63 +1199,63 @@ class MachineEditor {
             }
         };
         this._onOriginIPlus = async () => {
-            if (this.selectedObject instanceof Ramp) {
-                this.setSelectedObject(await this.editRampOriginDestInPlace(this.selectedObject, { i: 1, j: 0, k: 0 }, { i: 0, j: 0, k: 0 }));
+            if (this.selectedObject instanceof MachinePartWithOriginDestination) {
+                this.setSelectedObject(await this.editPartOriginDestInPlace(this.selectedObject, { i: 1, j: 0, k: 0 }, { i: 0, j: 0, k: 0 }));
             }
         };
         this._onOriginIMinus = async () => {
-            if (this.selectedObject instanceof Ramp) {
-                this.setSelectedObject(await this.editRampOriginDestInPlace(this.selectedObject, { i: -1, j: 0, k: 0 }, { i: 0, j: 0, k: 0 }));
+            if (this.selectedObject instanceof MachinePartWithOriginDestination) {
+                this.setSelectedObject(await this.editPartOriginDestInPlace(this.selectedObject, { i: -1, j: 0, k: 0 }, { i: 0, j: 0, k: 0 }));
             }
         };
         this._onOriginJPlus = async () => {
-            if (this.selectedObject instanceof Ramp) {
-                this.setSelectedObject(await this.editRampOriginDestInPlace(this.selectedObject, { i: 0, j: 1, k: 0 }, { i: 0, j: 0, k: 0 }));
+            if (this.selectedObject instanceof MachinePartWithOriginDestination) {
+                this.setSelectedObject(await this.editPartOriginDestInPlace(this.selectedObject, { i: 0, j: 1, k: 0 }, { i: 0, j: 0, k: 0 }));
             }
         };
         this._onOriginJMinus = async () => {
-            if (this.selectedObject instanceof Ramp) {
-                this.setSelectedObject(await this.editRampOriginDestInPlace(this.selectedObject, { i: 0, j: -1, k: 0 }, { i: 0, j: 0, k: 0 }));
+            if (this.selectedObject instanceof MachinePartWithOriginDestination) {
+                this.setSelectedObject(await this.editPartOriginDestInPlace(this.selectedObject, { i: 0, j: -1, k: 0 }, { i: 0, j: 0, k: 0 }));
             }
         };
         this._onOriginKPlus = async () => {
-            if (this.selectedObject instanceof Ramp) {
-                this.setSelectedObject(await this.editRampOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: 1 }, { i: 0, j: 0, k: 0 }));
+            if (this.selectedObject instanceof MachinePartWithOriginDestination) {
+                this.setSelectedObject(await this.editPartOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: 1 }, { i: 0, j: 0, k: 0 }));
             }
         };
         this._onOriginKMinus = async () => {
-            if (this.selectedObject instanceof Ramp) {
-                this.setSelectedObject(await this.editRampOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: -1 }, { i: 0, j: 0, k: 0 }));
+            if (this.selectedObject instanceof MachinePartWithOriginDestination) {
+                this.setSelectedObject(await this.editPartOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: -1 }, { i: 0, j: 0, k: 0 }));
             }
         };
         this._onDestinationIPlus = async () => {
-            if (this.selectedObject instanceof Ramp) {
-                this.setSelectedObject(await this.editRampOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: 0 }, { i: 1, j: 0, k: 0 }));
+            if (this.selectedObject instanceof MachinePartWithOriginDestination) {
+                this.setSelectedObject(await this.editPartOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: 0 }, { i: 1, j: 0, k: 0 }));
             }
         };
         this._onDestinationIMinus = async () => {
-            if (this.selectedObject instanceof Ramp) {
-                this.setSelectedObject(await this.editRampOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: 0 }, { i: -1, j: 0, k: 0 }));
+            if (this.selectedObject instanceof MachinePartWithOriginDestination) {
+                this.setSelectedObject(await this.editPartOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: 0 }, { i: -1, j: 0, k: 0 }));
             }
         };
         this._onDestinationJPlus = async () => {
-            if (this.selectedObject instanceof Ramp) {
-                this.setSelectedObject(await this.editRampOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: 0 }, { i: 0, j: 1, k: 0 }));
+            if (this.selectedObject instanceof MachinePartWithOriginDestination) {
+                this.setSelectedObject(await this.editPartOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: 0 }, { i: 0, j: 1, k: 0 }));
             }
         };
         this._onDestinationJMinus = async () => {
-            if (this.selectedObject instanceof Ramp) {
-                this.setSelectedObject(await this.editRampOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: 0 }, { i: 0, j: -1, k: 0 }));
+            if (this.selectedObject instanceof MachinePartWithOriginDestination) {
+                this.setSelectedObject(await this.editPartOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: 0 }, { i: 0, j: -1, k: 0 }));
             }
         };
         this._onDestinationKPlus = async () => {
-            if (this.selectedObject instanceof Ramp) {
-                this.setSelectedObject(await this.editRampOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: 0 }, { i: 0, j: 0, k: 1 }));
+            if (this.selectedObject instanceof MachinePartWithOriginDestination) {
+                this.setSelectedObject(await this.editPartOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: 0 }, { i: 0, j: 0, k: 1 }));
             }
         };
         this._onDestinationKMinus = async () => {
-            if (this.selectedObject instanceof Ramp) {
-                this.setSelectedObject(await this.editRampOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: 0 }, { i: 0, j: 0, k: -1 }));
+            if (this.selectedObject instanceof MachinePartWithOriginDestination) {
+                this.setSelectedObject(await this.editPartOriginDestInPlace(this.selectedObject, { i: 0, j: 0, k: 0 }, { i: 0, j: 0, k: -1 }));
             }
         };
         this._onIPlus = async () => {
@@ -1171,7 +1265,7 @@ class MachineEditor {
                     selectedTrack.setI(selectedTrack.i + 1);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.generateWires();
-                    await selectedTrack.instantiate();
+                    await selectedTrack.instantiate(true);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.select();
                     if (this.game.cameraMode === CameraMode.Selected) {
@@ -1191,7 +1285,7 @@ class MachineEditor {
                     selectedTrack.setI(selectedTrack.i - 1);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.generateWires();
-                    await selectedTrack.instantiate();
+                    await selectedTrack.instantiate(true);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.select();
                     if (this.game.cameraMode === CameraMode.Selected) {
@@ -1211,7 +1305,7 @@ class MachineEditor {
                     selectedTrack.setJ(selectedTrack.j + 1);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.generateWires();
-                    await selectedTrack.instantiate();
+                    await selectedTrack.instantiate(true);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.select();
                     if (this.game.cameraMode === CameraMode.Selected) {
@@ -1231,7 +1325,7 @@ class MachineEditor {
                     selectedTrack.setJ(selectedTrack.j - 1);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.generateWires();
-                    await selectedTrack.instantiate();
+                    await selectedTrack.instantiate(true);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.select();
                     if (this.game.cameraMode === CameraMode.Selected) {
@@ -1252,7 +1346,7 @@ class MachineEditor {
                         selectedTrack.setK(selectedTrack.k + 1);
                         selectedTrack.recomputeAbsolutePath();
                         selectedTrack.generateWires();
-                        await selectedTrack.instantiate();
+                        await selectedTrack.instantiate(true);
                         selectedTrack.recomputeAbsolutePath();
                         selectedTrack.select();
                         if (this.game.cameraMode === CameraMode.Selected) {
@@ -1282,7 +1376,7 @@ class MachineEditor {
                         selectedTrack.setK(selectedTrack.k - 1);
                         selectedTrack.recomputeAbsolutePath();
                         selectedTrack.generateWires();
-                        await selectedTrack.instantiate();
+                        await selectedTrack.instantiate(true);
                         selectedTrack.recomputeAbsolutePath();
                         selectedTrack.select();
                         if (this.game.cameraMode === CameraMode.Selected) {
@@ -1377,6 +1471,20 @@ class MachineEditor {
         this.machine.parts.forEach(part => {
             part.partVisibilityMode = PartVisibilityMode.Default;
         });
+    }
+    get hoveredObject() {
+        return this._hoveredObject;
+    }
+    set hoveredObject(o) {
+        if (o != this._hoveredObject) {
+            if (this._hoveredObject) {
+                this._hoveredObject.unlit();
+            }
+            this._hoveredObject = o;
+            if (this._hoveredObject) {
+                this._hoveredObject.highlight();
+            }
+        }
     }
     get selectedItem() {
         return this._selectedItem;
@@ -1512,7 +1620,7 @@ class MachineEditor {
                 else {
                     this.setSelectedItem(trackname);
                     let track = this.machine.trackFactory.createTrack(this._selectedItem, -10, -10, this.currentLayer);
-                    track.instantiate().then(() => {
+                    track.instantiate(true).then(() => {
                         track.setIsVisible(false);
                     });
                     this.setDraggedObject(track);
@@ -1521,7 +1629,7 @@ class MachineEditor {
             });
         }
         var r = document.querySelector(':root');
-        r.style.setProperty("--machine-editor-item-container-width", (Math.ceil(TrackNames.length / 2 + 1) * 16.8).toFixed(0) + "vw");
+        r.style.setProperty("--machine-editor-item-container-width", (Math.ceil(TrackNames.length / 2 + 1) * 16.7).toFixed(0) + "vw");
         document.addEventListener("keydown", this._onKeyDown);
         document.addEventListener("keyup", this._onKeyUp);
         this.game.canvas.addEventListener("pointerdown", this.pointerDown);
@@ -1804,48 +1912,77 @@ class MachineEditor {
             this.container.classList.add("bottom");
             this.container.classList.remove("left");
         }
+        let pick = this.game.scene.pick(this.game.scene.pointerX, this.game.scene.pointerY, (mesh) => {
+            if (mesh instanceof Arrow && mesh.isVisible) {
+                return true;
+            }
+            return false;
+        });
+        if (pick.hit && pick.pickedMesh instanceof Arrow) {
+            this.hoveredObject = pick.pickedMesh;
+        }
+        else {
+            this.hoveredObject = undefined;
+        }
     }
-    async editTrackInPlace(track, i, j, k, w, h, d) {
-        if (!isFinite(i)) {
-            i = track.i;
+    async editTrackInPlace(track, props) {
+        if (!props) {
+            props = {};
         }
-        if (!isFinite(j)) {
-            j = track.j;
+        if (!isFinite(props.i)) {
+            props.i = track.i;
         }
-        if (!isFinite(k)) {
-            k = track.k;
+        if (!isFinite(props.j)) {
+            props.j = track.j;
         }
-        let editedTrack = this.machine.trackFactory.createTrackWHD(track.partName, i, j, k, w, h, d, track.mirrorX, track.mirrorZ);
+        if (!isFinite(props.k)) {
+            props.k = track.k;
+        }
+        if (!isFinite(props.w) && track.xExtendable) {
+            props.w = track.w;
+        }
+        if (!isFinite(props.h) && track.yExtendable) {
+            props.h = track.h;
+        }
+        if (!isFinite(props.d) && track.zExtendable) {
+            props.d = track.d;
+        }
+        if (!isFinite(props.n) && track.nExtendable) {
+            props.n = track.n;
+        }
+        props.mirrorX = track.mirrorX;
+        props.mirrorZ = track.mirrorZ;
+        let editedTrack = this.machine.trackFactory.createTrackWHDN(track.partName, props);
         track.dispose();
         this.machine.parts.push(editedTrack);
         editedTrack.setIsVisible(true);
         editedTrack.generateWires();
-        await editedTrack.instantiate();
+        await editedTrack.instantiate(true);
         editedTrack.recomputeAbsolutePath();
         this.machine.generateBaseMesh();
         return editedTrack;
     }
-    async editRampOriginDestInPlace(ramp, dOrigin, dDestination) {
-        let origin = ramp.getOrigin();
+    async editPartOriginDestInPlace(part, dOrigin, dDestination) {
+        let origin = part.getOrigin();
         origin.i += dOrigin.i;
         origin.j += dOrigin.j;
         origin.k += dOrigin.k;
-        let destination = ramp.getDestination();
+        let destination = part.getDestination();
         destination.i += dDestination.i;
         destination.j += dDestination.j;
         destination.k += dDestination.k;
         if (origin.i >= destination.i) {
-            return ramp;
+            return part;
         }
-        let editedRamp = Ramp.CreateFromOriginDestination(origin, destination, this.machine);
-        ramp.dispose();
-        this.machine.parts.push(editedRamp);
-        editedRamp.setIsVisible(true);
-        editedRamp.generateWires();
-        await editedRamp.instantiate();
-        editedRamp.recomputeAbsolutePath();
+        let editedPart = part.recreateFromOriginDestination(origin, destination, this.machine);
+        part.dispose();
+        this.machine.parts.push(editedPart);
+        editedPart.setIsVisible(true);
+        editedPart.generateWires();
+        await editedPart.instantiate(true);
+        editedPart.recomputeAbsolutePath();
         this.machine.generateBaseMesh();
-        return editedRamp;
+        return editedPart;
     }
     async mirrorXTrackInPlace(track) {
         let mirroredTrack = this.machine.trackFactory.createTrack(track.partName, track.i, track.j, track.k, !track.mirrorX);
@@ -1853,7 +1990,7 @@ class MachineEditor {
         this.machine.parts.push(mirroredTrack);
         mirroredTrack.setIsVisible(true);
         mirroredTrack.generateWires();
-        await mirroredTrack.instantiate();
+        await mirroredTrack.instantiate(true);
         mirroredTrack.recomputeAbsolutePath();
         return mirroredTrack;
     }
@@ -1863,7 +2000,7 @@ class MachineEditor {
         this.machine.parts.push(mirroredTrack);
         mirroredTrack.setIsVisible(true);
         mirroredTrack.generateWires();
-        await mirroredTrack.instantiate();
+        await mirroredTrack.instantiate(true);
         mirroredTrack.recomputeAbsolutePath();
         return mirroredTrack;
     }
@@ -1894,7 +2031,7 @@ class MachineEditor {
                 this.KMinusHandle.isVisible = true;
             }
             else if (this.selectedObject instanceof MachinePart) {
-                if (this.selectedObject instanceof Ramp && this.selectedObjectsCount === 1) {
+                if (this.selectedObject instanceof MachinePartWithOriginDestination && this.selectedObjectsCount === 1) {
                     let origin = this.selectedObject.getOrigin();
                     let pOrigin = new BABYLON.Vector3(origin.i * tileWidth - 0.5 * tileWidth, -origin.j * tileHeight, -origin.k * tileDepth);
                     this.originIPlusHandle.position.copyFrom(pOrigin);
@@ -2037,6 +2174,7 @@ var CameraMode;
 })(CameraMode || (CameraMode = {}));
 class Game {
     constructor(canvasElement) {
+        this.savedCamPosToLocalStorage = true;
         this.screenRatio = 1;
         this.cameraMode = CameraMode.None;
         this.menuCameraMode = CameraMode.Ball;
@@ -2178,6 +2316,8 @@ class Game {
         this.camera = new BABYLON.ArcRotateCamera("camera", this.targetCamAlpha, this.targetCamBeta, this.targetCamRadius, this.targetCamTarget.clone());
         this.camera.minZ = 0.01;
         this.camera.maxZ = 10;
+        this.camera.lowerAlphaLimit = -Math.PI * 0.98;
+        this.camera.upperAlphaLimit = -Math.PI * 0.02;
         this.camera.wheelPrecision = 1000;
         this.camera.panningSensibility = 4000;
         this.camera.panningInertia *= 0.5;
@@ -2186,6 +2326,19 @@ class Game {
         this.camera.angularSensibilityX = 2000;
         this.camera.angularSensibilityY = 2000;
         this.camera.pinchPrecision = 5000;
+        if (this.savedCamPosToLocalStorage) {
+            if (window.localStorage.getItem("camera-target")) {
+                let target = JSON.parse(window.localStorage.getItem("camera-target"));
+                this.camera.target.x = target.x;
+                this.camera.target.y = target.y;
+                this.camera.target.z = target.z;
+            }
+            if (window.localStorage.getItem("camera-position")) {
+                let positionItem = JSON.parse(window.localStorage.getItem("camera-position"));
+                let position = new BABYLON.Vector3(positionItem.x, positionItem.y, positionItem.z);
+                this.camera.setPosition(position);
+            }
+        }
         let alternateMenuCamMode = () => {
             if (this.menuCameraMode === CameraMode.Ball) {
                 this.menuCameraMode = CameraMode.Landscape;
@@ -2203,7 +2356,7 @@ class Game {
         this.camera.getScene();
         this.machine = new Machine(this);
         this.machineEditor = new MachineEditor(this);
-        this.machine.deserialize(demo1);
+        this.machine.deserialize(deathLoop);
         //this.machine.deserialize(test);
         await this.machine.instantiate();
         await this.machine.generateBaseMesh();
@@ -2229,7 +2382,7 @@ class Game {
         this.toolbar = new Toolbar(this);
         this.toolbar.initialize();
         this.toolbar.resize();
-        let demos = [simpleLoop, demo1, demoLoops, demo3, largeTornado];
+        let demos = [simpleLoop, demo1, demoLoops, demo3, largeTornado, deathLoop, popopo];
         let container = document.getElementById("main-menu");
         let demoButtons = container.querySelectorAll(".panel.demo");
         for (let i = 0; i < demoButtons.length; i++) {
@@ -2271,11 +2424,13 @@ class Game {
                 else {
                     this.makeCircuitScreenshot();
                 }
+                /*
+                for (let i = 0; i < TrackNames.length; i++) {
+                    let trackname = TrackNames[i];
+                    await this.makeScreenshot(trackname);
+                }
+                */
             }
-            //for (let i = 0; i < TrackNames.length; i++) {
-            //    let trackname = TrackNames[i];
-            //    await this.makeScreenshot(trackname);
-            //}
         });
         this.canvas.addEventListener("pointerdown", this.onPointerDown);
         this.canvas.addEventListener("pointerup", this.onPointerUp);
@@ -2306,6 +2461,12 @@ class Game {
     }
     update() {
         let dt = this.scene.deltaTime / 1000;
+        if (this.savedCamPosToLocalStorage) {
+            let camPos = this.camera.position;
+            let camTarget = this.camera.target;
+            window.localStorage.setItem("camera-position", JSON.stringify({ x: camPos.x, y: camPos.y, z: camPos.z }));
+            window.localStorage.setItem("camera-target", JSON.stringify({ x: camTarget.x, y: camTarget.y, z: camTarget.z }));
+        }
         if (this.cameraMode != CameraMode.None && this.cameraMode != CameraMode.Selected && isFinite(dt)) {
             let speed = 0.01;
             let camTarget = this.targetCamTarget;
@@ -2355,6 +2516,9 @@ class Game {
                 }
             }
         }
+        this.camera.target.x = Nabu.MinMax(this.camera.target.x, this.machine.baseMeshMinX, this.machine.baseMeshMaxX);
+        this.camera.target.y = Nabu.MinMax(this.camera.target.y, this.machine.baseMeshMinY, this.machine.baseMeshMaxY);
+        this.camera.target.z = Nabu.MinMax(this.camera.target.z, -1, 0);
         window.localStorage.setItem("saved-main-volume", this.mainVolume.toFixed(2));
         window.localStorage.setItem("saved-time-factor", this.targetTimeFactor.toFixed(2));
         if (this.cameraOrtho) {
@@ -2877,7 +3041,12 @@ class Machine {
         this.instantiated = false;
         this.playing = false;
         this.onStopCallbacks = new Nabu.UniqueList();
+        this.baseMeshMinX = -0.15;
+        this.baseMeshMaxX = -0.15;
+        this.baseMeshMinY = -0.15;
+        this.baseMeshMaxY = -0.15;
         this.trackFactory = new MachinePartFactory(this);
+        this.templateManager = new TemplateManager(this);
     }
     async instantiate() {
         for (let i = 0; i < this.balls.length; i++) {
@@ -2944,27 +3113,27 @@ class Machine {
         this.playing = false;
     }
     async generateBaseMesh() {
-        let minX = -0.15;
-        let maxX = 0.15;
-        let minY = -0.15;
-        let maxY = 0.15;
+        this.baseMeshMinX = -0.15;
+        this.baseMeshMaxX = 0.15;
+        this.baseMeshMinY = -0.15;
+        this.baseMeshMaxY = 0.15;
         for (let i = 0; i < this.parts.length; i++) {
             let track = this.parts[i];
-            minX = Math.min(minX, track.position.x - tileWidth * 0.5);
-            maxX = Math.max(maxX, track.position.x + tileWidth * (track.w - 0.5));
-            minY = Math.min(minY, track.position.y - tileHeight * (track.h + 1));
-            maxY = Math.max(maxY, track.position.y);
+            this.baseMeshMinX = Math.min(this.baseMeshMinX, track.position.x - tileWidth * 0.5);
+            this.baseMeshMaxX = Math.max(this.baseMeshMaxX, track.position.x + tileWidth * (track.w - 0.5));
+            this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - tileHeight * (track.h + 1));
+            this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.position.y);
         }
-        let w = maxX - minX;
-        let h = maxY - minY;
+        let w = this.baseMeshMaxX - this.baseMeshMinX;
+        let h = this.baseMeshMaxY - this.baseMeshMinY;
         let u = w * 4;
         let v = h * 4;
         if (this.baseWall) {
             this.baseWall.dispose();
         }
         this.baseWall = BABYLON.MeshBuilder.CreatePlane("base-wall", { width: h + 0.2, height: w + 0.2, sideOrientation: BABYLON.Mesh.DOUBLESIDE, frontUVs: new BABYLON.Vector4(0, 0, v, u) });
-        this.baseWall.position.x = (maxX + minX) * 0.5;
-        this.baseWall.position.y = (maxY + minY) * 0.5;
+        this.baseWall.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
+        this.baseWall.position.y = (this.baseMeshMaxY + this.baseMeshMinY) * 0.5;
         this.baseWall.position.z += 0.016;
         this.baseWall.rotation.z = Math.PI / 2;
         this.baseWall.material = this.game.woodMaterial;
@@ -2995,6 +3164,22 @@ class Machine {
         }
         data.positions = positions;
         data.applyToMesh(this.baseFrame);
+    }
+    getBankAt(pos, exclude) {
+        for (let i = 0; i < this.parts.length; i++) {
+            let part = this.parts[i];
+            if (part != exclude) {
+                for (let j = 0; j < part.tracks.length; j++) {
+                    let track = part.tracks[j];
+                    if (BABYLON.Vector3.DistanceSquared(track.startWorldPosition, pos) < 0.000001) {
+                        return { isEnd: false, bank: track.preferedStartBank, part: part };
+                    }
+                    if (BABYLON.Vector3.DistanceSquared(track.endWorldPosition, pos) < 0.000001) {
+                        return { isEnd: true, bank: track.preferedEndBank, part: part };
+                    }
+                }
+            }
+        }
     }
     serialize() {
         let data = {
@@ -3031,7 +3216,9 @@ class Machine {
         for (let i = 0; i < data.parts.length; i++) {
             let part = data.parts[i];
             let track = this.trackFactory.createTrack(part.name, part.i, part.j, part.k, part.mirror ? true : part.mirrorX, part.mirrorZ);
-            this.parts.push(track);
+            if (track) {
+                this.parts.push(track);
+            }
         }
     }
     getEncloseStart() {
@@ -3078,13 +3265,12 @@ class MachinePartSelectorMesh extends BABYLON.Mesh {
     }
 }
 class MachinePart extends BABYLON.Mesh {
-    constructor(machine, _i, _j, _k, prop) {
+    constructor(machine, _i, _j, _k) {
         super("track", machine.game.scene);
         this.machine = machine;
         this._i = _i;
         this._j = _j;
         this._k = _k;
-        this.partName = "machine-part";
         this.tracks = [];
         this.wires = [];
         this.allWires = [];
@@ -3101,42 +3287,79 @@ class MachinePart extends BABYLON.Mesh {
         this.encloseMid = BABYLON.Vector3.One().scaleInPlace(0.5);
         this.enclose23 = BABYLON.Vector3.One().scaleInPlace(2 / 3);
         this.encloseEnd = BABYLON.Vector3.One();
-        this.w = 1;
-        this.h = 1;
-        this.d = 1;
-        this.mirrorX = false;
-        this.mirrorZ = false;
-        this.xExtendable = false;
-        this.yExtendable = false;
-        this.zExtendable = false;
-        this.minD = 1;
-        this.xMirrorable = false;
-        this.zMirrorable = false;
+        this.neighbours = new Nabu.UniqueList();
         this._partVisibilityMode = PartVisibilityMode.Default;
         this.position.x = this._i * tileWidth;
         this.position.y = -this._j * tileHeight;
         this.position.z = -this._k * tileDepth;
-        if (prop) {
-            if (isFinite(prop.w)) {
-                this.w = prop.w;
-            }
-            if (isFinite(prop.h)) {
-                this.h = prop.h;
-            }
-            if (isFinite(prop.d)) {
-                this.d = prop.d;
-            }
-            if (prop.mirrorX) {
-                this.mirrorX = true;
-            }
-            if (prop.mirrorZ) {
-                this.mirrorZ = true;
-            }
-        }
         this.tracks = [new Track(this)];
+    }
+    get partName() {
+        return this.template ? this.template.partName : "machine-part-no-template";
     }
     get game() {
         return this.machine.game;
+    }
+    addNeighbour(other) {
+        this.neighbours.push(other);
+        other.neighbours.push(this);
+    }
+    removeNeighbour(other) {
+        this.neighbours.remove(other);
+        other.neighbours.remove(this);
+    }
+    removeAllNeighbours() {
+        while (this.neighbours.length > 0) {
+            this.removeNeighbour(this.neighbours.get(0));
+        }
+    }
+    get w() {
+        return this.template.w;
+    }
+    get h() {
+        return this.template.h;
+    }
+    get d() {
+        return this.template.d;
+    }
+    get n() {
+        return this.template.n;
+    }
+    get mirrorX() {
+        return this.template.mirrorX;
+    }
+    get mirrorZ() {
+        return this.template.mirrorZ;
+    }
+    get xExtendable() {
+        return this.template.xExtendable;
+    }
+    get yExtendable() {
+        return this.template.yExtendable;
+    }
+    get zExtendable() {
+        return this.template.zExtendable;
+    }
+    get nExtendable() {
+        return this.template.nExtendable;
+    }
+    get minD() {
+        return this.template.minD;
+    }
+    get xMirrorable() {
+        return this.template.xMirrorable;
+    }
+    get zMirrorable() {
+        return this.template.zMirrorable;
+    }
+    get hasOriginDestinationHandles() {
+        return this.template.hasOriginDestinationHandles;
+    }
+    get template() {
+        return this._template;
+    }
+    setTemplate(template) {
+        this._template = template;
     }
     get i() {
         return this._i;
@@ -3196,16 +3419,6 @@ class MachinePart extends BABYLON.Mesh {
         this.selectorMesh.visibility = 0;
         this.encloseMesh.visibility = 0;
     }
-    mirrorXTrackPointsInPlace() {
-        for (let i = 0; i < this.tracks.length; i++) {
-            this.tracks[i].mirrorXTrackPointsInPlace();
-        }
-    }
-    mirrorZTrackPointsInPlace() {
-        for (let i = 0; i < this.tracks.length; i++) {
-            this.tracks[i].mirrorZTrackPointsInPlace();
-        }
-    }
     getSlopeAt(index, trackIndex = 0) {
         if (this.tracks[trackIndex]) {
             return this.tracks[trackIndex].getSlopeAt(index);
@@ -3218,25 +3431,15 @@ class MachinePart extends BABYLON.Mesh {
         }
         return 0;
     }
-    splitTrackPointAt(index, trackIndex = 0) {
-        if (this.tracks[trackIndex]) {
-            this.tracks[trackIndex].splitTrackPointAt(index);
-        }
-    }
-    deleteTrackPointAt(index, trackIndex = 0) {
-        if (this.tracks[trackIndex]) {
-            this.tracks[trackIndex].deleteTrackPointAt(index);
-        }
-    }
     getBarycenter() {
-        if (this.tracks[0].trackpoints.length < 2) {
+        if (this.tracks[0].template.trackpoints.length < 2) {
             return this.position.clone();
         }
-        let barycenter = this.tracks[0].trackpoints.map(trackpoint => {
+        let barycenter = this.tracks[0].template.trackpoints.map(trackpoint => {
             return trackpoint.position;
         }).reduce((pos1, pos2) => {
             return pos1.add(pos2);
-        }).scaleInPlace(1 / this.tracks[0].trackpoints.length);
+        }).scaleInPlace(1 / this.tracks[0].template.trackpoints.length);
         return BABYLON.Vector3.TransformCoordinates(barycenter, this.getWorldMatrix());
     }
     recomputeAbsolutePath() {
@@ -3248,7 +3451,7 @@ class MachinePart extends BABYLON.Mesh {
             wire.recomputeAbsolutePath();
         });
     }
-    async instantiate() {
+    async instantiate(rebuildNeighboursWireMeshes) {
         if (this.sleepersMesh) {
             this.sleepersMesh.dispose();
         }
@@ -3257,13 +3460,13 @@ class MachinePart extends BABYLON.Mesh {
         this.sleepersMesh.parent = this;
         let datas = [];
         for (let n = 0; n < this.tracks.length; n++) {
-            let points = [...this.tracks[n].interpolatedPoints].map(p => { return p.clone(); });
+            let points = [...this.tracks[n].templateInterpolatedPoints].map(p => { return p.clone(); });
             Mummu.DecimatePathInPlace(points, 10 / 180 * Math.PI);
             let dirStart = points[1].subtract(points[0]).normalize();
             let dirEnd = points[points.length - 1].subtract(points[points.length - 2]).normalize();
             points[0].subtractInPlace(dirStart.scale(this.wireGauge * 0.5));
             points[points.length - 1].addInPlace(dirEnd.scale(this.wireGauge * 0.5));
-            let tmp = BABYLON.ExtrudeShape("wire", { shape: selectorHullShape, path: this.tracks[n].interpolatedPoints, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+            let tmp = BABYLON.ExtrudeShape("wire", { shape: selectorHullShape, path: this.tracks[n].templateInterpolatedPoints, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
             let data = BABYLON.VertexData.ExtractFromMesh(tmp);
             datas.push(data);
             tmp.dispose();
@@ -3307,10 +3510,11 @@ class MachinePart extends BABYLON.Mesh {
         }, this.getScene());
         this.encloseMesh.parent = this;
         this.encloseMesh.visibility = 0;
-        this.rebuildWireMeshes();
+        this.rebuildWireMeshes(rebuildNeighboursWireMeshes);
     }
     dispose() {
         super.dispose();
+        this.removeAllNeighbours();
         let index = this.machine.parts.indexOf(this);
         if (index > -1) {
             this.machine.parts.splice(index, 1);
@@ -3320,15 +3524,26 @@ class MachinePart extends BABYLON.Mesh {
         this.AABBMin.copyFromFloats(Infinity, Infinity, Infinity);
         this.AABBMax.copyFromFloats(-Infinity, -Infinity, -Infinity);
         this.allWires = [...this.wires];
-        this.tracks.forEach(track => {
-            track.generateWires();
-            this.AABBMin.minimizeInPlace(track.AABBMin);
-            this.AABBMax.maximizeInPlace(track.AABBMax);
-            this.allWires.push(track.wires[0], track.wires[1]);
-        });
+        if (this.template) {
+            for (let i = 0; i < this.template.trackTemplates.length; i++) {
+                let track = this.tracks[i];
+                if (!track) {
+                    track = new Track(this);
+                    this.tracks[i] = track;
+                }
+                track.initialize(this.template.trackTemplates[i]);
+                this.AABBMin.minimizeInPlace(track.AABBMin);
+                this.AABBMax.maximizeInPlace(track.AABBMax);
+                this.allWires.push(track.wires[0], track.wires[1]);
+            }
+        }
+        else {
+            console.error("Can't generate wires, no template provided for " + this.partName);
+            console.log(this);
+        }
     }
     update(dt) { }
-    rebuildWireMeshes() {
+    rebuildWireMeshes(rebuildNeighboursWireMeshes) {
         if (this.renderOnlyPath) {
             let n = 8;
             let shape = [];
@@ -3338,7 +3553,7 @@ class MachinePart extends BABYLON.Mesh {
                 let sina = Math.sin(a);
                 shape[i] = new BABYLON.Vector3(cosa * this.wireSize * 0.5, sina * this.wireSize * 0.5, 0);
             }
-            let tmp = BABYLON.ExtrudeShape("wire", { shape: shape, path: this.tracks[0].interpolatedPoints, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+            let tmp = BABYLON.ExtrudeShape("wire", { shape: shape, path: this.tracks[0].templateInterpolatedPoints, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
             let vertexData = BABYLON.VertexData.ExtractFromMesh(tmp);
             vertexData.applyToMesh(this.sleepersMesh);
             tmp.dispose();
@@ -3347,11 +3562,22 @@ class MachinePart extends BABYLON.Mesh {
             });
         }
         else {
+            let neighboursToUpdate;
+            if (rebuildNeighboursWireMeshes) {
+                neighboursToUpdate = this.neighbours.cloneAsArray();
+                for (let i = 0; i < neighboursToUpdate.length; i++) {
+                    neighboursToUpdate[i].rebuildWireMeshes();
+                }
+            }
             this.allWires.forEach(wire => {
                 wire.show();
             });
-            SleeperMeshBuilder.GenerateSleepersVertexData(this, 0.03).applyToMesh(this.sleepersMesh);
+            this.removeAllNeighbours();
             this.tracks.forEach(track => {
+                if (track.template) {
+                    track.recomputeWiresPath();
+                    track.recomputeAbsolutePath();
+                }
                 track.wires.forEach(wire => {
                     wire.instantiate();
                 });
@@ -3359,79 +3585,54 @@ class MachinePart extends BABYLON.Mesh {
             this.wires.forEach(wire => {
                 wire.instantiate();
             });
-        }
-    }
-    serialize() {
-        let data = { points: [] };
-        for (let i = 0; i < this.tracks[0].trackpoints.length; i++) {
-            data.points[i] = {
-                position: { x: this.tracks[0].trackpoints[i].position.x, y: this.tracks[0].trackpoints[i].position.y, z: this.tracks[0].trackpoints[i].position.z }
-            };
-            if (this.tracks[0].trackpoints[i].fixedNormal) {
-                data.points[i].normal = { x: this.tracks[0].trackpoints[i].normal.x, y: this.tracks[0].trackpoints[i].normal.y, z: this.tracks[0].trackpoints[i].normal.z };
+            SleeperMeshBuilder.GenerateSleepersVertexData(this, 0.03).applyToMesh(this.sleepersMesh);
+            if (rebuildNeighboursWireMeshes) {
+                neighboursToUpdate = this.neighbours.cloneAsArray();
+                for (let i = 0; i < neighboursToUpdate.length; i++) {
+                    neighboursToUpdate[i].rebuildWireMeshes();
+                }
             }
-            if (this.tracks[0].trackpoints[i].fixedDir) {
-                data.points[i].dir = { x: this.tracks[0].trackpoints[i].dir.x, y: this.tracks[0].trackpoints[i].dir.y, z: this.tracks[0].trackpoints[i].dir.z };
-            }
-            if (this.tracks[0].trackpoints[i].fixedTangentIn) {
-                data.points[i].tangentIn = this.tracks[0].trackpoints[i].tangentIn;
-            }
-            if (this.tracks[0].trackpoints[i].fixedTangentOut) {
-                data.points[i].tangentOut = this.tracks[0].trackpoints[i].tangentOut;
-            }
-        }
-        return data;
-    }
-    deserialize(data) {
-        this.tracks = [new Track(this)];
-        for (let i = 0; i < data.points.length; i++) {
-            let pointData = data.points[i];
-            let direction;
-            if (pointData.dir) {
-                direction = new BABYLON.Vector3(pointData.dir.x, pointData.dir.y, pointData.dir.z);
-            }
-            let normal;
-            if (pointData.normal) {
-                normal = new BABYLON.Vector3(pointData.normal.x, pointData.normal.y, pointData.normal.z);
-            }
-            let trackPoint = new TrackPoint(this.tracks[0], new BABYLON.Vector3(pointData.position.x, pointData.position.y, pointData.position.z), direction, normal, pointData.tangentIn, pointData.tangentOut);
-            this.tracks[0].trackpoints[i] = trackPoint;
         }
     }
 }
 var TrackNames = [
     "ramp-1.1.1",
+    "wave-2.1.1",
+    "snake-2.1.1",
     "join",
     "flatjoin",
     "split",
-    "uturn-s",
-    "uturn-l",
-    "uturnlayer-0.2",
-    "loop-1.2",
-    "loop",
-    "wave",
-    "snake",
+    "uturn-0.2",
+    "uturnsharp",
+    "loop-1.1",
     "elevator-4"
 ];
 class MachinePartFactory {
     constructor(machine) {
         this.machine = machine;
     }
-    createTrackWHD(trackname, i, j, k = 0, w, h, d, mirrorX, mirrorZ) {
+    createTrackWHDN(trackname, props) {
+        if (!props) {
+            props = {};
+        }
         trackname = trackname.split("-")[0];
         let whd = "";
-        if (isFinite(w)) {
-            whd += w.toFixed(0) + ".";
+        if (isFinite(props.w)) {
+            whd += props.w.toFixed(0) + ".";
         }
-        if (isFinite(h)) {
-            whd += h.toFixed(0) + ".";
+        if (isFinite(props.h)) {
+            whd += props.h.toFixed(0) + ".";
         }
-        if (isFinite(d)) {
-            whd += d.toFixed(0) + ".";
+        if (isFinite(props.d)) {
+            whd += props.d.toFixed(0) + ".";
+        }
+        if (isFinite(props.n)) {
+            whd += props.n.toFixed(0) + ".";
         }
         whd = whd.substring(0, whd.length - 1);
         trackname += "-" + whd;
-        return this.createTrack(trackname, i, j, k, mirrorX, mirrorZ);
+        console.log(trackname);
+        return this.createTrack(trackname, props.i, props.j, props.k, props.mirrorX, props.mirrorZ);
     }
     createTrack(trackname, i, j, k = 0, mirrorX, mirrorZ) {
         if (trackname.startsWith("ramp-")) {
@@ -3440,33 +3641,33 @@ class MachinePartFactory {
             let d = parseInt(trackname.split("-")[1].split(".")[2]);
             return new Ramp(this.machine, i, j, k, w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
         }
-        if (trackname === "uturn-s") {
-            return new UTurn(this.machine, i, j, k, mirrorX);
+        if (trackname.startsWith("wave-")) {
+            let w = parseInt(trackname.split("-")[1].split(".")[0]);
+            let h = parseInt(trackname.split("-")[1].split(".")[1]);
+            let d = parseInt(trackname.split("-")[1].split(".")[2]);
+            return new Wave(this.machine, i, j, k, w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
         }
-        if (trackname === "uturn-l") {
-            return new UTurnLarge(this.machine, i, j, k, mirrorX);
+        if (trackname.startsWith("snake-")) {
+            let w = parseInt(trackname.split("-")[1].split(".")[0]);
+            let h = parseInt(trackname.split("-")[1].split(".")[1]);
+            let d = parseInt(trackname.split("-")[1].split(".")[2]);
+            return new Snake(this.machine, i, j, k, w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
         }
-        if (trackname.startsWith("uturnlayer-")) {
+        if (trackname.startsWith("uturn-")) {
             let h = parseInt(trackname.split("-")[1].split(".")[0]);
             let d = parseInt(trackname.split("-")[1].split(".")[1]);
-            return new UTurnLayer(this.machine, i, j, k, h, d, mirrorX, mirrorZ);
+            if (isFinite(h) && isFinite(d)) {
+                return new UTurn(this.machine, i, j, k, h, d, mirrorX, mirrorZ);
+            }
+        }
+        if (trackname === "uturnsharp") {
+            return new UTurnSharp(this.machine, i, j, k, mirrorX, mirrorZ);
         }
         if (trackname.startsWith("loop-")) {
             let w = parseInt(trackname.split("-")[1].split(".")[0]);
             let d = parseInt(trackname.split("-")[1].split(".")[1]);
-            return new Loop2(this.machine, i, j, k, w, d, mirrorX, mirrorZ);
-        }
-        if (trackname === "loop") {
-            return new Loop(this.machine, i, j, k, mirrorX);
-        }
-        if (trackname === "wave") {
-            return new Wave(this.machine, i, j, k, mirrorX);
-        }
-        if (trackname === "snake") {
-            return new Snake(this.machine, i, j, k, mirrorX);
-        }
-        if (trackname === "spiral") {
-            return new Spiral(this.machine, i, j, k, mirrorX);
+            let n = parseInt(trackname.split("-")[1].split(".")[2]);
+            return new Loop(this.machine, i, j, k, w, d, n, mirrorX, mirrorZ);
         }
         if (trackname === "join") {
             return new Join(this.machine, i, j, k, mirrorX);
@@ -3488,7 +3689,7 @@ class SleeperMeshBuilder {
         let q = part.game.config.graphicQ;
         let partialsDatas = [];
         for (let j = 0; j < part.tracks.length; j++) {
-            let interpolatedPoints = part.tracks[j].interpolatedPoints;
+            let interpolatedPoints = part.tracks[j].templateInterpolatedPoints;
             let summedLength = [0];
             for (let i = 1; i < interpolatedPoints.length; i++) {
                 let prev = interpolatedPoints[i - 1];
@@ -3560,7 +3761,7 @@ class SleeperMeshBuilder {
                     let path = basePath.map(v => { return v.clone(); });
                     let dir = interpolatedPoints[i + 1].subtract(interpolatedPoints[i - 1]).normalize();
                     let t = interpolatedPoints[i];
-                    Mummu.QuaternionFromYZAxisToRef(part.tracks[j].interpolatedNormals[i], dir, quat);
+                    Mummu.QuaternionFromYZAxisToRef(part.tracks[j].trackInterpolatedNormals[i], dir, quat);
                     let m = BABYLON.Matrix.Compose(BABYLON.Vector3.One(), quat, t);
                     for (let j = 0; j < path.length; j++) {
                         BABYLON.Vector3.TransformCoordinatesToRef(path[j], m, path[j]);
@@ -3615,26 +3816,27 @@ class SleeperMeshBuilder {
         return Mummu.MergeVertexDatas(...partialsDatas);
     }
 }
-class Track {
-    constructor(part) {
-        this.part = part;
-        this.trackpoints = [];
+class TrackTemplate {
+    constructor(partTemplate) {
+        this.partTemplate = partTemplate;
+        this.trackpoints = [] = [];
+        this.interpolatedPoints = [];
+        this.interpolatedNormals = [];
+        this.angles = [];
         this.drawStartTip = false;
         this.drawEndTip = false;
+        this.preferedStartBank = 0;
+        this.preferedEndBank = 0;
         this.summedLength = [0];
         this.totalLength = 0;
         this.globalSlope = 0;
         this.AABBMin = BABYLON.Vector3.Zero();
         this.AABBMax = BABYLON.Vector3.Zero();
-        this.wires = [
-            new Wire(this.part),
-            new Wire(this.part)
-        ];
     }
     mirrorXTrackPointsInPlace() {
         for (let i = 0; i < this.trackpoints.length; i++) {
             this.trackpoints[i].position.x *= -1;
-            this.trackpoints[i].position.x += (this.part.w - 1) * tileWidth;
+            this.trackpoints[i].position.x += (this.partTemplate.w - 1) * tileWidth;
             if (this.trackpoints[i].normal) {
                 this.trackpoints[i].normal.x *= -1;
             }
@@ -3645,9 +3847,9 @@ class Track {
     }
     mirrorZTrackPointsInPlace() {
         for (let i = 0; i < this.trackpoints.length; i++) {
-            this.trackpoints[i].position.z += (this.part.d - 1) * tileDepth * 0.5;
+            this.trackpoints[i].position.z += (this.partTemplate.d - 1) * tileDepth * 0.5;
             this.trackpoints[i].position.z *= -1;
-            this.trackpoints[i].position.z -= (this.part.d - 1) * tileDepth * 0.5;
+            this.trackpoints[i].position.z -= (this.partTemplate.d - 1) * tileDepth * 0.5;
             if (this.trackpoints[i].normal) {
                 this.trackpoints[i].normal.z *= -1;
             }
@@ -3656,75 +3858,7 @@ class Track {
             }
         }
     }
-    getSlopeAt(index) {
-        let trackpoint = this.trackpoints[index];
-        let nextTrackPoint = this.trackpoints[index + 1];
-        if (trackpoint) {
-            if (nextTrackPoint) {
-                let dy = nextTrackPoint.position.y - trackpoint.position.y;
-                let dLength = nextTrackPoint.summedLength - trackpoint.summedLength;
-                return dy / dLength * 100;
-            }
-            else {
-                let angleToVertical = Mummu.Angle(BABYLON.Axis.Y, trackpoint.dir);
-                let angleToHorizontal = Math.PI / 2 - angleToVertical;
-                return Math.tan(angleToHorizontal) * 100;
-            }
-        }
-        return 0;
-    }
-    getBankAt(index) {
-        let trackpoint = this.trackpoints[index];
-        if (trackpoint) {
-            let n = trackpoint.normal;
-            if (n.y < 0) {
-                n = n.scale(-1);
-            }
-            let angle = Mummu.AngleFromToAround(trackpoint.normal, BABYLON.Axis.Y, trackpoint.dir);
-            return angle / Math.PI * 180;
-        }
-        return 0;
-    }
-    splitTrackPointAt(index) {
-        if (index === 0) {
-            let trackPoint = this.trackpoints[0];
-            let nextTrackPoint = this.trackpoints[0 + 1];
-            let distA = BABYLON.Vector3.Distance(trackPoint.position, nextTrackPoint.position);
-            let tanInA = trackPoint.dir.scale(distA * trackPoint.tangentOut);
-            let tanOutA = nextTrackPoint.dir.scale(distA * nextTrackPoint.tangentIn);
-            let pointA = BABYLON.Vector3.Hermite(trackPoint.position, tanInA, nextTrackPoint.position, tanOutA, 0.5);
-            let normalA = BABYLON.Vector3.Lerp(trackPoint.normal, nextTrackPoint.normal, 0.5);
-            let trackPointA = new TrackPoint(this, pointA, normalA);
-            this.trackpoints.splice(1, 0, trackPointA);
-        }
-        if (index > 0 && index < this.trackpoints.length - 1) {
-            let prevTrackPoint = this.trackpoints[index - 1];
-            let trackPoint = this.trackpoints[index];
-            let nextTrackPoint = this.trackpoints[index + 1];
-            let distA = BABYLON.Vector3.Distance(trackPoint.position, prevTrackPoint.position);
-            let tanInA = prevTrackPoint.dir.scale(distA * prevTrackPoint.tangentOut);
-            let tanOutA = trackPoint.dir.scale(distA * trackPoint.tangentIn);
-            let pointA = BABYLON.Vector3.Hermite(prevTrackPoint.position, tanInA, trackPoint.position, tanOutA, 2 / 3);
-            let normalA = BABYLON.Vector3.Lerp(prevTrackPoint.normal, trackPoint.normal, 2 / 3);
-            let distB = BABYLON.Vector3.Distance(trackPoint.position, nextTrackPoint.position);
-            let tanInB = trackPoint.dir.scale(distB * trackPoint.tangentOut);
-            let tanOutB = nextTrackPoint.dir.scale(distB * nextTrackPoint.tangentIn);
-            let pointB = BABYLON.Vector3.Hermite(trackPoint.position, tanInB, nextTrackPoint.position, tanOutB, 1 / 3);
-            let normalB = BABYLON.Vector3.Lerp(trackPoint.normal, nextTrackPoint.normal, 1 / 3);
-            let trackPointA = new TrackPoint(this, pointA, normalA);
-            let trackPointB = new TrackPoint(this, pointB, normalB);
-            this.trackpoints.splice(index, 1, trackPointA, trackPointB);
-        }
-    }
-    deleteTrackPointAt(index) {
-        if (index > 0 && index < this.trackpoints.length - 1) {
-            this.trackpoints.splice(index, 1);
-        }
-    }
-    generateWires() {
-        this.interpolatedPoints = [];
-        this.interpolatedNormals = [];
-        // Update normals and tangents
+    initialize() {
         for (let i = 1; i < this.trackpoints.length - 1; i++) {
             let prevTrackPoint = this.trackpoints[i - 1];
             let trackPoint = this.trackpoints[i];
@@ -3739,8 +3873,6 @@ class Track {
                 trackPoint.tangentOut = 1;
             }
         }
-        this.wires[0].path = [];
-        this.wires[1].path = [];
         this.trackpoints[0].summedLength = 0;
         for (let i = 0; i < this.trackpoints.length - 1; i++) {
             let trackPoint = this.trackpoints[i];
@@ -3773,6 +3905,9 @@ class Track {
             let n = prevNormal;
             let right = BABYLON.Vector3.Cross(n, dir);
             n = BABYLON.Vector3.Cross(dir, right).normalize();
+            if (this.onNormalEvaluated) {
+                this.onNormalEvaluated(n);
+            }
             normalsForward.push(n);
         }
         normalsForward.push(this.trackpoints[this.trackpoints.length - 1].normal);
@@ -3785,14 +3920,18 @@ class Track {
             let n = prevNormal;
             let right = BABYLON.Vector3.Cross(n, dir);
             n = BABYLON.Vector3.Cross(dir, right).normalize();
+            if (this.onNormalEvaluated) {
+                this.onNormalEvaluated(n);
+            }
             normalsBackward[i] = n;
         }
         normalsBackward[0] = this.trackpoints[0].normal;
         for (let i = 0; i < N; i++) {
             let f = i / (N - 1);
-            this.interpolatedNormals.push(BABYLON.Vector3.Lerp(normalsForward[i], normalsBackward[i], f).normalize());
+            this.interpolatedNormals[i] = BABYLON.Vector3.Lerp(normalsForward[i], normalsBackward[i], f).normalize();
         }
-        let angles = [0];
+        let maxR = 0;
+        this.angles = [0];
         for (let i = 1; i < N - 1; i++) {
             let n = this.interpolatedNormals[i];
             let prevPoint = this.interpolatedPoints[i - 1];
@@ -3803,36 +3942,47 @@ class Track {
             let dirNext = nextPoint.subtract(point);
             let dNext = dirNext.length();
             let a = Mummu.AngleFromToAround(dirPrev.scale(-1), dirNext, n);
-            if (Math.abs(a) < Math.PI * 0.9999) {
+            if (Math.abs(a) < Math.PI * 0.9999999) {
                 let sign = Math.sign(a);
                 let rPrev = Math.tan(Math.abs(a) / 2) * (dPrev * 0.5);
                 let rNext = Math.tan(Math.abs(a) / 2) * (dNext * 0.5);
                 let r = (rPrev + rNext) * 0.5;
-                let f = 0.06 / r;
+                maxR = Math.max(r, maxR);
+                let f = 0.1 / r;
                 f = Math.max(Math.min(f, 1), 0);
-                angles[i] = Math.PI / 4 * sign * f;
+                this.angles[i] = Math.PI / 4 * sign * f;
             }
             else {
-                angles[i] = 0;
+                this.angles[i] = 0;
             }
         }
-        angles.push(0);
-        for (let n = 0; n < 50; n++) {
-            let newAngles = [...angles];
-            for (let i = 1; i < N - 1; i++) {
-                let aPrev = angles[i - 1];
-                let a = angles[i];
-                let aNext = angles[i + 1];
-                newAngles[i] = (aPrev + a + aNext) / 3;
+        this.angles.push(0);
+        let tmpAngles = [...this.angles];
+        let f = 1;
+        for (let n = 0; n < this.partTemplate.angleSmoothFactor * N; n++) {
+            for (let i = 0; i < N; i++) {
+                let aPrev = tmpAngles[i - 1];
+                let a = tmpAngles[i];
+                let point = this.interpolatedPoints[i];
+                let aNext = tmpAngles[i + 1];
+                if (isFinite(aPrev) && isFinite(aNext)) {
+                    let prevPoint = this.interpolatedPoints[i - 1];
+                    let distPrev = BABYLON.Vector3.Distance(prevPoint, point);
+                    let nextPoint = this.interpolatedPoints[i + 1];
+                    let distNext = BABYLON.Vector3.Distance(nextPoint, point);
+                    let d = distPrev / (distPrev + distNext);
+                    tmpAngles[i] = (1 - f) * a + f * ((1 - d) * aPrev + d * aNext);
+                }
+                else if (isFinite(aPrev)) {
+                    tmpAngles[i] = (1 - f) * a + f * aPrev;
+                }
+                else if (isFinite(aNext)) {
+                    tmpAngles[i] = (1 - f) * a + f * aNext;
+                }
             }
-            angles = newAngles;
         }
-        for (let i = 1; i < N - 1; i++) {
-            let point = this.interpolatedPoints[i];
-            let nextPoint = this.interpolatedPoints[i + 1];
-            let dirNext = nextPoint.subtract(point);
-            Mummu.RotateInPlace(this.interpolatedNormals[i], dirNext, angles[i]);
-        }
+        this.preferedStartBank = tmpAngles[0];
+        this.preferedEndBank = tmpAngles[tmpAngles.length - 1];
         this.summedLength = [0];
         this.totalLength = 0;
         for (let i = 0; i < N - 1; i++) {
@@ -3848,13 +3998,275 @@ class Track {
         this.totalLength = this.summedLength[N - 1];
         let dh = this.interpolatedPoints[this.interpolatedPoints.length - 1].y - this.interpolatedPoints[0].y;
         this.globalSlope = dh / this.totalLength * 100;
-        // Compute wire path and Update AABB values.
+    }
+}
+class MachinePartTemplate {
+    constructor() {
+        this.partName = "machine-part-template";
+        this.w = 1;
+        this.h = 1;
+        this.d = 1;
+        this.n = 1;
+        this.mirrorX = false;
+        this.mirrorZ = false;
+        this.angleSmoothFactor = 2;
+        this.xExtendable = false;
+        this.yExtendable = false;
+        this.zExtendable = false;
+        this.nExtendable = false;
+        this.minD = 1;
+        this.xMirrorable = false;
+        this.zMirrorable = false;
+        this.hasOriginDestinationHandles = false;
+        this.trackTemplates = [];
+    }
+    mirrorXTrackPointsInPlace() {
+        for (let i = 0; i < this.trackTemplates.length; i++) {
+            this.trackTemplates[i].mirrorXTrackPointsInPlace();
+        }
+    }
+    mirrorZTrackPointsInPlace() {
+        for (let i = 0; i < this.trackTemplates.length; i++) {
+            this.trackTemplates[i].mirrorZTrackPointsInPlace();
+        }
+    }
+    initialize() {
+        this.trackTemplates.forEach(trackTemplate => {
+            trackTemplate.initialize();
+        });
+    }
+}
+class TemplateManager {
+    constructor(machine) {
+        this.machine = machine;
+        this._dictionary = new Map();
+    }
+    getTemplate(partName, mirrorX, mirrorZ) {
+        let mirrorIndex = (mirrorX ? 0 : 1) + (mirrorZ ? 0 : 2);
+        let data;
+        let datas = this._dictionary.get(partName);
+        if (datas && datas[mirrorIndex]) {
+            data = datas[mirrorIndex];
+        }
+        else {
+            if (!datas) {
+                datas = [];
+            }
+            this._dictionary.set(partName, datas);
+        }
+        if (!data) {
+            if (partName.startsWith("uturn-")) {
+                let h = parseInt(partName.split("-")[1].split(".")[0]);
+                let d = parseInt(partName.split("-")[1].split(".")[1]);
+                data = UTurn.GenerateTemplate(h, d, mirrorX, mirrorZ);
+            }
+            else if (partName === "uturnsharp") {
+                data = UTurnSharp.GenerateTemplate(mirrorX);
+            }
+            else if (partName.startsWith("ramp-")) {
+                let w = parseInt(partName.split("-")[1].split(".")[0]);
+                let h = parseInt(partName.split("-")[1].split(".")[1]);
+                let d = parseInt(partName.split("-")[1].split(".")[2]);
+                data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
+            }
+            else if (partName.startsWith("wave-")) {
+                let w = parseInt(partName.split("-")[1].split(".")[0]);
+                let h = parseInt(partName.split("-")[1].split(".")[1]);
+                let d = parseInt(partName.split("-")[1].split(".")[2]);
+                data = Wave.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
+            }
+            else if (partName.startsWith("snake-")) {
+                let w = parseInt(partName.split("-")[1].split(".")[0]);
+                let h = parseInt(partName.split("-")[1].split(".")[1]);
+                let d = parseInt(partName.split("-")[1].split(".")[2]);
+                data = Snake.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
+            }
+            else if (partName.startsWith("elevator-")) {
+                let h = parseInt(partName.split("-")[1]);
+                data = Elevator.GenerateTemplate(h, mirrorX);
+            }
+            else if (partName === "split") {
+                data = Split.GenerateTemplate(mirrorX);
+            }
+            else if (partName === "flatjoin") {
+                data = FlatJoin.GenerateTemplate(mirrorX);
+            }
+            else if (partName === "join") {
+                data = Join.GenerateTemplate(mirrorX);
+            }
+            else if (partName.startsWith("loop-")) {
+                let w = parseInt(partName.split("-")[1].split(".")[0]);
+                let d = parseInt(partName.split("-")[1].split(".")[1]);
+                let n = parseInt(partName.split("-")[1].split(".")[2]);
+                data = Loop.GenerateTemplate(w, d, n, mirrorX, mirrorZ);
+            }
+            datas[mirrorIndex] = data;
+        }
+        return data;
+    }
+}
+class Track {
+    constructor(part) {
+        this.part = part;
+        this._startWorldPosition = BABYLON.Vector3.Zero();
+        this._endWorldPosition = BABYLON.Vector3.Zero();
+        this.AABBMin = BABYLON.Vector3.Zero();
+        this.AABBMax = BABYLON.Vector3.Zero();
+        this.wires = [
+            new Wire(this.part),
+            new Wire(this.part)
+        ];
+    }
+    get templateInterpolatedPoints() {
+        return this.template.interpolatedPoints;
+    }
+    get preferedStartBank() {
+        return this.template ? this.template.preferedStartBank : 0;
+    }
+    get startWorldPosition() {
+        this._startWorldPosition.copyFrom(this.part.position).addInPlace(this.templateInterpolatedPoints[0]);
+        return this._startWorldPosition;
+    }
+    get preferedEndBank() {
+        return this.template ? this.template.preferedEndBank : 0;
+    }
+    get endWorldPosition() {
+        this._endWorldPosition.copyFrom(this.part.position).addInPlace(this.templateInterpolatedPoints[this.templateInterpolatedPoints.length - 1]);
+        return this._endWorldPosition;
+    }
+    get trackIndex() {
+        return this.part.tracks.indexOf(this);
+    }
+    getSlopeAt(index) {
+        let trackpoint = this.template.trackpoints[index];
+        let nextTrackPoint = this.template.trackpoints[index + 1];
+        if (trackpoint) {
+            if (nextTrackPoint) {
+                let dy = nextTrackPoint.position.y - trackpoint.position.y;
+                let dLength = nextTrackPoint.summedLength - trackpoint.summedLength;
+                return dy / dLength * 100;
+            }
+            else {
+                let angleToVertical = Mummu.Angle(BABYLON.Axis.Y, trackpoint.dir);
+                let angleToHorizontal = Math.PI / 2 - angleToVertical;
+                return Math.tan(angleToHorizontal) * 100;
+            }
+        }
+        return 0;
+    }
+    getBankAt(index) {
+        let trackpoint = this.template.trackpoints[index];
+        if (trackpoint) {
+            let n = trackpoint.normal;
+            if (n.y < 0) {
+                n = n.scale(-1);
+            }
+            let angle = Mummu.AngleFromToAround(trackpoint.normal, BABYLON.Axis.Y, trackpoint.dir);
+            return angle / Math.PI * 180;
+        }
+        return 0;
+    }
+    initialize(template) {
+        this.template = template;
+        this.trackInterpolatedNormals = template.interpolatedNormals.map(v => { return v.clone(); });
+        // Update AABB values.
+        let N = this.templateInterpolatedPoints.length;
         this.AABBMin.copyFromFloats(Infinity, Infinity, Infinity);
         this.AABBMax.copyFromFloats(-Infinity, -Infinity, -Infinity);
         for (let i = 0; i < N; i++) {
-            let pPrev = this.interpolatedPoints[i - 1] ? this.interpolatedPoints[i - 1] : undefined;
-            let p = this.interpolatedPoints[i];
-            let pNext = this.interpolatedPoints[i + 1] ? this.interpolatedPoints[i + 1] : undefined;
+            let p = this.templateInterpolatedPoints[i];
+            this.AABBMin.minimizeInPlace(p);
+            this.AABBMax.maximizeInPlace(p);
+        }
+        this.AABBMin.x -= (this.part.wireSize + this.part.wireGauge) * 0.5;
+        this.AABBMin.y -= (this.part.wireSize + this.part.wireGauge) * 0.5;
+        this.AABBMin.z -= (this.part.wireSize + this.part.wireGauge) * 0.5;
+        this.AABBMax.x += (this.part.wireSize + this.part.wireGauge) * 0.5;
+        this.AABBMax.y += (this.part.wireSize + this.part.wireGauge) * 0.5;
+        this.AABBMax.z += (this.part.wireSize + this.part.wireGauge) * 0.5;
+        BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMin, this.part.getWorldMatrix(), this.AABBMin);
+        BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMax, this.part.getWorldMatrix(), this.AABBMax);
+    }
+    recomputeWiresPath() {
+        let N = this.templateInterpolatedPoints.length;
+        let angles = [...this.template.angles];
+        this.trackInterpolatedNormals = this.template.interpolatedNormals.map(v => { return v.clone(); });
+        //Mummu.DrawDebugPoint(this.startWorldPosition.add(this.endWorldPosition).scale(0.5), 60, BABYLON.Color3.Blue());
+        let startBank = 0;
+        let otherS = this.part.machine.getBankAt(this.startWorldPosition, this.part);
+        if (otherS) {
+            this.part.addNeighbour(otherS.part);
+            //Mummu.DrawDebugPoint(this.startWorldPosition, 60, BABYLON.Color3.Green());
+            let otherBank = otherS.bank * (otherS.isEnd ? 1 : -1);
+            if (this.preferedStartBank * otherBank >= 0) {
+                startBank = Math.sign(this.preferedStartBank + otherBank) * Math.max(Math.abs(this.preferedStartBank), Math.abs(otherBank));
+            }
+            else {
+                startBank = this.preferedStartBank * 0.5 + otherBank * 0.5;
+            }
+        }
+        let endBank = 0;
+        let otherE = this.part.machine.getBankAt(this.endWorldPosition, this.part);
+        if (otherE) {
+            this.part.addNeighbour(otherE.part);
+            //Mummu.DrawDebugPoint(this.endWorldPosition, 60, BABYLON.Color3.Red());
+            let otherBank = otherE.bank * (otherE.isEnd ? -1 : 1);
+            if (this.preferedEndBank * otherBank >= 0) {
+                endBank = Math.sign(this.preferedEndBank + otherBank) * Math.max(Math.abs(this.preferedEndBank), Math.abs(otherBank));
+            }
+            else {
+                endBank = this.preferedEndBank * 0.5 + otherBank * 0.5;
+            }
+        }
+        angles[0] = startBank;
+        angles[angles.length - 1] = endBank;
+        let f = 1;
+        for (let n = 0; n < this.template.partTemplate.angleSmoothFactor * N; n++) {
+            for (let i = 1; i < N - 1; i++) {
+                let aPrev = angles[i - 1];
+                let a = angles[i];
+                let point = this.templateInterpolatedPoints[i];
+                let aNext = angles[i + 1];
+                if (isFinite(aPrev) && isFinite(aNext)) {
+                    let prevPoint = this.templateInterpolatedPoints[i - 1];
+                    let distPrev = BABYLON.Vector3.Distance(prevPoint, point);
+                    let nextPoint = this.templateInterpolatedPoints[i + 1];
+                    let distNext = BABYLON.Vector3.Distance(nextPoint, point);
+                    let d = distPrev / (distPrev + distNext);
+                    angles[i] = (1 - f) * a + f * ((1 - d) * aPrev + d * aNext);
+                }
+                else if (isFinite(aPrev)) {
+                    angles[i] = (1 - f) * a + f * aPrev;
+                }
+                else if (isFinite(aNext)) {
+                    angles[i] = (1 - f) * a + f * aNext;
+                }
+            }
+        }
+        for (let i = 0; i < N; i++) {
+            let prevPoint = this.templateInterpolatedPoints[i - 1];
+            let point = this.templateInterpolatedPoints[i];
+            let nextPoint = this.templateInterpolatedPoints[i + 1];
+            let dir;
+            if (nextPoint) {
+                dir = nextPoint;
+            }
+            else {
+                dir = point;
+            }
+            if (prevPoint) {
+                dir = dir.subtract(prevPoint);
+            }
+            else {
+                dir = dir.subtract(point);
+            }
+            Mummu.RotateInPlace(this.trackInterpolatedNormals[i], dir, angles[i]);
+        }
+        // Compute wire path
+        for (let i = 0; i < N; i++) {
+            let pPrev = this.templateInterpolatedPoints[i - 1] ? this.templateInterpolatedPoints[i - 1] : undefined;
+            let p = this.templateInterpolatedPoints[i];
+            let pNext = this.templateInterpolatedPoints[i + 1] ? this.templateInterpolatedPoints[i + 1] : undefined;
             if (!pPrev) {
                 pPrev = p.subtract(pNext.subtract(p));
             }
@@ -3862,47 +4274,25 @@ class Track {
                 pNext = p.add(p.subtract(pPrev));
             }
             let dir = pNext.subtract(pPrev).normalize();
-            let up = this.interpolatedNormals[i];
+            let up = this.trackInterpolatedNormals[i];
             let rotation = BABYLON.Quaternion.Identity();
             Mummu.QuaternionFromZYAxisToRef(dir, up, rotation);
             let matrix = BABYLON.Matrix.Compose(BABYLON.Vector3.One(), rotation, p);
             this.wires[0].path[i] = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(-this.part.wireGauge * 0.5, 0, 0), matrix);
             this.wires[1].path[i] = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(this.part.wireGauge * 0.5, 0, 0), matrix);
-            this.AABBMin.minimizeInPlace(this.wires[0].path[i]);
-            this.AABBMin.minimizeInPlace(this.wires[1].path[i]);
-            this.AABBMax.maximizeInPlace(this.wires[0].path[i]);
-            this.AABBMax.maximizeInPlace(this.wires[1].path[i]);
         }
         Mummu.DecimatePathInPlace(this.wires[0].path, 2 / 180 * Math.PI);
         Mummu.DecimatePathInPlace(this.wires[1].path, 2 / 180 * Math.PI);
-        this.AABBMin.x -= this.part.wireSize * 0.5;
-        this.AABBMin.y -= this.part.wireSize * 0.5;
-        this.AABBMin.z -= this.part.wireSize * 0.5;
-        this.AABBMax.x += this.part.wireSize * 0.5;
-        this.AABBMax.y += this.part.wireSize * 0.5;
-        this.AABBMax.z += this.part.wireSize * 0.5;
-        BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMin, this.part.getWorldMatrix(), this.AABBMin);
-        BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMax, this.part.getWorldMatrix(), this.AABBMax);
-        if (this.drawStartTip) {
-            this.wires[0].startTipCenter = this.trackpoints[0].position.clone();
-            this.wires[0].startTipNormal = this.trackpoints[0].normal.clone();
-            this.wires[0].startTipDir = this.trackpoints[0].dir.clone();
+        if (this.template.drawStartTip) {
+            this.wires[0].startTipCenter = this.template.trackpoints[0].position.clone();
+            this.wires[0].startTipNormal = this.template.trackpoints[0].normal.clone();
+            this.wires[0].startTipDir = this.template.trackpoints[0].dir.clone();
         }
-        if (this.drawEndTip) {
-            this.wires[0].endTipCenter = this.trackpoints[this.trackpoints.length - 1].position.clone();
-            this.wires[0].endTipNormal = this.trackpoints[this.trackpoints.length - 1].normal.clone();
-            this.wires[0].endTipDir = this.trackpoints[this.trackpoints.length - 1].dir.clone();
+        if (this.template.drawEndTip) {
+            this.wires[0].endTipCenter = this.template.trackpoints[this.template.trackpoints.length - 1].position.clone();
+            this.wires[0].endTipNormal = this.template.trackpoints[this.template.trackpoints.length - 1].normal.clone();
+            this.wires[0].endTipDir = this.template.trackpoints[this.template.trackpoints.length - 1].dir.clone();
         }
-        /*
-        if (this.wires[1].drawStartTip) {
-            this.wires[1].startTipNormal = this.trackpoints[this.trackpoints.length - 1].normal;
-            this.wires[1].startTipDir = this.trackpoints[this.trackpoints.length - 1].dir;
-        }
-        if (this.wires[1].drawEndTip) {
-            this.wires[1].endTipNormal = this.trackpoints[this.trackpoints.length - 1].normal;
-            this.wires[1].endTipDir = this.trackpoints[this.trackpoints.length - 1].dir;
-        }
-        */
     }
     recomputeAbsolutePath() {
         this.wires.forEach(wire => {
@@ -3911,8 +4301,8 @@ class Track {
     }
 }
 class TrackPoint {
-    constructor(track, position, dir, normal, tangentIn, tangentOut) {
-        this.track = track;
+    constructor(template, position, dir, normal, tangentIn, tangentOut) {
+        this.template = template;
         this.position = position;
         this.dir = dir;
         this.normal = normal;
@@ -3958,8 +4348,8 @@ class TrackPoint {
         this.normal.normalize();
     }
     isFirstOrLast() {
-        let index = this.track.trackpoints.indexOf(this);
-        if (index === 0 || index === this.track.trackpoints.length - 1) {
+        let index = this.template.trackpoints.indexOf(this);
+        if (index === 0 || index === this.template.trackpoints.length - 1) {
             return true;
         }
         return false;
@@ -3967,11 +4357,7 @@ class TrackPoint {
 }
 class Elevator extends MachinePart {
     constructor(machine, i, j, k, h = 1, mirrorX) {
-        super(machine, i, j, k, {
-            h: 1,
-            mirrorX: mirrorX
-        });
-        this.h = h;
+        super(machine, i, j, k);
         this.boxesCount = 4;
         this.rWheel = 0.015;
         this.boxX = [];
@@ -3987,39 +4373,10 @@ class Elevator extends MachinePart {
         this.p = 0;
         this.chainLength = 0;
         this.speed = 0.04; // in m/s
-        this.boxesCount;
-        this.yExtendable = true;
-        this.xMirrorable = true;
-        this.partName = "elevator-" + h.toFixed(0);
-        let dir = new BABYLON.Vector3(1, 0, 0);
-        dir.normalize();
-        let n = new BABYLON.Vector3(0, 1, 0);
-        n.normalize();
-        let dirLeft = new BABYLON.Vector3(1, 0, 0);
-        dirLeft.normalize();
-        let nLeft = new BABYLON.Vector3(0, 1, 0);
-        nLeft.normalize();
-        let dirRight = new BABYLON.Vector3(1, 1, 0);
-        dirRight.normalize();
-        let nRight = new BABYLON.Vector3(-1, 1, 0);
-        nRight.normalize();
-        this.tracks[0].trackpoints = [
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * this.h, 0), dir),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.1, -tileHeight * (this.h + 0.15), 0), dir),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(0, -tileHeight * (this.h + 0.35), 0), dir),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(0 + 0.01, -tileHeight * (this.h + 0.35) + 0.01, 0), n),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(0 + 0.01, 0 - tileHeight, 0), n),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-0.005, 0.035 - tileHeight, 0), (new BABYLON.Vector3(-1, 1, 0)).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize())
-        ];
-        this.tracks[0].drawEndTip = true;
-        this.tracks[1] = new Track(this);
-        this.tracks[1].trackpoints = [
-            new TrackPoint(this.tracks[1], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight, 0), dirLeft),
-            new TrackPoint(this.tracks[1], new BABYLON.Vector3(-0.008, -tileHeight * 0.5, 0), dirRight)
-        ];
+        let partName = "elevator-" + h.toFixed(0);
+        this.setTemplate(this.machine.templateManager.getTemplate(partName, mirrorX));
         let x = 1;
         if (mirrorX) {
-            this.mirrorXTrackPointsInPlace();
             x = -1;
         }
         this.wheels = [
@@ -4096,6 +4453,46 @@ class Elevator extends MachinePart {
         this.machine.onStopCallbacks.push(this.reset);
         this.reset();
     }
+    static GenerateTemplate(h, mirrorX) {
+        let template = new MachinePartTemplate();
+        template.partName = "elevator-" + h.toFixed(0);
+        template.h = h;
+        template.mirrorX = mirrorX;
+        template.yExtendable = true;
+        template.xMirrorable = true;
+        let dir = new BABYLON.Vector3(1, 0, 0);
+        dir.normalize();
+        let n = new BABYLON.Vector3(0, 1, 0);
+        n.normalize();
+        let dirLeft = new BABYLON.Vector3(1, 0, 0);
+        dirLeft.normalize();
+        let nLeft = new BABYLON.Vector3(0, 1, 0);
+        nLeft.normalize();
+        let dirRight = new BABYLON.Vector3(1, 1, 0);
+        dirRight.normalize();
+        let nRight = new BABYLON.Vector3(-1, 1, 0);
+        nRight.normalize();
+        template.trackTemplates[0] = new TrackTemplate(template);
+        template.trackTemplates[0].trackpoints = [
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * h, 0), dir),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.1, -tileHeight * (h + 0.15), 0), dir),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0, -tileHeight * (h + 0.35), 0), dir),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0 + 0.01, -tileHeight * (h + 0.35) + 0.01, 0), n),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0 + 0.01, 0 - tileHeight, 0), n),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-0.005, 0.035 - tileHeight, 0), (new BABYLON.Vector3(-1, 1, 0)).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize())
+        ];
+        template.trackTemplates[0].drawEndTip = true;
+        template.trackTemplates[1] = new TrackTemplate(template);
+        template.trackTemplates[1].trackpoints = [
+            new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight, 0), dirLeft),
+            new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-0.008, -tileHeight * 0.5, 0), dirRight)
+        ];
+        if (mirrorX) {
+            template.mirrorXTrackPointsInPlace();
+        }
+        template.initialize();
+        return template;
+    }
     dispose() {
         super.dispose();
         this.machine.onStopCallbacks.remove(this.reset);
@@ -4142,178 +4539,153 @@ class Elevator extends MachinePart {
         this.wheels[1].rotation.z -= deltaAngle;
     }
 }
-/// <reference path="../machine/MachinePart.ts"/>
-class FlatLoop extends MachinePart {
-    constructor(machine, i, j, k, mirror) {
+class FlatJoin extends MachinePart {
+    constructor(machine, i, j, k, mirrorX) {
         super(machine, i, j, k);
-        this.deserialize({
-            points: [
-                { position: { x: -0.075, y: 0, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
-                { position: { x: 0.0002, y: -0.004, z: -0.0004 }, normal: { x: 0.019861618966497012, y: 0.9751749757297097, z: -0.22054315405967592 } },
-                { position: { x: 0.0438, y: -0.0064, z: -0.0176 }, normal: { x: -0.22558304612591473, y: 0.9269655818421536, z: -0.29974505730802486 } },
-                { position: { x: 0.0656, y: -0.0092, z: -0.0657 }, normal: { x: -0.36624766795617253, y: 0.9272115297672086, z: -0.07836724305102492 } },
-                { position: { x: 0.05, y: -0.0116, z: -0.1081 }, normal: { x: -0.28899453151103105, y: 0.9331762009279609, z: 0.21369215890710064 } },
-                { position: { x: 0.0001, y: -0.0146, z: -0.1307 }, normal: { x: -0.06591259754365662, y: 0.9234801060022608, z: 0.3779418252894237 } },
-                { position: { x: -0.0463, y: -0.017, z: -0.1117 }, normal: { x: 0.21142849593782587, y: 0.9373586814752951, z: 0.27686945185116646 } },
-                { position: { x: -0.064, y: -0.0194, z: -0.0655 }, normal: { x: 0.3862942302916957, y: 0.9210759814896877, z: 0.0489469505296813 } },
-                { position: { x: -0.0462, y: -0.022, z: -0.0184 }, normal: { x: 0.2824107521306146, y: 0.937604682593982, z: -0.20283398694217641 } },
-                { position: { x: -0.0005, y: -0.0244, z: -0.0002 }, normal: { x: 0.09320082689165142, y: 0.9775672574755118, z: -0.18888055214478572 } },
-                { position: { x: 0.075, y: -0.03, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
-            ],
-        });
-        if (mirror) {
-            this.mirrorXTrackPointsInPlace();
-        }
+        let partName = "flatjoin";
+        this.setTemplate(this.machine.templateManager.getTemplate(partName, mirrorX));
+        console.log(this.template);
         this.generateWires();
+    }
+    static GenerateTemplate(mirrorX) {
+        let template = new MachinePartTemplate();
+        template.partName = "flatjoin";
+        template.mirrorX = mirrorX;
+        template.xMirrorable = true;
+        let dir = new BABYLON.Vector3(1, 0, 0);
+        dir.normalize();
+        let n = new BABYLON.Vector3(0, 1, 0);
+        n.normalize();
+        let dirJoin = (new BABYLON.Vector3(2, -1, 0)).normalize();
+        template.trackTemplates[0] = new TrackTemplate(template);
+        template.trackTemplates[0].trackpoints = [
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight, 0), dir),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.5, -tileHeight, 0), dir)
+        ];
+        template.trackTemplates[1] = new TrackTemplate(template);
+        template.trackTemplates[1].trackpoints = [
+            new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
+            new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.25, -tileHeight * 0.25, 0), dirJoin)
+        ];
+        let center = new BABYLON.Vector3(-0.0135, 0.0165, 0);
+        let r = 0.02;
+        template.trackTemplates[2] = new TrackTemplate(template);
+        template.trackTemplates[2].trackpoints = [
+            new TrackPoint(template.trackTemplates[2], center.add(new BABYLON.Vector3(-r * Math.sqrt(3) / 2, -r * 1 / 2, 0)), new BABYLON.Vector3(0.5, -Math.sqrt(3) / 2, 0), new BABYLON.Vector3(-1, 0, 0)),
+            new TrackPoint(template.trackTemplates[2], center.add(new BABYLON.Vector3(0 + 0.03, -r - 0.011, 0)), new BABYLON.Vector3(1, 0, 0), new BABYLON.Vector3(0, -1, 0)),
+        ];
+        template.trackTemplates[2].drawStartTip = true;
+        template.trackTemplates[2].drawEndTip = true;
+        if (mirrorX) {
+            template.mirrorXTrackPointsInPlace();
+        }
+        template.initialize();
+        return template;
     }
 }
 class Join extends MachinePart {
     constructor(machine, i, j, k, mirrorX) {
-        super(machine, i, j, k, {
-            mirrorX: mirrorX
-        });
-        this.xMirrorable = true;
-        this.partName = "join";
+        super(machine, i, j, k);
+        let partName = "join";
+        this.setTemplate(this.machine.templateManager.getTemplate(partName, mirrorX));
+        this.generateWires();
+    }
+    static GenerateTemplate(mirrorX) {
+        let template = new MachinePartTemplate();
+        template.partName = "join";
+        template.mirrorX = mirrorX;
+        template.xMirrorable = true;
         let dir = new BABYLON.Vector3(1, 0, 0);
         dir.normalize();
         let n = new BABYLON.Vector3(0, 1, 0);
         n.normalize();
         let dirJoin = (new BABYLON.Vector3(-2, -1, 0)).normalize();
         let nJoin = (new BABYLON.Vector3(-1, 2, 0)).normalize();
-        this.tracks[0].trackpoints = [
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth / 3, 0, 0), dir),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(tileWidth / 3, -tileHeight, 0), dir),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(tileWidth * 0.5, -tileHeight, 0), dir)
+        template.trackTemplates[0] = new TrackTemplate(template);
+        template.trackTemplates[0].trackpoints = [
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth / 3, 0, 0), dir),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth / 3, -tileHeight, 0), dir),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.5, -tileHeight, 0), dir)
         ];
-        this.tracks[1] = new Track(this);
-        this.tracks[1].trackpoints = [
-            new TrackPoint(this.tracks[1], new BABYLON.Vector3(tileWidth * 0.5, 0, 0), dir.scale(-1)),
-            new TrackPoint(this.tracks[1], new BABYLON.Vector3(tileWidth * 0.25, -tileHeight * 0.25, 0), dirJoin)
+        template.trackTemplates[1] = new TrackTemplate(template);
+        template.trackTemplates[1].trackpoints = [
+            new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(tileWidth * 0.5, 0, 0), dir.scale(-1)),
+            new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(tileWidth * 0.25, -tileHeight * 0.25, 0), dirJoin)
         ];
         let center = new BABYLON.Vector3(0.0135, 0.0165, 0);
         let r = 0.02;
-        this.tracks[2] = new Track(this);
-        this.tracks[2].trackpoints = [
-            new TrackPoint(this.tracks[2], center.add(new BABYLON.Vector3(-r * Math.sqrt(3) / 2, -r * 1 / 2, 0)), new BABYLON.Vector3(0.5, -Math.sqrt(3) / 2, 0), new BABYLON.Vector3(-1, 0, 0)),
-            new TrackPoint(this.tracks[2], center.add(new BABYLON.Vector3(0, -r, 0))),
-            new TrackPoint(this.tracks[2], center.add(new BABYLON.Vector3(r * Math.sqrt(3) / 2, -r * 1 / 2, 0)), new BABYLON.Vector3(0.5, Math.sqrt(3) / 2, 0), new BABYLON.Vector3(1, 0, 0)),
+        template.trackTemplates[2] = new TrackTemplate(template);
+        template.trackTemplates[2].trackpoints = [
+            new TrackPoint(template.trackTemplates[2], center.add(new BABYLON.Vector3(-r * Math.sqrt(3) / 2, -r * 1 / 2, 0)), new BABYLON.Vector3(0.5, -Math.sqrt(3) / 2, 0), new BABYLON.Vector3(-1, 0, 0)),
+            new TrackPoint(template.trackTemplates[2], center.add(new BABYLON.Vector3(0, -r, 0))),
+            new TrackPoint(template.trackTemplates[2], center.add(new BABYLON.Vector3(r * Math.sqrt(3) / 2, -r * 1 / 2, 0)), new BABYLON.Vector3(0.5, Math.sqrt(3) / 2, 0), new BABYLON.Vector3(1, 0, 0)),
         ];
-        this.tracks[2].drawStartTip = true;
-        this.tracks[2].drawEndTip = true;
+        template.trackTemplates[2].drawStartTip = true;
+        template.trackTemplates[2].drawEndTip = true;
         if (mirrorX) {
-            this.mirrorXTrackPointsInPlace();
+            template.mirrorXTrackPointsInPlace();
         }
-        this.generateWires();
-    }
-}
-class FlatJoin extends MachinePart {
-    constructor(machine, i, j, k, mirrorX) {
-        super(machine, i, j, k, {
-            mirrorX: mirrorX
-        });
-        this.xMirrorable = true;
-        this.partName = "flatjoin";
-        let dir = new BABYLON.Vector3(1, 0, 0);
-        dir.normalize();
-        let n = new BABYLON.Vector3(0, 1, 0);
-        n.normalize();
-        let dirJoin = (new BABYLON.Vector3(2, -1, 0)).normalize();
-        let nJoin = (new BABYLON.Vector3(1, 2, 0)).normalize();
-        this.tracks[0].trackpoints = [
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight, 0), dir),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(tileWidth * 0.5, -tileHeight, 0), dir)
-        ];
-        this.tracks[1] = new Track(this);
-        this.tracks[1].trackpoints = [
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
-            new TrackPoint(this.tracks[1], new BABYLON.Vector3(-tileWidth * 0.25, -tileHeight * 0.25, 0), dirJoin)
-        ];
-        let center = new BABYLON.Vector3(-0.0135, 0.0165, 0);
-        let r = 0.02;
-        this.tracks[2] = new Track(this);
-        this.tracks[2].trackpoints = [
-            new TrackPoint(this.tracks[2], center.add(new BABYLON.Vector3(-r * Math.sqrt(3) / 2, -r * 1 / 2, 0)), new BABYLON.Vector3(0.5, -Math.sqrt(3) / 2, 0), new BABYLON.Vector3(-1, 0, 0)),
-            new TrackPoint(this.tracks[2], center.add(new BABYLON.Vector3(0 + 0.03, -r - 0.011, 0)), new BABYLON.Vector3(1, 0, 0), new BABYLON.Vector3(0, -1, 0)),
-        ];
-        this.tracks[2].drawStartTip = true;
-        this.tracks[2].drawEndTip = true;
-        if (mirrorX) {
-            this.mirrorXTrackPointsInPlace();
-        }
-        this.generateWires();
+        template.initialize();
+        return template;
     }
 }
 /// <reference path="../machine/MachinePart.ts"/>
 class Loop extends MachinePart {
-    constructor(machine, i, j, k, mirrorX) {
-        super(machine, i, j, k, {
-            w: 2,
-            h: 3,
-            d: 1,
-            mirrorX: mirrorX
-        });
-        this.xMirrorable = true;
-        this.partName = "loop";
-        this.deserialize({
-            points: [
-                { position: { x: -0.07499999999999998, y: 0, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
-                { position: { x: -0.021400000000000002, y: -0.0158, z: 0 }, normal: { x: 0.4396275545392263, y: 0.8981638211016448, z: -0.0054188332648665 } },
-                { position: { x: 0.01999999999999999, y: -0.0465, z: 0 }, normal: { x: 0.5982436505113027, y: 0.8012971523271827, z: -0.005235293235149783 } },
-                { position: { x: 0.05199999999999999, y: -0.0706, z: 0 }, normal: { x: 0.4741604675908546, y: 0.878895570768095, z: -0.05210015986776756 } },
-                { position: { x: 0.0795, y: -0.0786, z: 0 }, normal: { x: 0.09449201595693026, y: 0.9944340313908211, z: -0.0466070395133045 } },
-                { position: { x: 0.10065375229916038, y: -0.07522312329722819, z: 1.1529110999219938e-11 }, normal: { x: -0.5164966685450393, y: 0.8544407592437108, z: -0.05623326706592006 } },
-                { position: { x: 0.11519302709514871, y: -0.05708879183907972, z: -0.0009829866651905254 }, normal: { x: -0.9589534906617966, y: 0.25476375646906013, z: -0.12451357812435228 } },
-                { position: { x: 0.11218277110706124, y: -0.03280312921665407, z: -0.0019974993144583333 }, normal: { x: -0.8687142251904587, y: -0.4874405932158047, z: -0.08796171347333712 } },
-                { position: { x: 0.09431741317667067, y: -0.018836421903859007, z: -0.006790230548899395 }, normal: { x: -0.2827692887364913, y: -0.9591460712007929, z: -0.008963450649307923 } },
-                { position: { x: 0.0715028480454771, y: -0.02070606642307432, z: -0.013133538933271394 }, normal: { x: 0.44191323501249113, y: -0.8959028193766404, z: 0.045506383659676526 } },
-                { position: { x: 0.05679978340718872, y: -0.03791636105629381, z: -0.018090494323189286 }, normal: { x: 0.9547976002539688, y: -0.29720598940938536, z: -0.005490210237409393 } },
-                { position: { x: 0.05785498312066663, y: -0.06445088096471263, z: -0.01854822983510782 }, normal: { x: 0.8764619011291043, y: 0.452593339877206, z: 0.16423703774713058 } },
-                { position: { x: 0.08849293866937, y: -0.10093496548854738, z: -0.013560714982744127 }, normal: { x: 0.4579284797457813, y: 0.879998331714446, z: 0.12611282098783305 } },
-                { position: { x: 0.1453843264203472, y: -0.11222087303501635, z: -0.003043587228636343 }, normal: { x: -0.0774630913932069, y: 0.99670764505399, z: -0.023944514251439668 } },
-                { position: { x: 0.225, y: -0.09, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
-            ],
-        });
-        if (mirrorX) {
-            this.mirrorXTrackPointsInPlace();
+    constructor(machine, i, j, k, w = 1, d = 1, n = 1, mirrorX, mirrorZ) {
+        super(machine, i, j, k);
+        if (!isFinite(n)) {
+            n = 1;
         }
+        let partName = "loop-" + w.toFixed(0) + "." + d.toFixed(0) + "." + n.toFixed(0);
+        this.setTemplate(this.machine.templateManager.getTemplate(partName, mirrorX, mirrorZ));
         this.generateWires();
     }
-}
-class Loop2 extends MachinePart {
-    constructor(machine, i, j, k, w = 1, d = 1, mirrorX, mirrorZ) {
-        super(machine, i, j, k, {
-            w: w,
-            h: 4 * w,
-            d: d,
-            mirrorX: mirrorX,
-            mirrorZ: mirrorZ,
+    static GenerateTemplate(w, d, n, mirrorX, mirrorZ) {
+        let template = new MachinePartTemplate();
+        template.partName = "loop-" + w.toFixed(0) + "." + d.toFixed(0) + "." + n.toFixed(0);
+        template.w = w;
+        template.h = 4;
+        template.d = d;
+        template.n = n;
+        template.mirrorX = mirrorX;
+        template.mirrorZ = mirrorZ;
+        template.xExtendable = true;
+        template.zExtendable = true;
+        template.nExtendable = true;
+        template.xMirrorable = true;
+        template.zMirrorable = true;
+        template.trackTemplates[0] = new TrackTemplate(template);
+        template.trackTemplates[0].onNormalEvaluated = (n => {
+            n.z = 0;
+            n.normalize();
         });
-        this.xExtendable = true;
-        this.zExtendable = true;
-        this.xMirrorable = true;
-        this.zMirrorable = true;
-        this.partName = "loop-" + w.toFixed(0) + "." + d.toFixed(0);
-        let dir = new BABYLON.Vector3(1, 0, 0);
-        dir.normalize();
-        let n = new BABYLON.Vector3(0, 1, 0);
-        n.normalize();
-        this.tracks[0].trackpoints = [
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, -this.h * tileHeight, 0), dir)
+        template.trackTemplates[0].trackpoints = [
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -template.h * tileHeight, 0), Tools.V3Dir(90))
         ];
-        let nLoops = 1;
-        let rStart = tileWidth * 0.5 * w * 0.7;
-        let rEnd = rStart / (nLoops * 0.7);
+        let nLoops = n;
+        let xCenterStart = 0;
+        let xCenterEnd = tileWidth * (template.w - 1);
+        let r = tileWidth * 0.5 * 0.7;
+        let depthStart = 0.013;
+        let depthEnd = -0.013;
+        if (d > 1) {
+            depthStart = 0;
+            depthEnd = -tileDepth * (template.d - 1);
+        }
         for (let n = 0; n <= 8 * nLoops; n++) {
-            let f = Math.floor(n / 8) / nLoops;
-            let r = rStart * (1 - f) + rEnd * f;
+            let f = (n + 0) / (8 * nLoops);
             let a = 2 * Math.PI * n / 8;
             let cosa = Math.cos(a);
             let sina = Math.sin(a);
-            this.tracks[0].trackpoints.push(new TrackPoint(this.tracks[0], new BABYLON.Vector3(sina * r + 0.5 * tileWidth * (this.w - 1), r * 1 - cosa * r - this.h * tileHeight, -tileDepth * (this.d - 1) * (n + 0) / (8 * nLoops))));
+            let normal;
+            if (n % 8 === 4) {
+                normal = Tools.V3Dir(180, 1);
+            }
+            template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(sina * r + f * (xCenterEnd - xCenterStart) + xCenterStart, r * 1 - cosa * r - template.h * tileHeight, f * (depthEnd - depthStart) + depthStart), undefined, normal));
         }
-        this.tracks[0].trackpoints.push(new TrackPoint(this.tracks[0], new BABYLON.Vector3(tileWidth * (this.w - 0.5), -this.h * tileHeight, -tileDepth * (this.d - 1)), dir));
-        let points = this.tracks[0].trackpoints.map(tp => { return tp.position.clone(); });
+        template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.w - 0.5), -template.h * tileHeight, -tileDepth * (template.d - 1)), Tools.V3Dir(90)));
+        let points = template.trackTemplates[0].trackpoints.map(tp => { return tp.position.clone(); });
         let f = 3;
         for (let n = 0; n < 2; n++) {
             let smoothedPoints = [...points].map(p => { return p.clone(); });
@@ -4323,69 +4695,19 @@ class Loop2 extends MachinePart {
             points = smoothedPoints;
         }
         for (let i = 0; i < points.length; i++) {
-            this.tracks[0].trackpoints[i].position.copyFrom(points[i]);
+            template.trackTemplates[0].trackpoints[i].position.copyFrom(points[i]);
         }
         if (mirrorX) {
-            this.mirrorXTrackPointsInPlace();
+            template.mirrorXTrackPointsInPlace();
         }
         if (mirrorZ) {
-            this.mirrorZTrackPointsInPlace();
+            template.mirrorZTrackPointsInPlace();
         }
-        this.generateWires();
+        template.initialize();
+        return template;
     }
 }
-class Ramp extends MachinePart {
-    constructor(machine, i, j, k, w = 1, h = 1, d = 1, mirrorX, mirrorZ) {
-        super(machine, i, j, k, {
-            w: w,
-            h: h,
-            d: d,
-            mirrorX: mirrorX,
-            mirrorZ: mirrorZ,
-        });
-        this.xExtendable = true;
-        this.yExtendable = true;
-        this.zExtendable = true;
-        this.xMirrorable = true;
-        this.zMirrorable = true;
-        this.partName = "ramp-" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
-        let dir = new BABYLON.Vector3(1, 0, 0);
-        dir.normalize();
-        let n = new BABYLON.Vector3(0, 1, 0);
-        n.normalize();
-        this.tracks[0].trackpoints = [
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(tileWidth * (this.w - 0.5), -tileHeight * this.h, -tileDepth * (this.d - 1)), dir)
-        ];
-        if (mirrorX) {
-            this.mirrorXTrackPointsInPlace();
-        }
-        if (mirrorZ) {
-            this.mirrorZTrackPointsInPlace();
-        }
-        this.generateWires();
-    }
-    static CreateFromOriginDestination(origin, dest, machine) {
-        let i = Math.min(origin.i, dest.i);
-        let j = Math.min(origin.j, dest.j);
-        let k = Math.min(origin.k, dest.k);
-        let w = dest.i - origin.i;
-        let h = Math.abs(dest.j - origin.j);
-        let d = Math.abs(dest.k - origin.k) + 1;
-        let mirrorX = dest.j < origin.j;
-        let mirrorZ = false;
-        if (mirrorX) {
-            if (origin.k < dest.k) {
-                mirrorZ = true;
-            }
-        }
-        else {
-            if (origin.k > dest.k) {
-                mirrorZ = true;
-            }
-        }
-        return new Ramp(machine, i, j, k, w, h, d, mirrorX, mirrorZ);
-    }
+class MachinePartWithOriginDestination extends MachinePart {
     getOrigin() {
         let i = this.i;
         let j;
@@ -4451,82 +4773,179 @@ class Ramp extends MachinePart {
         };
     }
 }
-/// <reference path="../machine/MachinePart.ts"/>
-class Snake extends MachinePart {
-    constructor(machine, i, j, k, mirrorX) {
-        super(machine, i, j, k, {
-            w: 2,
-            mirrorX: mirrorX
-        });
-        this.xMirrorable = true;
-        this.partName = "snake";
-        this.deserialize({
-            points: [
-                { position: { x: -0.075, y: 0, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
-                { position: { x: 0.015, y: -0.0006, z: -0.02 }, normal: { x: 0, y: 0.983976396926608, z: 0.17829876693721267 } },
-                { position: { x: 0.075, y: 0, z: 0 }, normal: { x: -0.0008909764600687716, y: 0.9800741060756494, z: -0.1986301909603991 } },
-                { position: { x: 0.125, y: -0.0005, z: -0.02 }, normal: { x: 0, y: 0.9797898655773956, z: 0.20002954609714332 } },
-                { position: { x: 0.225, y: 0, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
-            ],
-        });
+class Ramp extends MachinePartWithOriginDestination {
+    constructor(machine, i, j, k, w = 1, h = 1, d = 1, mirrorX, mirrorZ) {
+        super(machine, i, j, k);
+        let partName = "ramp-" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
+        this.setTemplate(this.machine.templateManager.getTemplate(partName, mirrorX, mirrorZ));
         this.generateWires();
     }
-}
-/// <reference path="../machine/MachinePart.ts"/>
-class Spiral extends MachinePart {
-    constructor(machine, i, j, k, mirrorX) {
-        super(machine, i, j, k, {
-            h: 3,
-            d: 3,
-            mirrorX: mirrorX
-        });
-        this.xMirrorable = true;
-        this.partName = "spiral";
-        this.deserialize({
-            points: [
-                { position: { x: -0.075, y: 0, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
-                { position: { x: 0.016, y: -0.0046, z: -0.003 }, normal: { x: -0.015717737727546616, y: 0.9540837723373087, z: -0.2991272439670763 } },
-                { position: { x: 0.0539, y: -0.007, z: -0.0291 }, normal: { x: -0.23440514155513867, y: 0.9572137575720567, z: -0.16969399496534734 } },
-                { position: { x: 0.0587, y: -0.0104, z: -0.0947 }, normal: { x: -0.26108911497483256, y: 0.962603890274194, z: 0.07229263081840669 } },
-                { position: { x: -0.0004, y: -0.014, z: -0.132 }, normal: { x: -0.05669056122664204, y: 0.9496966537903617, z: 0.307997477339017 } },
-                { position: { x: -0.0592, y: -0.0176, z: -0.0942 }, normal: { x: 0.2271455627956944, y: 0.956270760554333, z: 0.18425831273260118 } },
-                { position: { x: -0.05457944698749076, y: -0.02093380924123054, z: -0.029224609659455173 }, normal: { x: 0.2828470950098421, y: 0.9527277009365863, z: -0.11093894137127873 } },
-                { position: { x: -0.0001, y: -0.0242, z: -0.0002 }, normal: { x: 0.05761736284437951, y: 0.9614294117737494, z: -0.2689492994511073 } },
-                { position: { x: 0.0539, y: -0.0274, z: -0.0291 }, normal: { x: -0.2056041140599629, y: 0.9592796231163523, z: -0.19367383136440203 } },
-                { position: { x: 0.0585, y: -0.0308, z: -0.0951 }, normal: { x: -0.2760246393306465, y: 0.9577600466606554, z: 0.08066034653388042 } },
-                { position: { x: -0.0004, y: -0.0344, z: -0.1318 }, normal: { x: -0.05646125432587785, y: 0.9628151753392908, z: 0.2641951265567164 } },
-                { position: { x: -0.0596, y: -0.038, z: -0.0941 }, normal: { x: 0.207215385873428, y: 0.9626195991602705, z: 0.1744284700668061 } },
-                { position: { x: -0.0545, y: -0.0414, z: -0.0289 }, normal: { x: 0.25683498853746184, y: 0.961760534367209, z: -0.09514443334563788 } },
-                { position: { x: -0.0001, y: -0.0446, z: -0.0002 }, normal: { x: 0.05638334684224795, y: 0.9532309575517539, z: -0.29693713099549046 } },
-                { position: { x: 0.0537, y: -0.0478, z: -0.0289 }, normal: { x: -0.2235635179648617, y: 0.9523438291486475, z: -0.20751044435802915 } },
-                { position: { x: 0.0582, y: -0.0512, z: -0.0933 }, normal: { x: -0.2777348824891539, y: 0.9572384789896519, z: 0.08098042597019127 } },
-                { position: { x: -0.0004, y: -0.0548, z: -0.1317 }, normal: { x: -0.059760670464650514, y: 0.9561892328648884, z: 0.28658474003141166 } },
-                { position: { x: -0.0594, y: -0.0584, z: -0.0938 }, normal: { x: 0.2333172321844389, y: 0.9540226282981233, z: 0.18815922475641142 } },
-                { position: { x: -0.0546, y: -0.0618, z: -0.029 }, normal: { x: 0.27002249679763296, y: 0.9572406097255708, z: -0.10381842955559523 } },
-                { position: { x: 0.0001, y: -0.065, z: 0.0001 }, normal: { x: 0.056820314112295565, y: 0.9531047312532147, z: -0.2972588487613405 } },
-                { position: { x: 0.0538, y: -0.0682, z: -0.0288 }, normal: { x: -0.22241380697343624, y: 0.9531421193320655, z: -0.2050663278618935 } },
-                { position: { x: 0.0583, y: -0.0716, z: -0.0937 }, normal: { x: -0.26972561388849237, y: 0.9599379519312946, z: 0.07594222576687933 } },
-                { position: { x: 0, y: -0.0752, z: -0.1314 }, normal: { x: -0.05845262320389176, y: 0.9606457375292047, z: 0.27155673036688727 } },
-                { position: { x: -0.0591, y: -0.0788, z: -0.0935 }, normal: { x: 0.21156040971579268, y: 0.9609976130263491, z: 0.17811732312873305 } },
-                { position: { x: -0.0545, y: -0.0822, z: -0.0289 }, normal: { x: 0.2585951718617067, y: 0.9642143266760841, z: -0.05847451857347828 } },
-                { position: { x: -0.0171, y: -0.0846, z: -0.0034 }, normal: { x: 0.1212412050387472, y: 0.950287799276933, z: -0.2867990040885013 } },
-                { position: { x: 0.075, y: -0.09, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
-            ],
-        });
+    static GenerateTemplate(w = 1, h = 1, d = 1, mirrorX, mirrorZ) {
+        let template = new MachinePartTemplate();
+        template.partName = "ramp-" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
+        template.w = w;
+        template.h = h;
+        template.d = d;
+        template.mirrorX = mirrorX;
+        template.mirrorZ = mirrorZ;
+        template.xExtendable = true;
+        template.yExtendable = true;
+        template.zExtendable = true;
+        template.xMirrorable = true;
+        template.zMirrorable = true;
+        let dir = new BABYLON.Vector3(1, 0, 0);
+        dir.normalize();
+        let n = new BABYLON.Vector3(0, 1, 0);
+        n.normalize();
+        template.trackTemplates[0] = new TrackTemplate(template);
+        template.trackTemplates[0].trackpoints = [
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.w - 0.5), -tileHeight * template.h, -tileDepth * (template.d - 1)), dir)
+        ];
         if (mirrorX) {
-            this.mirrorXTrackPointsInPlace();
+            template.mirrorXTrackPointsInPlace();
         }
+        if (mirrorZ) {
+            template.mirrorZTrackPointsInPlace();
+        }
+        template.initialize();
+        return template;
+    }
+    recreateFromOriginDestination(origin, dest, machine) {
+        let i = Math.min(origin.i, dest.i);
+        let j = Math.min(origin.j, dest.j);
+        let k = Math.min(origin.k, dest.k);
+        let w = dest.i - origin.i;
+        let h = Math.abs(dest.j - origin.j);
+        let d = Math.abs(dest.k - origin.k) + 1;
+        let mirrorX = dest.j < origin.j;
+        let mirrorZ = false;
+        if (mirrorX) {
+            if (origin.k < dest.k) {
+                mirrorZ = true;
+            }
+        }
+        else {
+            if (origin.k > dest.k) {
+                mirrorZ = true;
+            }
+        }
+        return new Ramp(machine, i, j, k, w, h, d, mirrorX, mirrorZ);
+    }
+}
+class UTurnSharp extends MachinePart {
+    constructor(machine, i, j, k, mirrorX, mirrorZ) {
+        super(machine, i, j, k);
+        let partName = "uturnsharp";
+        this.setTemplate(this.machine.templateManager.getTemplate(partName, mirrorX, mirrorZ));
         this.generateWires();
+    }
+    static GenerateTemplate(mirrorX, mirrorZ) {
+        let template = new MachinePartTemplate();
+        template.angleSmoothFactor = 0.1;
+        template.partName = "uturnsharp";
+        template.mirrorX = mirrorX,
+            template.mirrorZ = mirrorZ;
+        template.xMirrorable = true;
+        template.zMirrorable = true;
+        template.trackTemplates[0] = new TrackTemplate(template);
+        template.trackTemplates[0].trackpoints = [
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-0.075, 0, 0), new BABYLON.Vector3(1, 0, 0)),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0.0193, -0.0084, 0.000)),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0.0518, 0.0057, -0.0046)),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0.0638, 0.0181, -0.0256)),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0.0586, 0.0099, -0.0448)),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0.0454, -0.0086, -0.0519)),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0.0262, -0.0253, -0.0454)),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-0.0152, -0.0301, 0), new BABYLON.Vector3(-1, 0, 0)),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-0.075, -0.03, 0), new BABYLON.Vector3(-1, 0, 0))
+        ];
+        if (mirrorX) {
+            template.mirrorXTrackPointsInPlace();
+        }
+        if (mirrorZ) {
+            template.mirrorZTrackPointsInPlace();
+        }
+        template.initialize();
+        return template;
+    }
+}
+class Snake extends MachinePartWithOriginDestination {
+    constructor(machine, i, j, k, w = 1, h = 1, d = 1, mirrorX, mirrorZ) {
+        super(machine, i, j, k);
+        let partName = "snake-" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
+        this.setTemplate(this.machine.templateManager.getTemplate(partName, mirrorX, mirrorZ));
+        this.generateWires();
+    }
+    static GenerateTemplate(w = 1, h = 1, d = 1, mirrorX, mirrorZ) {
+        let template = new MachinePartTemplate();
+        template.partName = "snake-" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
+        template.angleSmoothFactor = 0.5;
+        template.w = w;
+        template.h = h;
+        template.d = d;
+        template.mirrorX = mirrorX;
+        template.mirrorZ = mirrorZ;
+        template.xExtendable = true;
+        template.yExtendable = true;
+        template.zExtendable = true;
+        template.xMirrorable = true;
+        template.zMirrorable = true;
+        let dir = new BABYLON.Vector3(1, 0, 0);
+        dir.normalize();
+        let n = new BABYLON.Vector3(0, 1, 0);
+        n.normalize();
+        template.trackTemplates[0] = new TrackTemplate(template);
+        let start = new BABYLON.Vector3(-tileWidth * 0.5, 0, 0);
+        let end = new BABYLON.Vector3(tileWidth * (template.w - 0.5), -tileHeight * template.h, -tileDepth * (template.d - 1));
+        let tanVector = dir.scale(BABYLON.Vector3.Distance(start, end));
+        template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], start, dir, undefined, undefined, 1)];
+        for (let i = 1; i < 2 * (w + 1); i++) {
+            let p1 = BABYLON.Vector3.Hermite(start, tanVector, end, tanVector, i / (2 * (w + 1)));
+            if (i % 2 === 1) {
+                p1.z -= 0.015;
+            }
+            else {
+                p1.z += 0.015;
+            }
+            template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], p1));
+        }
+        template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], end, dir, undefined, 1));
+        if (mirrorX) {
+            template.mirrorXTrackPointsInPlace();
+        }
+        if (mirrorZ) {
+            template.mirrorZTrackPointsInPlace();
+        }
+        template.initialize();
+        return template;
+    }
+    recreateFromOriginDestination(origin, dest, machine) {
+        let i = Math.min(origin.i, dest.i);
+        let j = Math.min(origin.j, dest.j);
+        let k = Math.min(origin.k, dest.k);
+        let w = dest.i - origin.i;
+        let h = Math.abs(dest.j - origin.j);
+        let d = Math.abs(dest.k - origin.k) + 1;
+        let mirrorX = dest.j < origin.j;
+        let mirrorZ = false;
+        if (mirrorX) {
+            if (origin.k < dest.k) {
+                mirrorZ = true;
+            }
+        }
+        else {
+            if (origin.k > dest.k) {
+                mirrorZ = true;
+            }
+        }
+        return new Snake(machine, i, j, k, w, h, d, mirrorX, mirrorZ);
     }
 }
 class Split extends MachinePart {
     constructor(machine, i, j, k, mirrorX) {
-        super(machine, i, j, k, {
-            h: 2,
-            mirrorX: mirrorX
-        });
+        super(machine, i, j, k);
         this._animatePivot = Mummu.AnimationFactory.EmptyNumberCallback;
-        this.pivotL = 0.025;
         this.reset = () => {
             this._moving = false;
             if (this.mirrorX) {
@@ -4537,46 +4956,9 @@ class Split extends MachinePart {
             }
         };
         this._moving = false;
-        this.xMirrorable = true;
-        this.partName = "split";
-        let dir = new BABYLON.Vector3(1, 0, 0);
-        dir.normalize();
-        let n = new BABYLON.Vector3(0, 1, 0);
-        n.normalize();
-        let rCurb = this.pivotL * 0.3;
-        let pEndLeft = new BABYLON.Vector3(0, -tileHeight, 0);
-        pEndLeft.x -= this.pivotL / Math.SQRT2;
-        pEndLeft.y += this.pivotL / Math.SQRT2;
-        let pEndRight = pEndLeft.multiplyByFloats(-1, 1, 1);
-        let dirEnd = Tools.V3Dir(135);
-        let nEnd = Tools.V3Dir(45);
-        this.tracks[0].trackpoints = [
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
-            new TrackPoint(this.tracks[0], pEndLeft.subtract(dirEnd.scale(0.001)), dirEnd)
-        ];
-        this.tracks[1] = new Track(this);
-        this.tracks[1].trackpoints = [
-            new TrackPoint(this.tracks[1], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * this.h, 0), dir),
-            new TrackPoint(this.tracks[1], new BABYLON.Vector3(-this.pivotL / Math.SQRT2, -tileHeight - this.pivotL / Math.SQRT2 - this.wireSize * 1.5, 0), dirEnd.multiplyByFloats(1, -1, 1)),
-            new TrackPoint(this.tracks[1], new BABYLON.Vector3(this.pivotL / Math.SQRT2, -tileHeight - this.pivotL / Math.SQRT2 - this.wireSize * 1.5, 0), dirEnd),
-            new TrackPoint(this.tracks[1], new BABYLON.Vector3(tileWidth * 0.5, -tileHeight * this.h, 0), dir)
-        ];
-        this.tracks[2] = new Track(this);
-        this.tracks[2].trackpoints = [
-            new TrackPoint(this.tracks[2], new BABYLON.Vector3(tileWidth * 0.5, 0, 0), dir.multiplyByFloats(-1, 1, 1)),
-            new TrackPoint(this.tracks[2], pEndLeft.subtract(dirEnd.scale(0.001)).multiplyByFloats(-1, 1, 1), dirEnd.multiplyByFloats(-1, 1, 1))
-        ];
-        this.tracks[3] = new Track(this);
-        this.tracks[3].trackpoints = [
-            new TrackPoint(this.tracks[3], pEndLeft.add(Tools.V3Dir(315, 0.02)).add(Tools.V3Dir(45, 0.014)), Tools.V3Dir(150), new BABYLON.Vector3(0, -1, 0)),
-            new TrackPoint(this.tracks[3], new BABYLON.Vector3(0, -0.003, 0)),
-            new TrackPoint(this.tracks[3], pEndRight.add(Tools.V3Dir(45, 0.02)).add(Tools.V3Dir(315, 0.014)), Tools.V3Dir(30), new BABYLON.Vector3(0, -1, 0))
-        ];
-        this.tracks[3].drawStartTip = true;
-        this.tracks[3].drawEndTip = true;
-        if (mirrorX) {
-            this.mirrorXTrackPointsInPlace();
-        }
+        let partName = "split";
+        this.setTemplate(this.machine.templateManager.getTemplate(partName, mirrorX));
+        let rCurb = Split.pivotL * 0.3;
         let anchorDatas = [];
         let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.001, diameter: 0.01 });
         let q = BABYLON.Quaternion.Identity();
@@ -4610,16 +4992,16 @@ class Split extends MachinePart {
         });
         let wireHorizontal0 = new Wire(this);
         wireHorizontal0.parent = this.pivot;
-        wireHorizontal0.path = [new BABYLON.Vector3(-this.pivotL, 0, -dz), new BABYLON.Vector3(this.pivotL, 0, -dz)];
+        wireHorizontal0.path = [new BABYLON.Vector3(-Split.pivotL, 0, -dz), new BABYLON.Vector3(Split.pivotL, 0, -dz)];
         let wireHorizontal1 = new Wire(this);
         wireHorizontal1.parent = this.pivot;
-        wireHorizontal1.path = [new BABYLON.Vector3(-this.pivotL, 0, dz), new BABYLON.Vector3(this.pivotL, 0, dz)];
+        wireHorizontal1.path = [new BABYLON.Vector3(-Split.pivotL, 0, dz), new BABYLON.Vector3(Split.pivotL, 0, dz)];
         let wireVertical0 = new Wire(this);
         wireVertical0.parent = this.pivot;
-        wireVertical0.path = [new BABYLON.Vector3(0, this.pivotL, -dz), new BABYLON.Vector3(0, rCurb * 0.3, -dz)];
+        wireVertical0.path = [new BABYLON.Vector3(0, Split.pivotL, -dz), new BABYLON.Vector3(0, rCurb * 0.3, -dz)];
         let wireVertical1 = new Wire(this);
         wireVertical1.parent = this.pivot;
-        wireVertical1.path = [new BABYLON.Vector3(0, this.pivotL, dz), new BABYLON.Vector3(0, rCurb * 0.3, dz)];
+        wireVertical1.path = [new BABYLON.Vector3(0, Split.pivotL, dz), new BABYLON.Vector3(0, rCurb * 0.3, dz)];
         let curbLeft0 = new Wire(this);
         curbLeft0.wireSize = this.wireSize * 0.8;
         curbLeft0.parent = this.pivot;
@@ -4673,6 +5055,52 @@ class Split extends MachinePart {
         this.machine.onStopCallbacks.push(this.reset);
         this.reset();
     }
+    static GenerateTemplate(mirrorX) {
+        let template = new MachinePartTemplate();
+        template.partName = "split";
+        template.h = 2;
+        template.xMirrorable = true;
+        let dir = new BABYLON.Vector3(1, 0, 0);
+        dir.normalize();
+        let n = new BABYLON.Vector3(0, 1, 0);
+        n.normalize();
+        let pEndLeft = new BABYLON.Vector3(0, -tileHeight, 0);
+        pEndLeft.x -= Split.pivotL / Math.SQRT2;
+        pEndLeft.y += Split.pivotL / Math.SQRT2;
+        let pEndRight = pEndLeft.multiplyByFloats(-1, 1, 1);
+        let dirEnd = Tools.V3Dir(135);
+        let nEnd = Tools.V3Dir(45);
+        template.trackTemplates[0] = new TrackTemplate(template);
+        template.trackTemplates[0].trackpoints = [
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
+            new TrackPoint(template.trackTemplates[0], pEndLeft.subtract(dirEnd.scale(0.001)), dirEnd)
+        ];
+        template.trackTemplates[1] = new TrackTemplate(template);
+        template.trackTemplates[1].trackpoints = [
+            new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * template.h, 0), dir),
+            new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-Split.pivotL / Math.SQRT2, -tileHeight - Split.pivotL / Math.SQRT2 - 0.0015 * 1.5, 0), dirEnd.multiplyByFloats(1, -1, 1)),
+            new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(Split.pivotL / Math.SQRT2, -tileHeight - Split.pivotL / Math.SQRT2 - 0.0015 * 1.5, 0), dirEnd),
+            new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(tileWidth * 0.5, -tileHeight * template.h, 0), dir)
+        ];
+        template.trackTemplates[2] = new TrackTemplate(template);
+        template.trackTemplates[2].trackpoints = [
+            new TrackPoint(template.trackTemplates[2], new BABYLON.Vector3(tileWidth * 0.5, 0, 0), dir.multiplyByFloats(-1, 1, 1)),
+            new TrackPoint(template.trackTemplates[2], pEndLeft.subtract(dirEnd.scale(0.001)).multiplyByFloats(-1, 1, 1), dirEnd.multiplyByFloats(-1, 1, 1))
+        ];
+        template.trackTemplates[3] = new TrackTemplate(template);
+        template.trackTemplates[3].trackpoints = [
+            new TrackPoint(template.trackTemplates[3], pEndLeft.add(Tools.V3Dir(315, 0.02)).add(Tools.V3Dir(45, 0.014)), Tools.V3Dir(150), new BABYLON.Vector3(0, -1, 0)),
+            new TrackPoint(template.trackTemplates[3], new BABYLON.Vector3(0, -0.003, 0)),
+            new TrackPoint(template.trackTemplates[3], pEndRight.add(Tools.V3Dir(45, 0.02)).add(Tools.V3Dir(315, 0.014)), Tools.V3Dir(30), new BABYLON.Vector3(0, -1, 0))
+        ];
+        template.trackTemplates[3].drawStartTip = true;
+        template.trackTemplates[3].drawEndTip = true;
+        if (mirrorX) {
+            template.mirrorXTrackPointsInPlace();
+        }
+        template.initialize();
+        return template;
+    }
     dispose() {
         super.dispose();
         this.machine.onStopCallbacks.remove(this.reset);
@@ -4684,14 +5112,14 @@ class Split extends MachinePart {
                 if (BABYLON.Vector3.Distance(ball.position, this.pivot.absolutePosition) < 0.05) {
                     let local = BABYLON.Vector3.TransformCoordinates(ball.position, this.pivot.getWorldMatrix().clone().invert());
                     if (local.y < ball.radius * 0.9) {
-                        if (local.x > ball.radius * 0.5 && local.x < this.pivotL) {
+                        if (local.x > ball.radius * 0.5 && local.x < Split.pivotL) {
                             this._moving = true;
                             this._animatePivot(-Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
                                 this._moving = false;
                             });
                             return;
                         }
-                        else if (local.x > -this.pivotL && local.x < -ball.radius * 0.5) {
+                        else if (local.x > -Split.pivotL && local.x < -ball.radius * 0.5) {
                             this._moving = true;
                             this._animatePivot(Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
                                 this._moving = false;
@@ -4704,81 +5132,27 @@ class Split extends MachinePart {
         }
     }
 }
-class UTurnLarge extends MachinePart {
-    constructor(machine, i, j, k, mirrorX) {
-        super(machine, i, j, k, {
-            w: 2,
-            d: 3,
-            mirrorX: mirrorX
-        });
-        this.xMirrorable = true;
-        this.partName = "uturn-l";
-        this.deserialize({
-            points: [
-                { position: { x: -0.075, y: 0, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
-                { position: { x: 0.13394933569683048, y: -0.008441899296066684, z: 0.00026137674993623877 }, normal: { x: 0.032306075793350764, y: 0.9833195664766373, z: -0.17899426708984922 } },
-                { position: { x: 0.1712, y: -0.01, z: -0.0105 }, normal: { x: -0.11360563098237532, y: 0.9568855505453798, z: -0.2673271474552511 } },
-                { position: { x: 0.1955, y: -0.0116, z: -0.0372 }, normal: { x: -0.20660883087432497, y: 0.9643838758298143, z: -0.16515608085750325 } },
-                { position: { x: 0.2038, y: -0.013, z: -0.0688 }, normal: { x: -0.25848323253959904, y: 0.9647301065787487, z: -0.049822083019837024 } },
-                { position: { x: 0.197, y: -0.0144, z: -0.0992 }, normal: { x: -0.274874420263502, y: 0.9572314992222168, z: 0.09028792821629655 } },
-                { position: { x: 0.1744, y: -0.016, z: -0.1265 }, normal: { x: -0.18804611436208896, y: 0.956335180137496, z: 0.22374468061767094 } },
-                { position: { x: 0.1339, y: -0.0178, z: -0.1377 }, normal: { x: -0.051765501746220265, y: 0.9550181735779958, z: 0.29199421392334324 } },
-                { position: { x: 0.0987, y: -0.0194, z: -0.1288 }, normal: { x: 0.11311928184404368, y: 0.954449314514888, z: 0.2760987759790836 } },
-                { position: { x: 0.0723, y: -0.021, z: -0.1014 }, normal: { x: 0.2540510175431706, y: 0.9536388488664376, z: 0.16134133511898094 } },
-                { position: { x: 0.055, y: -0.024, z: -0.0328 }, normal: { x: -0.2934267273272182, y: 0.9518591565545972, z: -0.08868428143255824 } },
-                { position: { x: 0.0301, y: -0.0254, z: -0.009 }, normal: { x: -0.16527157396712613, y: 0.9629216416134613, z: -0.2132304362675873 } },
-                { position: { x: -0.0057, y: -0.027, z: 0.0007 }, normal: { x: -0.056169210068177, y: 0.9868539889112726, z: -0.1515395143526165 } },
-                { position: { x: -0.075, y: -0.03, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: -1, y: 0, z: 0 } },
-            ],
-        });
-        if (mirrorX) {
-            this.mirrorXTrackPointsInPlace();
-        }
-        this.generateWires();
-    }
-}
+Split.pivotL = 0.025;
 class UTurn extends MachinePart {
-    constructor(machine, i, j, k, mirrorX) {
-        super(machine, i, j, k, {
-            d: 2,
-            mirrorX: mirrorX
-        });
-        this.xMirrorable = true;
-        this.partName = "uturn-s";
-        this.deserialize({
-            points: [
-                { position: { x: -0.075, y: 0, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
-                { position: { x: 0.0193, y: -0.0084, z: 0.0003 }, normal: { x: -0.05500779973536025, y: 0.925151067399511, z: -0.37559239137370676 } },
-                { position: { x: 0.05180769566226052, y: 0.0056684545036756045, z: -0.004609346816050227 }, normal: { x: -0.6257808486659882, y: 0.6834386999132468, z: -0.37591205474654144 }, tangentOut: 1.275 },
-                { position: { x: 0.0638, y: 0.0181, z: -0.0256 }, normal: { x: -0.985533398197922, y: -0.018330358969221288, z: -0.16848714780812155 } },
-                { position: { x: 0.0586, y: 0.0099, z: -0.0448 }, normal: { x: -0.8873689664333703, y: 0.20446962902517424, z: 0.4132414405856218 } },
-                { position: { x: 0.0454, y: -0.0086, z: -0.0519 }, normal: { x: -0.5726089695906795, y: 0.5162041363475339, z: 0.6369083588413618 } },
-                { position: { x: 0.0262, y: -0.0253, z: -0.0454 }, normal: { x: -0.01778258232366703, y: 0.911265522044504, z: 0.41143520522539134 } },
-                { position: { x: -0.0152, y: -0.0301, z: -0.0069 }, normal: { x: -0.18431426214031815, y: 0.931209421797995, z: -0.31444755608259073 } },
-                { position: { x: -0.075, y: -0.03, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: -1, y: 0, z: 0 } },
-            ],
-        });
-        if (mirrorX) {
-            this.mirrorXTrackPointsInPlace();
-        }
+    constructor(machine, i, j, k, h, d, mirrorX, mirrorZ) {
+        super(machine, i, j, k);
+        let partName = "uturn-" + h.toFixed(0) + "." + d.toFixed(0);
+        this.setTemplate(this.machine.templateManager.getTemplate(partName, mirrorX, mirrorZ));
         this.generateWires();
     }
-}
-class UTurnLayer extends MachinePart {
-    constructor(machine, i, j, k, h, d, mirrorX, mirrorZ) {
-        super(machine, i, j, k, {
-            w: Math.ceil(d / 3),
-            h: h,
-            d: d,
-            mirrorX: mirrorX,
-            mirrorZ: mirrorZ
-        });
-        this.yExtendable = true;
-        this.zExtendable = true;
-        this.minD = 2;
-        this.xMirrorable = true;
-        this.zMirrorable = true;
-        this.partName = "uturnlayer-" + h.toFixed(0) + "." + d.toFixed(0);
+    static GenerateTemplate(h, d, mirrorX, mirrorZ) {
+        let template = new MachinePartTemplate();
+        template.partName = "uturn-" + h.toFixed(0) + "." + d.toFixed(0);
+        template.w = Math.ceil(d / 3),
+            template.h = h,
+            template.d = d,
+            template.mirrorX = mirrorX,
+            template.mirrorZ = mirrorZ;
+        template.yExtendable = true;
+        template.zExtendable = true;
+        template.minD = 2;
+        template.xMirrorable = true;
+        template.zMirrorable = true;
         let dir = new BABYLON.Vector3(1, 0, 0);
         dir.normalize();
         let n = new BABYLON.Vector3(0, 1, 0);
@@ -4786,52 +5160,99 @@ class UTurnLayer extends MachinePart {
         let r = tileDepth * (d - 1) * 0.5;
         let x0 = -tileWidth * 0.5 + 2 * Math.PI * r / 6;
         let r2 = r / Math.SQRT2;
-        this.tracks[0].trackpoints = [
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), new BABYLON.Vector3(1, 0, 0)),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(x0 + 0, 0, 0)),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(x0 + r2, 0, -r + r2)),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(x0 + r, 0, -r)),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(x0 + r2, 0, -r - r2)),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(x0 + 0, 0, -2 * r)),
-            new TrackPoint(this.tracks[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, -2 * r), new BABYLON.Vector3(-1, 0, 0)),
+        template.trackTemplates[0] = new TrackTemplate(template);
+        template.trackTemplates[0].trackpoints = [
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), new BABYLON.Vector3(1, 0, 0)),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, 0)),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r2, 0, -r + r2)),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r, 0, -r)),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r2, 0, -r - r2)),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, -2 * r)),
+            new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, -2 * r), new BABYLON.Vector3(-1, 0, 0)),
         ];
-        for (let n = 0; n < this.tracks[0].trackpoints.length; n++) {
-            let f = n / (this.tracks[0].trackpoints.length - 1);
-            this.tracks[0].trackpoints[n].position.y = -f * this.h * tileHeight;
+        for (let n = 0; n < template.trackTemplates[0].trackpoints.length; n++) {
+            let f = n / (template.trackTemplates[0].trackpoints.length - 1);
+            template.trackTemplates[0].trackpoints[n].position.y = -f * template.h * tileHeight;
         }
         if (mirrorX) {
-            this.mirrorXTrackPointsInPlace();
+            template.mirrorXTrackPointsInPlace();
         }
         if (mirrorZ) {
-            this.mirrorZTrackPointsInPlace();
+            template.mirrorZTrackPointsInPlace();
         }
-        this.generateWires();
+        template.initialize();
+        return template;
     }
 }
-/// <reference path="../machine/MachinePart.ts"/>
-class Wave extends MachinePart {
-    constructor(machine, i, j, k, mirrorX) {
-        super(machine, i, j, k, {
-            w: 2,
-            mirrorX: mirrorX
-        });
-        this.xMirrorable = true;
-        this.partName = "wave";
-        this.deserialize({
-            points: [
-                { position: { x: -0.075, y: 0, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
-                { position: { x: -0.02574170106019552, y: -0.02331256943245867, z: -1.3457124303783985e-10 }, normal: { x: 0.09980015069654494, y: 0.9950075024445529, z: 2.9746223976965384e-11 } },
-                { position: { x: 0.0247, y: -0.01, z: 0 }, normal: { x: 0.06997826494958422, y: 0.9975485163312338, z: 7.031366138779832e-11 } },
-                { position: { x: 0.07405330047633624, y: -0.030313212452661144, z: -1.1598073586596702e-10 }, normal: { x: 0.09950371902099892, y: 0.9950371902099892, z: -5.235549835316916e-10 } },
-                { position: { x: 0.1247, y: -0.02, z: 0 }, normal: { x: 0.12353766744973763, y: 0.9923398836694403, z: 6.989528287372397e-12 } },
-                { position: { x: 0.1734746589421829, y: -0.04269030514205091, z: 1.6954757086143357e-10 }, normal: { x: 0.09920903435744811, y: 0.9950666146052045, z: 8.515907414511131e-11 } },
-                { position: { x: 0.22499999999999998, y: -0.03, z: 0 }, normal: { x: 0, y: 1, z: 0 }, dir: { x: 1, y: 0, z: 0 } },
-            ],
-        });
-        if (mirrorX) {
-            this.mirrorXTrackPointsInPlace();
-        }
+class Wave extends MachinePartWithOriginDestination {
+    constructor(machine, i, j, k, w = 1, h = 1, d = 1, mirrorX, mirrorZ) {
+        super(machine, i, j, k);
+        let partName = "wave-" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
+        this.setTemplate(this.machine.templateManager.getTemplate(partName, mirrorX, mirrorZ));
         this.generateWires();
+    }
+    static GenerateTemplate(w = 1, h = 1, d = 1, mirrorX, mirrorZ) {
+        let template = new MachinePartTemplate();
+        template.partName = "wave-" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
+        template.w = w;
+        template.h = h;
+        template.d = d;
+        template.mirrorX = mirrorX;
+        template.mirrorZ = mirrorZ;
+        template.xExtendable = true;
+        template.yExtendable = true;
+        template.zExtendable = true;
+        template.xMirrorable = true;
+        template.zMirrorable = true;
+        let dir = new BABYLON.Vector3(1, 0, 0);
+        dir.normalize();
+        let n = new BABYLON.Vector3(0, 1, 0);
+        n.normalize();
+        template.trackTemplates[0] = new TrackTemplate(template);
+        let start = new BABYLON.Vector3(-tileWidth * 0.5, 0, 0);
+        let end = new BABYLON.Vector3(tileWidth * (template.w - 0.5), -tileHeight * template.h, -tileDepth * (template.d - 1));
+        let tanVector = dir.scale(BABYLON.Vector3.Distance(start, end));
+        template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], start, dir, undefined, undefined, 1)];
+        for (let i = 1; i < 2 * (w + 1); i++) {
+            let p1 = BABYLON.Vector3.Hermite(start, tanVector, end, tanVector, i / (2 * (w + 1)));
+            if (i % 2 === 1) {
+                p1.y -= 0.008;
+            }
+            else {
+                p1.y += 0.008;
+            }
+            template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], p1));
+        }
+        template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], end, dir, undefined, 1));
+        if (mirrorX) {
+            template.mirrorXTrackPointsInPlace();
+        }
+        if (mirrorZ) {
+            template.mirrorZTrackPointsInPlace();
+        }
+        template.initialize();
+        return template;
+    }
+    recreateFromOriginDestination(origin, dest, machine) {
+        let i = Math.min(origin.i, dest.i);
+        let j = Math.min(origin.j, dest.j);
+        let k = Math.min(origin.k, dest.k);
+        let w = dest.i - origin.i;
+        let h = Math.abs(dest.j - origin.j);
+        let d = Math.abs(dest.k - origin.k) + 1;
+        let mirrorX = dest.j < origin.j;
+        let mirrorZ = false;
+        if (mirrorX) {
+            if (origin.k < dest.k) {
+                mirrorZ = true;
+            }
+        }
+        else {
+            if (origin.k > dest.k) {
+                mirrorZ = true;
+            }
+        }
+        return new Wave(machine, i, j, k, w, h, d, mirrorX, mirrorZ);
     }
 }
 class Arrow extends BABYLON.Mesh {
@@ -4865,6 +5286,14 @@ class Arrow extends BABYLON.Mesh {
             data.applyToMesh(this);
         }
         this.game.scene.onBeforeRenderObservable.add(this._update);
+    }
+    highlight() {
+        this.renderOutline = true;
+        this.outlineColor = BABYLON.Color3.White();
+        this.outlineWidth = 0.05 * this.size;
+    }
+    unlit() {
+        this.renderOutline = false;
     }
     dispose() {
         super.dispose();
@@ -5114,7 +5543,7 @@ class Logo {
         earlyAccessDisclaimer.setAttribute("fill", "white");
         earlyAccessDisclaimer.setAttribute("font-family", "Consolas");
         earlyAccessDisclaimer.setAttribute("font-size", "26px");
-        earlyAccessDisclaimer.innerHTML = "> v0.1.2 early access";
+        earlyAccessDisclaimer.innerHTML = "> v0.1.3 early access";
         this.container.appendChild(earlyAccessDisclaimer);
     }
 }
@@ -5154,7 +5583,7 @@ class MachinePartEditorMenu {
         this.wPlusButton.onclick = async () => {
             if (this.currentObject instanceof MachinePart && this.currentObject.xExtendable) {
                 let w = this.currentObject.w + 1;
-                let editedTrack = await this.machineEditor.editTrackInPlace(this.currentObject, undefined, undefined, undefined, w, this.currentObject.yExtendable ? this.currentObject.h : undefined, this.currentObject.zExtendable ? this.currentObject.d : undefined);
+                let editedTrack = await this.machineEditor.editTrackInPlace(this.currentObject, { w: w });
                 this.machineEditor.setSelectedObject(editedTrack);
             }
         };
@@ -5163,7 +5592,7 @@ class MachinePartEditorMenu {
             if (this.currentObject instanceof MachinePart && this.currentObject.xExtendable) {
                 let w = this.currentObject.w - 1;
                 if (w >= 1) {
-                    let editedTrack = await this.machineEditor.editTrackInPlace(this.currentObject, undefined, undefined, undefined, w, this.currentObject.yExtendable ? this.currentObject.h : undefined, this.currentObject.zExtendable ? this.currentObject.d : undefined);
+                    let editedTrack = await this.machineEditor.editTrackInPlace(this.currentObject, { w: w });
                     this.machineEditor.setSelectedObject(editedTrack);
                 }
             }
@@ -5174,7 +5603,7 @@ class MachinePartEditorMenu {
         this.hPlusButton.onclick = async () => {
             if (this.currentObject instanceof MachinePart && this.currentObject.yExtendable) {
                 let h = this.currentObject.h + 1;
-                let editedTrack = await this.machineEditor.editTrackInPlace(this.currentObject, undefined, undefined, undefined, this.currentObject.xExtendable ? this.currentObject.w : undefined, h, this.currentObject.zExtendable ? this.currentObject.d : undefined);
+                let editedTrack = await this.machineEditor.editTrackInPlace(this.currentObject, { h: h });
                 this.machineEditor.setSelectedObject(editedTrack);
             }
         };
@@ -5183,7 +5612,7 @@ class MachinePartEditorMenu {
             if (this.currentObject instanceof MachinePart && this.currentObject.yExtendable) {
                 let h = this.currentObject.h - 1;
                 if (h >= 0) {
-                    let editedTrack = await this.machineEditor.editTrackInPlace(this.currentObject, undefined, undefined, undefined, this.currentObject.xExtendable ? this.currentObject.w : undefined, h, this.currentObject.zExtendable ? this.currentObject.d : undefined);
+                    let editedTrack = await this.machineEditor.editTrackInPlace(this.currentObject, { h: h });
                     this.machineEditor.setSelectedObject(editedTrack);
                 }
             }
@@ -5194,7 +5623,7 @@ class MachinePartEditorMenu {
         this.dPlusButton.onclick = async () => {
             if (this.currentObject instanceof MachinePart && this.currentObject.zExtendable) {
                 let d = this.currentObject.d + 1;
-                let editedTrack = await this.machineEditor.editTrackInPlace(this.currentObject, undefined, undefined, undefined, this.currentObject.xExtendable ? this.currentObject.w : undefined, this.currentObject.yExtendable ? this.currentObject.h : undefined, d);
+                let editedTrack = await this.machineEditor.editTrackInPlace(this.currentObject, { d: d });
                 this.machineEditor.setSelectedObject(editedTrack);
             }
         };
@@ -5203,12 +5632,32 @@ class MachinePartEditorMenu {
             if (this.currentObject instanceof MachinePart && this.currentObject.zExtendable) {
                 let d = this.currentObject.d - 1;
                 if (d >= this.currentObject.minD) {
-                    let editedTrack = await this.machineEditor.editTrackInPlace(this.currentObject, undefined, undefined, undefined, this.currentObject.xExtendable ? this.currentObject.w : undefined, this.currentObject.yExtendable ? this.currentObject.h : undefined, d);
+                    let editedTrack = await this.machineEditor.editTrackInPlace(this.currentObject, { d: d });
                     this.machineEditor.setSelectedObject(editedTrack);
                 }
             }
         };
         this.dValue = document.querySelector("#machine-editor-part-menu-depth .value");
+        this.countLine = document.getElementById("machine-editor-part-menu-count");
+        this.nPlusButton = document.querySelector("#machine-editor-part-menu-count button.plus");
+        this.nPlusButton.onclick = async () => {
+            if (this.currentObject instanceof MachinePart && this.currentObject.nExtendable) {
+                let n = this.currentObject.n + 1;
+                let editedTrack = await this.machineEditor.editTrackInPlace(this.currentObject, { n: n });
+                this.machineEditor.setSelectedObject(editedTrack);
+            }
+        };
+        this.nMinusButton = document.querySelector("#machine-editor-part-menu-count button.minus");
+        this.nMinusButton.onclick = async () => {
+            if (this.currentObject instanceof MachinePart && this.currentObject.nExtendable) {
+                let n = this.currentObject.n - 1;
+                if (n > 0) {
+                    let editedTrack = await this.machineEditor.editTrackInPlace(this.currentObject, { n: n });
+                    this.machineEditor.setSelectedObject(editedTrack);
+                }
+            }
+        };
+        this.nValue = document.querySelector("#machine-editor-part-menu-count .value");
         this.mirrorXLine = document.getElementById("machine-editor-part-menu-mirrorX");
         this.mirrorXButton = document.querySelector("#machine-editor-part-menu-mirrorX button");
         this.mirrorXButton.onclick = async () => {
@@ -5256,6 +5705,7 @@ class MachinePartEditorMenu {
                 this.widthLine.style.display = this._shown && this.currentObject instanceof MachinePart && this.currentObject.xExtendable ? "" : "none";
                 this.heightLine.style.display = this._shown && this.currentObject instanceof MachinePart && this.currentObject.yExtendable ? "" : "none";
                 this.depthLine.style.display = this._shown && this.currentObject instanceof MachinePart && this.currentObject.zExtendable ? "" : "none";
+                this.countLine.style.display = this._shown && this.currentObject instanceof MachinePart && this.currentObject.nExtendable ? "" : "none";
                 this.mirrorXLine.style.display = this._shown && this.currentObject instanceof MachinePart && this.currentObject.xMirrorable ? "" : "none";
                 this.mirrorZLine.style.display = this._shown && this.currentObject instanceof MachinePart && this.currentObject.zMirrorable ? "" : "none";
                 this.fillLine.style.display = this._shown && this.currentObject instanceof Elevator ? "" : "none";
@@ -5269,6 +5719,7 @@ class MachinePartEditorMenu {
                     this.wValue.innerText = this.currentObject.w.toFixed(0);
                     this.hValue.innerText = this.currentObject.h.toFixed(0);
                     this.dValue.innerText = this.currentObject.d.toFixed(0);
+                    this.nValue.innerText = this.currentObject.n.toFixed(0);
                 }
                 else if (this.currentObject instanceof Ball) {
                     this.titleElement.innerText = "Marble";
@@ -5281,6 +5732,8 @@ class MachinePartEditorMenu {
 class MainMenu {
     constructor(game) {
         this.game = game;
+        this.xCount = 1;
+        this.yCount = 1;
         this.container = document.getElementById("main-menu");
         this.updateNode = new BABYLON.Node("main-menu-update-node");
     }
@@ -5306,71 +5759,160 @@ class MainMenu {
         this.container.style.pointerEvents = "none";
     }
     resize() {
-        let requestedTileCount = this.container.querySelectorAll(".panel.demo").length + 3;
+        let requestedTileCount = 0;
+        let requestedFullLines = 0;
+        let panels = [];
+        let elements = this.container.querySelectorAll("menu-panel");
+        for (let i = 0; i < elements.length; i++) {
+            let panel = elements[i];
+            panels[i] = panel;
+            panel.w = parseInt(panel.getAttribute("w"));
+            panel.h = parseInt(panel.getAttribute("h"));
+            let area = panel.w * panel.h;
+            requestedTileCount += area;
+        }
         let rect = this.container.getBoundingClientRect();
         let containerW = rect.width;
         let containerH = rect.height;
-        let bestValue = 0;
-        let xCount;
-        let yCount;
-        for (let xC = 1; xC <= 10; xC++) {
-            for (let yC = 1; yC <= 10; yC++) {
-                let count = xC * yC;
-                if (count >= requestedTileCount) {
-                    let w = containerW / xC;
-                    let h = containerH / yC;
-                    let area = w * h;
-                    let squareness = Math.min(w / h, h / w);
-                    let value = area * squareness;
-                    if (value > bestValue) {
-                        xCount = xC;
-                        yCount = yC;
-                        bestValue = value;
+        let min = 0;
+        let ok = false;
+        let emptyLinesBottom = 0;
+        while (!ok) {
+            ok = true;
+            min++;
+            let bestValue = 0;
+            for (let xC = min; xC <= 10; xC++) {
+                for (let yC = min; yC <= 10; yC++) {
+                    let count = xC * yC;
+                    if (count >= requestedTileCount) {
+                        let w = containerW / xC;
+                        let h = containerH / (yC + requestedFullLines);
+                        let area = w * h;
+                        let squareness = Math.min(w / h, h / w);
+                        let value = area * squareness;
+                        if (value > bestValue) {
+                            this.xCount = xC;
+                            this.yCount = yC + requestedFullLines;
+                            bestValue = value;
+                        }
+                    }
+                }
+            }
+            console.log("test " + this.xCount + " " + this.yCount);
+            let grid = [];
+            for (let y = 0; y <= this.yCount; y++) {
+                grid[y] = [];
+                for (let x = 0; x <= this.xCount; x++) {
+                    grid[y][x] = (x < this.xCount && y < this.yCount);
+                }
+            }
+            for (let n = 0; n < panels.length; n++) {
+                let panel = panels[n];
+                panel.x = -1;
+                panel.y = -1;
+                for (let line = 0; line < this.yCount && panel.x === -1; line++) {
+                    for (let col = 0; col < this.xCount && panel.x === -1; col++) {
+                        let fit = true;
+                        for (let x = 0; x < panel.w; x++) {
+                            for (let y = 0; y < panel.h; y++) {
+                                fit = fit && grid[line + y][col + x];
+                            }
+                        }
+                        if (fit) {
+                            panel.x = col;
+                            panel.y = line;
+                            for (let x = 0; x < panel.w; x++) {
+                                for (let y = 0; y < panel.h; y++) {
+                                    grid[line + y][col + x] = false;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (panel.x === -1) {
+                    ok = false;
+                }
+            }
+            if (!ok) {
+                console.log("can't find a way to make a menu layout");
+            }
+            else {
+                console.log("now it's ok");
+                let empty = true;
+                emptyLinesBottom = 0;
+                for (let y = this.yCount - 1; y > 0 && empty; y--) {
+                    for (let x = 0; x < this.xCount && empty; x++) {
+                        if (!grid[y][x]) {
+                            empty = false;
+                        }
+                    }
+                    if (empty) {
+                        emptyLinesBottom++;
                     }
                 }
             }
         }
-        let tileW = containerW / xCount;
-        let tileH = containerH / yCount;
-        let m = Math.min(tileW, tileH) / 20;
-        let demoButtons = this.container.querySelectorAll(".panel.demo");
-        for (let i = 0; i < demoButtons.length; i++) {
-            let pos = i + 2;
-            let button = demoButtons[i];
-            button.style.display = "block";
-            button.style.width = (tileW - 2 * m).toFixed(0) + "px";
-            button.style.height = (tileH - 2 * m).toFixed(0) + "px";
-            button.style.position = "absolute";
-            button.style.left = ((pos % xCount) * tileW + m).toFixed(0) + "px";
-            button.style.top = (Math.floor(pos / xCount) * tileH + m).toFixed(0) + "px";
-            button.style.backgroundImage = "url(./datas/icons/demo-" + (i + 1).toFixed(0) + ".png)";
+        let tileW = containerW / this.xCount;
+        let tileH = containerH / this.yCount;
+        let m = Math.min(tileW, tileH) / 15;
+        for (let i = 0; i < panels.length; i++) {
+            let panel = panels[i];
+            panel.style.display = "block";
+            panel.style.width = (panel.w * tileW - 2 * m).toFixed(0) + "px";
+            panel.style.height = (panel.h * tileH - 2 * m).toFixed(0) + "px";
+            panel.style.position = "absolute";
+            panel.computedLeft = (panel.x * tileW + m);
+            if (panel.style.display != "none") {
+                panel.style.left = panel.computedLeft.toFixed(0) + "px";
+            }
+            panel.computedTop = (panel.y * tileH + m + emptyLinesBottom * 0.5 * tileH);
+            panel.style.top = panel.computedTop.toFixed(0) + "px";
+            let label = panel.querySelector(".label");
+            if (label) {
+                label.style.fontSize = (tileW / 4).toFixed(0) + "px";
+            }
+            let label2 = panel.querySelector(".label-2");
+            if (label2) {
+                label2.style.fontSize = (tileW / 7).toFixed(0) + "px";
+            }
         }
-        let n = demoButtons.length;
-        let buttonCreate = this.container.querySelector(".panel.create");
-        buttonCreate.style.display = "block";
-        buttonCreate.style.width = (2 * tileW - 2 * m).toFixed(0) + "px";
-        buttonCreate.style.height = (tileH - 2 * m).toFixed(0) + "px";
-        buttonCreate.style.position = "absolute";
-        buttonCreate.style.left = m.toFixed(0) + "px";
-        buttonCreate.style.top = m.toFixed(0) + "px";
-        buttonCreate.style.backgroundImage = "url(./datas/icons/create.png)";
-        buttonCreate.style.backgroundPosition = "bottom right";
-        let buttonOption = this.container.querySelector(".panel.option");
-        buttonOption.style.display = "block";
-        buttonOption.style.width = (tileW - 2 * m).toFixed(0) + "px";
-        buttonOption.style.height = (tileH * 0.5 - 2 * m).toFixed(0) + "px";
-        buttonOption.style.position = "absolute";
-        buttonOption.style.right = (m).toFixed(0) + "px";
-        buttonOption.style.bottom = (0.5 * tileH + m).toFixed(0) + "px";
-        let buttonCredit = this.container.querySelector(".panel.credit");
-        buttonCredit.style.display = "block";
-        buttonCredit.style.width = (tileW - 2 * m).toFixed(0) + "px";
-        buttonCredit.style.height = (tileH * 0.5 - 2 * m).toFixed(0) + "px";
-        buttonCredit.style.position = "absolute";
-        buttonCredit.style.right = (m).toFixed(0) + "px";
-        buttonCredit.style.bottom = m.toFixed(0) + "px";
+        this.container.querySelector("menu-panel.create").style.backgroundImage = "url(./datas/icons/create.png)";
+        let demoPanels = this.container.querySelectorAll("menu-panel.demo");
+        demoPanels.forEach((e, i) => {
+            if (e instanceof HTMLElement) {
+                e.style.backgroundImage = "url(./datas/icons/demo-" + (i + 1).toFixed(0) + ".png)";
+            }
+        });
     }
 }
+class MainMenuPanel extends HTMLElement {
+    constructor() {
+        super(...arguments);
+        this.x = 0;
+        this.y = 0;
+        this.w = 1;
+        this.h = 1;
+        this.computedTop = 0;
+        this.computedLeft = 0;
+    }
+    get top() {
+        return parseFloat(this.style.top);
+    }
+    set top(v) {
+        if (this) {
+            this.style.top = v.toFixed(1) + "px";
+        }
+    }
+    get left() {
+        return parseFloat(this.style.left);
+    }
+    set left(v) {
+        if (this) {
+            this.style.left = v.toFixed(1) + "px";
+        }
+    }
+}
+customElements.define("menu-panel", MainMenuPanel);
 class OptionsPage {
     constructor(game) {
         this.game = game;

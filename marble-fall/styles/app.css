@@ -108,8 +108,8 @@ body {
 
 .panel {
     background-color: rgba(39, 43, 46, 80%);
-    outline: 0.1vh solid white;
-    border-radius: 2vh;
+    outline: calc(min(0.1vh, 0.1vw)) solid white;
+    border-radius: calc(min(1.5vh, 1.5vw));
     margin: 0;
     padding: 0;
     color: white;
@@ -120,12 +120,26 @@ body {
 
 .panel:hover { 
     background-color: rgba(78, 86, 92, 90%);
+    outline: calc(min(0.3vh, 0.3vw)) solid white;
+    cursor: pointer;
+}
+
+.panel.studio {
+    background: url("../datas/icons/logo-white-no-bg.png");
+    background-color: rgba(0, 0, 0, 90%);
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.panel.studio:hover {
+    background-color: rgba(10, 10, 10, 0.8);
 }
 
 .panel .label {
     text-align: right;
     display: block;
-    margin: 10%;
+    margin: 0.5vh 1.5vh 0.5vh 1.5vh;
     font-size: 3vh;
 }
 
@@ -142,22 +156,16 @@ body {
 .panel.create .label {
     text-align: left;
     display: block;
-    margin: 3vh;
-    font-size: 6vh;
 }
 
 .panel.option .label {
     text-align: left;
     display: block;
-    margin: 2vh;
-    font-size: 2vh;
 }
 
 .panel.credit .label {
     text-align: left;
     display: block;
-    margin: 2vh;
-    font-size: 2vh;
 }
 
 .page {
