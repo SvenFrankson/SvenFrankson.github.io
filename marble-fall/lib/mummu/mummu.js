@@ -870,6 +870,8 @@ var Mummu;
         up = BABYLON.Vector3.Cross(dir, right).normalize();
         let alphaL = isFinite(props.alpha) ? props.alpha : props.alphaMax - props.alphaMin;
         let alphaMin = isFinite(props.alpha) ? -props.alpha * 0.5 : props.alphaMin;
+        console.log("AlphaMin " + (alphaMin / Math.PI * 180).toFixed(1) + "°");
+        console.log("AlphaL " + (alphaL / Math.PI * 180).toFixed(1) + "°");
         let betaL = isFinite(props.beta) ? props.beta : props.betaMax - props.betaMin;
         let betaMin = isFinite(props.beta) ? -props.beta * 0.5 : props.betaMin;
         let cAlpha = Math.round(alphaL / props.angularQuadLength);

@@ -702,6 +702,38 @@ var popopo = {
         { name: "ramp-1.1.5", i: 0, j: -2, k: 0, mirrorX: false, mirrorZ: true },
     ],
 };
+var aerial = {
+    balls: [
+        { x: 0.3039999976158142, y: -0.36149999833106994, z: 0 },
+        { x: 0.3039999976158142, y: -0.28106269574165343, z: 0 },
+        { x: 0.3039999976158142, y: -0.20062536334991454, z: 0 },
+        { x: 0.3039999976158142, y: -0.12018804585933686, z: 0 },
+        { x: 0.3039999976158142, y: -0.03975073954463005, z: 0 },
+        { x: 0.3039999976158142, y: 0.04068657422065735, z: 0 },
+    ],
+    parts: [
+        { name: "ramp-2.2.1", i: 0, j: -1, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "uturn-1.3", i: -1, j: 1, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "loop-1.6.1", i: 2, j: 2, k: 2 },
+        { name: "uturn-0.3", i: 3, j: 6, k: 5 },
+        { name: "ramp-2.4.1", i: 0, j: 2, k: 2, mirrorX: false, mirrorZ: false },
+        { name: "ramp-2.3.6", i: 1, j: 3, k: 0, mirrorX: false, mirrorZ: false },
+        { name: "uturn-0.2", i: -2, j: 10, k: 1, mirrorX: true, mirrorZ: false },
+        { name: "elevator-14", i: 2, j: -2, k: 0, mirrorX: false, mirrorZ: false },
+        { name: "loop-1.3.1", i: 1, j: 10, k: 1 },
+        { name: "uturn-0.3", i: 1, j: 12, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "ramp-1.2.3", i: 2, j: 12, k: 1, mirrorX: true, mirrorZ: false },
+        { name: "uturn-0.3", i: 3, j: 12, k: 1 },
+        { name: "ramp-1.0.2", i: 2, j: 12, k: 2, mirrorX: false, mirrorZ: false },
+        { name: "ramp-3.6.2", i: -2, j: 8, k: 0, mirrorX: false, mirrorZ: false },
+        { name: "loop-1.4.1", i: -1, j: 6, k: 2 },
+        { name: "uturn-1.5", i: 1, j: 8, k: 1 },
+        { name: "ramp-2.7.2", i: -1, j: 3, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "ramp-1.1.1", i: 0, j: 9, k: 5, mirrorX: true, mirrorZ: false },
+        { name: "uturn-0.4", i: -4, j: 8, k: 0, mirrorX: true, mirrorZ: false },
+        { name: "ramp-3.0.3", i: -2, j: 8, k: 1, mirrorX: false, mirrorZ: true },
+    ],
+};
 class HelperShape {
     constructor() {
         this.show = true;
@@ -983,12 +1015,12 @@ class MachineEditor {
                     }
                     draggedTrack.setIsVisible(true);
                     draggedTrack.generateWires();
+                    this.machine.generateBaseMesh();
                     draggedTrack.instantiate(true).then(() => {
                         draggedTrack.recomputeAbsolutePath();
                         this.setSelectedObject(draggedTrack);
                         this.setDraggedObject(undefined);
                         this.setSelectedItem("");
-                        this.machine.generateBaseMesh();
                     });
                 }
                 else if (this.draggedObject instanceof Ball) {
@@ -1265,6 +1297,7 @@ class MachineEditor {
                     selectedTrack.setI(selectedTrack.i + 1);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.generateWires();
+                    this.machine.generateBaseMesh();
                     await selectedTrack.instantiate(true);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.select();
@@ -1275,7 +1308,6 @@ class MachineEditor {
             }
             this.setDraggedObject(undefined);
             this.setSelectedItem("");
-            this.machine.generateBaseMesh();
             this.updateFloatingElements();
         };
         this._onIMinus = async () => {
@@ -1285,6 +1317,7 @@ class MachineEditor {
                     selectedTrack.setI(selectedTrack.i - 1);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.generateWires();
+                    this.machine.generateBaseMesh();
                     await selectedTrack.instantiate(true);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.select();
@@ -1295,7 +1328,6 @@ class MachineEditor {
             }
             this.setDraggedObject(undefined);
             this.setSelectedItem("");
-            this.machine.generateBaseMesh();
             this.updateFloatingElements();
         };
         this._onJPlus = async () => {
@@ -1305,6 +1337,7 @@ class MachineEditor {
                     selectedTrack.setJ(selectedTrack.j + 1);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.generateWires();
+                    this.machine.generateBaseMesh();
                     await selectedTrack.instantiate(true);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.select();
@@ -1315,7 +1348,6 @@ class MachineEditor {
             }
             this.setDraggedObject(undefined);
             this.setSelectedItem("");
-            this.machine.generateBaseMesh();
             this.updateFloatingElements();
         };
         this._onJMinus = async () => {
@@ -1325,6 +1357,7 @@ class MachineEditor {
                     selectedTrack.setJ(selectedTrack.j - 1);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.generateWires();
+                    this.machine.generateBaseMesh();
                     await selectedTrack.instantiate(true);
                     selectedTrack.recomputeAbsolutePath();
                     selectedTrack.select();
@@ -1335,7 +1368,6 @@ class MachineEditor {
             }
             this.setDraggedObject(undefined);
             this.setSelectedItem("");
-            this.machine.generateBaseMesh();
             this.updateFloatingElements();
         };
         this._onKPlus = async () => {
@@ -1346,6 +1378,7 @@ class MachineEditor {
                         selectedTrack.setK(selectedTrack.k + 1);
                         selectedTrack.recomputeAbsolutePath();
                         selectedTrack.generateWires();
+                        this.machine.generateBaseMesh();
                         await selectedTrack.instantiate(true);
                         selectedTrack.recomputeAbsolutePath();
                         selectedTrack.select();
@@ -1356,7 +1389,6 @@ class MachineEditor {
                 }
                 this.setDraggedObject(undefined);
                 this.setSelectedItem("");
-                this.machine.generateBaseMesh();
                 this.updateFloatingElements();
             }
             else if (this.selectedObject instanceof Ball) {
@@ -1376,6 +1408,7 @@ class MachineEditor {
                         selectedTrack.setK(selectedTrack.k - 1);
                         selectedTrack.recomputeAbsolutePath();
                         selectedTrack.generateWires();
+                        this.machine.generateBaseMesh();
                         await selectedTrack.instantiate(true);
                         selectedTrack.recomputeAbsolutePath();
                         selectedTrack.select();
@@ -1386,7 +1419,6 @@ class MachineEditor {
                 }
                 this.setDraggedObject(undefined);
                 this.setSelectedItem("");
-                this.machine.generateBaseMesh();
                 this.updateFloatingElements();
             }
             else if (this.selectedObject instanceof Ball) {
@@ -1957,9 +1989,9 @@ class MachineEditor {
         this.machine.parts.push(editedTrack);
         editedTrack.setIsVisible(true);
         editedTrack.generateWires();
+        this.machine.generateBaseMesh();
         await editedTrack.instantiate(true);
         editedTrack.recomputeAbsolutePath();
-        this.machine.generateBaseMesh();
         return editedTrack;
     }
     async editPartOriginDestInPlace(part, dOrigin, dDestination) {
@@ -1979,9 +2011,9 @@ class MachineEditor {
         this.machine.parts.push(editedPart);
         editedPart.setIsVisible(true);
         editedPart.generateWires();
+        this.machine.generateBaseMesh();
         await editedPart.instantiate(true);
         editedPart.recomputeAbsolutePath();
-        this.machine.generateBaseMesh();
         return editedPart;
     }
     async mirrorXTrackInPlace(track) {
@@ -2174,7 +2206,7 @@ var CameraMode;
 })(CameraMode || (CameraMode = {}));
 class Game {
     constructor(canvasElement) {
-        this.savedCamPosToLocalStorage = true;
+        this.DEBUG_MODE = true;
         this.screenRatio = 1;
         this.cameraMode = CameraMode.None;
         this.menuCameraMode = CameraMode.Ball;
@@ -2241,9 +2273,13 @@ class Game {
         this.config = new Configuration(this);
         this.config.initialize();
         //let line = BABYLON.MeshBuilder.CreateLines("zero", { points: [new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 0, -1)]});
-        this.scene.clearColor = BABYLON.Color4.FromHexString("#272b2e");
-        //this.scene.clearColor = BABYLON.Color4.FromHexString("#00ff00");
-        this.light = new BABYLON.HemisphericLight("light", (new BABYLON.Vector3(2, 2, -2)).normalize(), this.scene);
+        if (this.DEBUG_MODE) {
+            this.scene.clearColor = BABYLON.Color4.FromHexString("#00ff0000");
+        }
+        else {
+            this.scene.clearColor = BABYLON.Color4.FromHexString("#272b2e");
+        }
+        this.light = new BABYLON.HemisphericLight("light", (new BABYLON.Vector3(2, 3, -2.5)).normalize(), this.scene);
         this.handleMaterial = new BABYLON.StandardMaterial("handle-material");
         this.handleMaterial.diffuseColor.copyFromFloats(0, 1, 1);
         this.handleMaterial.specularColor.copyFromFloats(0, 0, 0);
@@ -2290,6 +2326,10 @@ class Game {
         this.copperMaterial.metallic = 1.0;
         this.copperMaterial.roughness = 0.15;
         this.copperMaterial.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./datas/environment/environmentSpecular.env", this.scene);
+        this.velvetMaterial = new BABYLON.StandardMaterial("velvet-material");
+        this.velvetMaterial.diffuseColor.copyFromFloats(1, 1, 1);
+        this.velvetMaterial.diffuseTexture = new BABYLON.Texture("./datas/textures/velvet.jpg");
+        this.velvetMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
         this.woodMaterial = new BABYLON.StandardMaterial("wood-material");
         this.woodMaterial.diffuseColor.copyFromFloats(0.3, 0.3, 0.3);
         this.woodMaterial.diffuseTexture = new BABYLON.Texture("./datas/textures/wood-color.jpg");
@@ -2297,36 +2337,51 @@ class Game {
         this.woodMaterial.specularTexture = new BABYLON.Texture("./datas/textures/wood-roughness.jpg");
         this.woodMaterial.specularColor.copyFromFloats(0.2, 0.2, 0.2);
         this.woodMaterial.bumpTexture = new BABYLON.Texture("./datas/textures/wood-normal-2.png");
-        this.leatherMaterial = new BABYLON.StandardMaterial("wood-material");
+        this.leatherMaterial = new BABYLON.StandardMaterial("leather-material");
         this.leatherMaterial.diffuseColor.copyFromFloats(0.05, 0.02, 0.02);
         this.leatherMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+        this.whiteMaterial = new BABYLON.StandardMaterial("white-material");
+        this.whiteMaterial.diffuseColor.copyFromFloats(0.9, 0.95, 1).scaleInPlace(0.9);
+        this.whiteMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
         this.deepBlackMaterial = new BABYLON.StandardMaterial("deep-black-material");
         this.deepBlackMaterial.diffuseColor.copyFromFloats(0, 0, 0.);
         this.deepBlackMaterial.specularColor.copyFromFloats(0, 0, 0);
-        this.skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 10 / Math.sqrt(3) }, this.scene);
-        this.skybox.rotation.y = Math.PI / 2;
+        this.autolitMaterial = new BABYLON.StandardMaterial("autolit-material");
+        this.autolitMaterial.diffuseColor.copyFromFloats(1, 1, 1);
+        this.autolitMaterial.emissiveColor = BABYLON.Color3.White().scale(0.3);
+        this.autolitMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+        this.skybox = BABYLON.MeshBuilder.CreateSphere("skyBox", { diameter: 20, sideOrientation: BABYLON.Mesh.BACKSIDE }, this.scene);
+        this.skybox.layerMask = 0x10000000;
         let skyboxMaterial = new BABYLON.StandardMaterial("skyBox", this.scene);
         skyboxMaterial.backFaceCulling = false;
-        let skyTexture = new BABYLON.CubeTexture("./datas/skyboxes/skybox", this.scene, ["_px.jpg", "_py.jpg", "_pz.jpg", "_nx.jpg", "_ny.jpg", "_nz.jpg"]);
-        skyboxMaterial.reflectionTexture = skyTexture;
-        skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-        skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+        let skyTexture = new BABYLON.Texture("./datas/skyboxes/snow.jpeg");
+        skyboxMaterial.diffuseTexture = skyTexture;
+        skyboxMaterial.emissiveColor = BABYLON.Color3.White();
         skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
         this.skybox.material = skyboxMaterial;
+        this.skybox.rotation.y = 0.16 * Math.PI;
         this.camera = new BABYLON.ArcRotateCamera("camera", this.targetCamAlpha, this.targetCamBeta, this.targetCamRadius, this.targetCamTarget.clone());
         this.camera.minZ = 0.01;
-        this.camera.maxZ = 10;
-        this.camera.lowerAlphaLimit = -Math.PI * 0.98;
-        this.camera.upperAlphaLimit = -Math.PI * 0.02;
+        this.camera.maxZ = 25;
+        if (!this.DEBUG_MODE) {
+            this.camera.lowerAlphaLimit = -Math.PI * 0.98;
+            this.camera.upperAlphaLimit = -Math.PI * 0.02;
+            this.camera.lowerRadiusLimit = 0.05;
+            this.camera.upperRadiusLimit = 1.5;
+        }
         this.camera.wheelPrecision = 1000;
         this.camera.panningSensibility = 4000;
         this.camera.panningInertia *= 0.5;
-        this.camera.lowerRadiusLimit = 0.05;
-        this.camera.upperRadiusLimit = 1.5;
         this.camera.angularSensibilityX = 2000;
         this.camera.angularSensibilityY = 2000;
         this.camera.pinchPrecision = 5000;
-        if (this.savedCamPosToLocalStorage) {
+        let camBackGround = new BABYLON.FreeCamera("background-camera", BABYLON.Vector3.Zero());
+        camBackGround.parent = this.camera;
+        camBackGround.layerMask = 0x10000000;
+        new BABYLON.BlurPostProcess("blurH", new BABYLON.Vector2(1, 0), 32, 1, camBackGround);
+        new BABYLON.BlurPostProcess("blurV", new BABYLON.Vector2(0, 1), 32, 1, camBackGround);
+        this.scene.activeCameras = [camBackGround, this.camera];
+        if (this.DEBUG_MODE) {
             if (window.localStorage.getItem("camera-target")) {
                 let target = JSON.parse(window.localStorage.getItem("camera-target"));
                 this.camera.target.x = target.x;
@@ -2354,12 +2409,19 @@ class Game {
         alternateMenuCamMode();
         this.camera.attachControl();
         this.camera.getScene();
+        this.room = new Room(this);
         this.machine = new Machine(this);
         this.machineEditor = new MachineEditor(this);
-        this.machine.deserialize(deathLoop);
+        if (this.DEBUG_MODE) {
+            this.machine.deserialize(aerial);
+        }
+        else {
+            this.machine.deserialize(simpleLoop);
+        }
         //this.machine.deserialize(test);
-        await this.machine.instantiate();
         await this.machine.generateBaseMesh();
+        await this.machine.instantiate();
+        await this.room.instantiate();
         let screenshotButton = document.querySelector("#toolbar-screenshot");
         screenshotButton.addEventListener("click", () => {
             this.makeCircuitScreenshot();
@@ -2392,8 +2454,8 @@ class Game {
                 buttonDemo.onclick = async () => {
                     this.machine.dispose();
                     this.machine.deserialize(demo);
-                    await this.machine.instantiate();
                     await this.machine.generateBaseMesh();
+                    await this.machine.instantiate();
                     this.setPageMode(GameMode.DemoMode);
                 };
             }
@@ -2411,7 +2473,12 @@ class Game {
         buttonCredit.onclick = () => {
             this.setPageMode(GameMode.Credits);
         };
-        await this.setPageMode(GameMode.MainMenu);
+        if (this.DEBUG_MODE) {
+            await this.setPageMode(GameMode.CreateMode);
+        }
+        else {
+            await this.setPageMode(GameMode.MainMenu);
+        }
         this.machine.play();
         document.addEventListener("keydown", async (event) => {
             //await this.makeScreenshot("join");
@@ -2461,7 +2528,7 @@ class Game {
     }
     update() {
         let dt = this.scene.deltaTime / 1000;
-        if (this.savedCamPosToLocalStorage) {
+        if (this.DEBUG_MODE) {
             let camPos = this.camera.position;
             let camTarget = this.camera.target;
             window.localStorage.setItem("camera-position", JSON.stringify({ x: camPos.x, y: camPos.y, z: camPos.z }));
@@ -3041,10 +3108,13 @@ class Machine {
         this.instantiated = false;
         this.playing = false;
         this.onStopCallbacks = new Nabu.UniqueList();
-        this.baseMeshMinX = -0.15;
-        this.baseMeshMaxX = -0.15;
-        this.baseMeshMinY = -0.15;
-        this.baseMeshMaxY = -0.15;
+        this.margin = 0.02;
+        this.baseMeshMinX = -this.margin;
+        this.baseMeshMaxX = this.margin;
+        this.baseMeshMinY = -this.margin;
+        this.baseMeshMaxY = this.margin;
+        this.baseMeshMinZ = -this.margin;
+        this.baseMeshMaxZ = this.margin;
         this.trackFactory = new MachinePartFactory(this);
         this.templateManager = new TemplateManager(this);
     }
@@ -3052,6 +3122,7 @@ class Machine {
         for (let i = 0; i < this.balls.length; i++) {
             await this.balls[i].instantiate();
         }
+        this.parts = this.parts.sort((a, b) => { return b.j - a.j; });
         for (let i = 0; i < this.parts.length; i++) {
             await this.parts[i].instantiate();
         }
@@ -3113,57 +3184,130 @@ class Machine {
         this.playing = false;
     }
     async generateBaseMesh() {
-        this.baseMeshMinX = -0.15;
-        this.baseMeshMaxX = 0.15;
-        this.baseMeshMinY = -0.15;
-        this.baseMeshMaxY = 0.15;
+        this.baseMeshMinX = -this.margin;
+        this.baseMeshMaxX = this.margin;
+        this.baseMeshMinY = -this.margin;
+        this.baseMeshMaxY = this.margin;
+        this.baseMeshMinZ = -this.margin;
+        this.baseMeshMaxZ = this.margin;
         for (let i = 0; i < this.parts.length; i++) {
             let track = this.parts[i];
             this.baseMeshMinX = Math.min(this.baseMeshMinX, track.position.x - tileWidth * 0.5);
             this.baseMeshMaxX = Math.max(this.baseMeshMaxX, track.position.x + tileWidth * (track.w - 0.5));
             this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - tileHeight * (track.h + 1));
             this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.position.y);
+            this.baseMeshMinZ = Math.min(this.baseMeshMinZ, track.position.z - tileDepth * (track.d - 0.5));
+            this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.position.z);
         }
-        let w = this.baseMeshMaxX - this.baseMeshMinX;
-        let h = this.baseMeshMaxY - this.baseMeshMinY;
-        let u = w * 4;
-        let v = h * 4;
-        if (this.baseWall) {
-            this.baseWall.dispose();
+        if (false) {
+            let w = this.baseMeshMaxX - this.baseMeshMinX;
+            let h = this.baseMeshMaxY - this.baseMeshMinY;
+            let u = w * 4;
+            let v = h * 4;
+            if (this.baseWall) {
+                this.baseWall.dispose();
+            }
+            this.baseWall = BABYLON.MeshBuilder.CreatePlane("base-wall", { width: h + 2 * this.margin, height: w + 2 * this.margin, sideOrientation: BABYLON.Mesh.DOUBLESIDE, frontUVs: new BABYLON.Vector4(0, 0, v, u) });
+            this.baseWall.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
+            this.baseWall.position.y = (this.baseMeshMaxY + this.baseMeshMinY) * 0.5;
+            this.baseWall.position.z += 0.016;
+            this.baseWall.rotation.z = Math.PI / 2;
+            this.baseWall.material = this.game.woodMaterial;
+            if (this.baseFrame) {
+                this.baseFrame.dispose();
+            }
+            this.baseFrame = new BABYLON.Mesh("base-frame");
+            this.baseFrame.position.copyFrom(this.baseWall.position);
+            this.baseFrame.material = this.game.steelMaterial;
+            let vertexDatas = await this.game.vertexDataLoader.get("./meshes/base-frame.babylon");
+            let data = Mummu.CloneVertexData(vertexDatas[0]);
+            let positions = [...data.positions];
+            for (let i = 0; i < positions.length / 3; i++) {
+                let x = positions[3 * i];
+                let y = positions[3 * i + 1];
+                if (x > 0) {
+                    positions[3 * i] += w * 0.5 - 0.01 + this.margin;
+                }
+                else if (x < 0) {
+                    positions[3 * i] -= w * 0.5 - 0.01 + this.margin;
+                }
+                if (y > 0) {
+                    positions[3 * i + 1] += h * 0.5 - 0.01 + this.margin;
+                }
+                else if (y < 0) {
+                    positions[3 * i + 1] -= h * 0.5 - 0.01 + this.margin;
+                }
+            }
+            data.positions = positions;
+            data.applyToMesh(this.baseFrame);
         }
-        this.baseWall = BABYLON.MeshBuilder.CreatePlane("base-wall", { width: h + 0.2, height: w + 0.2, sideOrientation: BABYLON.Mesh.DOUBLESIDE, frontUVs: new BABYLON.Vector4(0, 0, v, u) });
-        this.baseWall.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
-        this.baseWall.position.y = (this.baseMeshMaxY + this.baseMeshMinY) * 0.5;
-        this.baseWall.position.z += 0.016;
-        this.baseWall.rotation.z = Math.PI / 2;
-        this.baseWall.material = this.game.woodMaterial;
-        if (this.baseFrame) {
-            this.baseFrame.dispose();
+        else {
+            let w = this.baseMeshMaxX - this.baseMeshMinX;
+            let h = 1;
+            let d = this.baseMeshMaxZ - this.baseMeshMinZ;
+            if (this.baseFrame) {
+                this.baseFrame.dispose();
+            }
+            this.baseFrame = new BABYLON.Mesh("base-stand");
+            this.baseFrame.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
+            this.baseFrame.position.y = this.baseMeshMinY;
+            this.baseFrame.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
+            this.baseFrame.material = this.game.whiteMaterial;
+            let vertexDatas = await this.game.vertexDataLoader.get("./meshes/museum-stand.babylon");
+            let data = Mummu.CloneVertexData(vertexDatas[0]);
+            let positions = [...data.positions];
+            for (let i = 0; i < positions.length / 3; i++) {
+                let x = positions[3 * i];
+                let z = positions[3 * i + 2];
+                if (x > 0) {
+                    positions[3 * i] += w * 0.5 - 0.5 + this.margin;
+                }
+                else if (x < 0) {
+                    positions[3 * i] -= w * 0.5 - 0.5 + this.margin;
+                }
+                if (z > 0) {
+                    positions[3 * i + 2] += d * 0.5 - 0.5 + this.margin;
+                }
+                else if (z < 0) {
+                    positions[3 * i + 2] -= d * 0.5 - 0.5 + this.margin;
+                }
+            }
+            data.positions = positions;
+            data.applyToMesh(this.baseFrame);
+            if (this.baseWall) {
+                this.baseWall.dispose();
+            }
+            this.baseWall = new BABYLON.Mesh("base-top");
+            this.baseWall.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
+            this.baseWall.position.y = this.baseMeshMinY;
+            this.baseWall.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
+            this.baseWall.material = this.game.velvetMaterial;
+            data = Mummu.CloneVertexData(vertexDatas[1]);
+            let uvs = [];
+            positions = [...data.positions];
+            for (let i = 0; i < positions.length / 3; i++) {
+                let x = positions[3 * i];
+                let z = positions[3 * i + 2];
+                if (x > 0) {
+                    positions[3 * i] += w * 0.5 - 0.5 + this.margin;
+                }
+                else if (x < 0) {
+                    positions[3 * i] -= w * 0.5 - 0.5 + this.margin;
+                }
+                if (z > 0) {
+                    positions[3 * i + 2] += d * 0.5 - 0.5 + this.margin;
+                }
+                else if (z < 0) {
+                    positions[3 * i + 2] -= d * 0.5 - 0.5 + this.margin;
+                }
+                uvs.push(positions[3 * i] * 2);
+                uvs.push(positions[3 * i + 2] * 2);
+            }
+            data.positions = positions;
+            data.uvs = uvs;
+            data.applyToMesh(this.baseWall);
         }
-        this.baseFrame = new BABYLON.Mesh("base-frame");
-        this.baseFrame.position.copyFrom(this.baseWall.position);
-        this.baseFrame.material = this.game.steelMaterial;
-        let vertexDatas = await this.game.vertexDataLoader.get("./meshes/base-frame.babylon");
-        let data = Mummu.CloneVertexData(vertexDatas[0]);
-        let positions = [...data.positions];
-        for (let i = 0; i < positions.length / 3; i++) {
-            let x = positions[3 * i];
-            let y = positions[3 * i + 1];
-            if (x > 0) {
-                positions[3 * i] += w * 0.5 - 0.01 + 0.1;
-            }
-            else if (x < 0) {
-                positions[3 * i] -= w * 0.5 - 0.01 + 0.1;
-            }
-            if (y > 0) {
-                positions[3 * i + 1] += h * 0.5 - 0.01 + 0.1;
-            }
-            else if (y < 0) {
-                positions[3 * i + 1] -= h * 0.5 - 0.01 + 0.1;
-            }
-        }
-        data.positions = positions;
-        data.applyToMesh(this.baseFrame);
+        this.game.room.setGroundHeight(this.baseMeshMinY - 0.8);
     }
     getBankAt(pos, exclude) {
         for (let i = 0; i < this.parts.length; i++) {
@@ -3250,7 +3394,7 @@ var PartVisibilityMode;
     PartVisibilityMode[PartVisibilityMode["Selected"] = 1] = "Selected";
     PartVisibilityMode[PartVisibilityMode["Ghost"] = 2] = "Ghost";
 })(PartVisibilityMode || (PartVisibilityMode = {}));
-var radius = 0.014 * 1.2 / 2;
+var radius = 0.014 * 1.5 / 2;
 var selectorHullShape = [];
 for (let i = 0; i < 6; i++) {
     let a = i / 6 * 2 * Math.PI;
@@ -3585,7 +3729,11 @@ class MachinePart extends BABYLON.Mesh {
             this.wires.forEach(wire => {
                 wire.instantiate();
             });
-            SleeperMeshBuilder.GenerateSleepersVertexData(this, 0.03).applyToMesh(this.sleepersMesh);
+            requestAnimationFrame(() => {
+                if (!this.sleepersMesh.isDisposed()) {
+                    SleeperMeshBuilder.GenerateSleepersVertexData(this, { drawGroundAnchors: true, groundAnchorsRelativeMaxY: 0.6 }).applyToMesh(this.sleepersMesh);
+                }
+            });
             if (rebuildNeighboursWireMeshes) {
                 neighboursToUpdate = this.neighbours.cloneAsArray();
                 for (let i = 0; i < neighboursToUpdate.length; i++) {
@@ -3593,6 +3741,7 @@ class MachinePart extends BABYLON.Mesh {
                 }
             }
         }
+        this.computeWorldMatrix(true);
     }
 }
 var TrackNames = [
@@ -3685,7 +3834,13 @@ class MachinePartFactory {
     }
 }
 class SleeperMeshBuilder {
-    static GenerateSleepersVertexData(part, spacing) {
+    static GenerateSleepersVertexData(part, props) {
+        if (!isFinite(props.spacing)) {
+            props.spacing = 0.03;
+        }
+        if (!isFinite(props.groundAnchorsRelativeMaxY)) {
+            props.groundAnchorsRelativeMaxY = 1;
+        }
         let q = part.game.config.graphicQ;
         let partialsDatas = [];
         for (let j = 0; j < part.tracks.length; j++) {
@@ -3697,7 +3852,7 @@ class SleeperMeshBuilder {
                 let dist = BABYLON.Vector3.Distance(prev, trackpoint);
                 summedLength[i] = summedLength[i - 1] + dist;
             }
-            let count = Math.round(summedLength[summedLength.length - 1] / spacing / 3) * 3;
+            let count = Math.round(summedLength[summedLength.length - 1] / props.spacing / 3) * 3;
             count = Math.max(1, count);
             let correctedSpacing = summedLength[summedLength.length - 1] / count;
             let radius = part.wireSize * 0.5 * 0.75;
@@ -3761,7 +3916,8 @@ class SleeperMeshBuilder {
                     let path = basePath.map(v => { return v.clone(); });
                     let dir = interpolatedPoints[i + 1].subtract(interpolatedPoints[i - 1]).normalize();
                     let t = interpolatedPoints[i];
-                    Mummu.QuaternionFromYZAxisToRef(part.tracks[j].trackInterpolatedNormals[i], dir, quat);
+                    let up = part.tracks[j].trackInterpolatedNormals[i];
+                    Mummu.QuaternionFromYZAxisToRef(up, dir, quat);
                     let m = BABYLON.Matrix.Compose(BABYLON.Vector3.One(), quat, t);
                     for (let j = 0; j < path.length; j++) {
                         BABYLON.Vector3.TransformCoordinatesToRef(path[j], m, path[j]);
@@ -3769,45 +3925,74 @@ class SleeperMeshBuilder {
                     let tmp = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                     partialsDatas.push(BABYLON.VertexData.ExtractFromMesh(tmp));
                     tmp.dispose();
-                    let addAnchor = false;
-                    if (part.k === 0 && (n - 1.5) % 3 === 0) {
-                        let anchor = path[nPath / 2 - 1];
-                        if (anchor.z > -0.01) {
-                            addAnchor = true;
+                    if (props.drawWallAnchors) {
+                        let addAnchor = false;
+                        if (part.k === 0 && (n - 1.5) % 3 === 0) {
+                            let anchor = path[nPath / 2 - 1];
+                            if (anchor.z > -0.01) {
+                                addAnchor = true;
+                            }
+                        }
+                        if (addAnchor) {
+                            let anchor = path[nPath / 2 - 1];
+                            let anchorCenter = anchor.clone();
+                            anchorCenter.z = 0.015;
+                            let radiusFixation = Math.abs(anchor.z - anchorCenter.z);
+                            let anchorWall = anchorCenter.clone();
+                            anchorWall.y -= radiusFixation * 0.5;
+                            let nFixation = 2;
+                            if (q === 2) {
+                                nFixation = 6;
+                            }
+                            else if (q === 3) {
+                                nFixation = 10;
+                            }
+                            let fixationPath = [];
+                            for (let i = 0; i <= nFixation; i++) {
+                                let a = i / nFixation * 0.5 * Math.PI;
+                                let cosa = Math.cos(a);
+                                let sina = Math.sin(a);
+                                fixationPath[i] = new BABYLON.Vector3(0, -sina * radiusFixation * 0.5, -cosa * radiusFixation);
+                                fixationPath[i].addInPlace(anchorCenter);
+                            }
+                            let tmp = BABYLON.ExtrudeShape("tmp", { shape: shape, path: fixationPath, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                            partialsDatas.push(BABYLON.VertexData.ExtractFromMesh(tmp));
+                            tmp.dispose();
+                            let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.001, diameter: 0.01 });
+                            let quat = BABYLON.Quaternion.Identity();
+                            Mummu.QuaternionFromYZAxisToRef(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0), quat);
+                            Mummu.RotateVertexDataInPlace(tmpVertexData, quat);
+                            Mummu.TranslateVertexDataInPlace(tmpVertexData, anchorWall);
+                            partialsDatas.push(tmpVertexData);
+                            tmp.dispose();
                         }
                     }
-                    if (addAnchor) {
-                        let anchor = path[nPath / 2 - 1];
-                        let anchorCenter = anchor.clone();
-                        anchorCenter.z = 0.015;
-                        let radiusFixation = Math.abs(anchor.z - anchorCenter.z);
-                        let anchorWall = anchorCenter.clone();
-                        anchorWall.y -= radiusFixation * 0.5;
-                        let nFixation = 2;
-                        if (q === 2) {
-                            nFixation = 6;
+                    if (props.drawGroundAnchors) {
+                        if ((n - 1.5) % 6 === 0 && up.y > 0.1) {
+                            let anchor = path[nPath / 2];
+                            let anchorYWorld = anchor.y + part.position.y;
+                            let anchorBase = anchor.clone();
+                            let minY = part.machine.baseMeshMinY;
+                            let maxY = part.machine.baseMeshMaxY;
+                            anchorBase.y = part.machine.baseMeshMinY - part.position.y;
+                            if (anchorYWorld < minY + props.groundAnchorsRelativeMaxY * (maxY - minY)) {
+                                let rayOrigin = anchor.add(part.position);
+                                let rayDir = new BABYLON.Vector3(0, -1, 0);
+                                rayOrigin.addInPlace(rayDir.scale(0.05));
+                                let ray = new BABYLON.Ray(rayOrigin, rayDir, 3);
+                                let pick = part.game.scene.pickWithRay(ray, (m => { return m instanceof MachinePartSelectorMesh; }));
+                                if (!pick.hit) {
+                                    let fixationPath = [anchor, anchorBase];
+                                    let tmp = BABYLON.ExtrudeShape("tmp", { shape: shape, path: fixationPath, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                                    partialsDatas.push(BABYLON.VertexData.ExtractFromMesh(tmp));
+                                    tmp.dispose();
+                                    let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.006, diameter: 0.004 });
+                                    Mummu.TranslateVertexDataInPlace(tmpVertexData, anchorBase);
+                                    partialsDatas.push(tmpVertexData);
+                                    tmp.dispose();
+                                }
+                            }
                         }
-                        else if (q === 3) {
-                            nFixation = 10;
-                        }
-                        let fixationPath = [];
-                        for (let i = 0; i <= nFixation; i++) {
-                            let a = i / nFixation * 0.5 * Math.PI;
-                            let cosa = Math.cos(a);
-                            let sina = Math.sin(a);
-                            fixationPath[i] = new BABYLON.Vector3(0, -sina * radiusFixation * 0.5, -cosa * radiusFixation);
-                            fixationPath[i].addInPlace(anchorCenter);
-                        }
-                        let tmp = BABYLON.ExtrudeShape("tmp", { shape: shape, path: fixationPath, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                        partialsDatas.push(BABYLON.VertexData.ExtractFromMesh(tmp));
-                        tmp.dispose();
-                        let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.001, diameter: 0.01 });
-                        let quat = BABYLON.Quaternion.Identity();
-                        Mummu.QuaternionFromYZAxisToRef(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0), quat);
-                        Mummu.RotateVertexDataInPlace(tmpVertexData, quat);
-                        Mummu.TranslateVertexDataInPlace(tmpVertexData, anchorWall);
-                        partialsDatas.push(tmpVertexData);
-                        tmp.dispose();
                     }
                     n++;
                 }
@@ -5253,6 +5438,126 @@ class Wave extends MachinePartWithOriginDestination {
             }
         }
         return new Wave(machine, i, j, k, w, h, d, mirrorX, mirrorZ);
+    }
+}
+class Painting extends BABYLON.Mesh {
+    constructor(room, paintingName, size = 0.5) {
+        super("painting-" + paintingName);
+        this.room = room;
+        this.paintingName = paintingName;
+        this.size = size;
+        this.layerMask = 0x10000000;
+    }
+    async instantiate() {
+        let vertexDatas = await this.room.game.vertexDataLoader.get("./meshes/paint-support.babylon");
+        if (vertexDatas && vertexDatas[0]) {
+            vertexDatas[0].applyToMesh(this);
+        }
+        if (vertexDatas && vertexDatas[1]) {
+            let steel = new BABYLON.Mesh("steel");
+            vertexDatas[1].applyToMesh(steel);
+            steel.parent = this;
+            steel.material = this.room.game.steelMaterial;
+            steel.layerMask = 0x10000000;
+        }
+        if (vertexDatas && vertexDatas[2]) {
+            let lightedPlane = new BABYLON.Mesh("lighted-plane");
+            vertexDatas[2].applyToMesh(lightedPlane);
+            lightedPlane.parent = this;
+            lightedPlane.material = this.room.game.autolitMaterial;
+            lightedPlane.layerMask = 0x10000000;
+        }
+        let texture = new BABYLON.Texture("./datas/textures/" + this.paintingName + ".jpg");
+        return new Promise(resolve => {
+            let checkTextureLoaded = () => {
+                if (texture.isReady()) {
+                    let w = texture._texture.baseWidth;
+                    let h = texture._texture.baseHeight;
+                    let r = w / h;
+                    let wMesh = this.size;
+                    let hMesh = this.size;
+                    if (r >= 1) {
+                        hMesh /= r;
+                    }
+                    else {
+                        wMesh *= r;
+                    }
+                    let plane = BABYLON.MeshBuilder.CreatePlane("paint", { width: wMesh, height: hMesh });
+                    plane.layerMask = 0x10000000;
+                    let mat = new BABYLON.StandardMaterial(this.name + "-material");
+                    mat.diffuseTexture = texture;
+                    mat.emissiveColor = BABYLON.Color3.White();
+                    plane.material = mat;
+                    plane.position.y = 1.2;
+                    plane.rotation.y = Math.PI;
+                    plane.parent = this;
+                    resolve();
+                }
+                else {
+                    requestAnimationFrame(checkTextureLoaded);
+                }
+            };
+            checkTextureLoaded();
+        });
+    }
+}
+class Room {
+    constructor(game) {
+        this.game = game;
+        this.ground = new BABYLON.Mesh("room-ground");
+        this.ground.layerMask = 0x10000000;
+        this.ground.position.y = -2;
+        let groundMaterial = new BABYLON.StandardMaterial("ground-material");
+        groundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#3f4c52");
+        groundMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+        this.ground.material = groundMaterial;
+        this.wall = new BABYLON.Mesh("room-wall");
+        this.wall.layerMask = 0x10000000;
+        this.wall.material = this.game.whiteMaterial;
+        this.wall.parent = this.ground;
+        this.frame = new BABYLON.Mesh("room-frame");
+        this.frame.layerMask = 0x10000000;
+        this.frame.material = this.game.steelMaterial;
+        this.frame.parent = this.ground;
+    }
+    async instantiate() {
+        let vertexDatas = await this.game.vertexDataLoader.get("./meshes/room.babylon");
+        vertexDatas[0].applyToMesh(this.ground);
+        vertexDatas[1].applyToMesh(this.wall);
+        vertexDatas[2].applyToMesh(this.frame);
+        let paint1 = new Painting(this, "bilbao_1", 0.8);
+        paint1.instantiate();
+        paint1.position.copyFromFloats(-4, 0, 3);
+        paint1.rotation.y = 0.7 * Math.PI;
+        paint1.parent = this.ground;
+        let paint2 = new Painting(this, "bilbao_2", 0.8);
+        paint2.instantiate();
+        paint2.position.copyFromFloats(-3, 0, 3.3);
+        paint2.rotation.y = -0.9 * Math.PI;
+        paint2.parent = this.ground;
+        let paint3 = new Painting(this, "bilbao_3", 0.8);
+        paint3.instantiate();
+        paint3.position.copyFromFloats(4, 0, 3.5);
+        paint3.rotation.y = -Math.PI * 0.5;
+        paint3.parent = this.ground;
+        let paint4 = new Painting(this, "flower_1", 0.8);
+        paint4.instantiate();
+        paint4.position.copyFromFloats(4, 0, -3);
+        paint4.rotation.y = -0.3 * Math.PI;
+        paint4.parent = this.ground;
+        let paint5 = new Painting(this, "flower_2", 0.8);
+        paint5.instantiate();
+        paint5.position.copyFromFloats(3, 0, -3.3);
+        paint5.rotation.y = 0.1 * Math.PI;
+        paint5.parent = this.ground;
+        let paint6 = new Painting(this, "flower_3", 0.8);
+        paint6.instantiate();
+        paint6.position.copyFromFloats(-4, 0, -3.5);
+        paint6.rotation.y = Math.PI * 0.5;
+        paint6.parent = this.ground;
+    }
+    setGroundHeight(h) {
+        this.ground.position.y = h;
     }
 }
 class Arrow extends BABYLON.Mesh {
