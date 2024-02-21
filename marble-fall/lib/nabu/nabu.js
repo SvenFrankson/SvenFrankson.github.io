@@ -1,5 +1,24 @@
 var Nabu;
 (function (Nabu) {
+    async function Wait(frames = 1) {
+        return new Promise(resolve => {
+            let check = () => {
+                if (frames <= 0) {
+                    resolve();
+                    return;
+                }
+                else {
+                    frames--;
+                    requestAnimationFrame(check);
+                }
+            };
+            check();
+        });
+    }
+    Nabu.Wait = Wait;
+})(Nabu || (Nabu = {}));
+var Nabu;
+(function (Nabu) {
     function Compress(data) {
         let out = [];
         let lastD;
