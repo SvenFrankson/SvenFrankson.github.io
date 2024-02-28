@@ -121,7 +121,6 @@ body {
 .panel:hover { 
     background-color: rgba(78, 86, 92, 90%);
     outline: calc(min(0.3vh, 0.3vw)) solid white;
-    cursor: pointer;
 }
 
 .panel.studio {
@@ -538,4 +537,20 @@ body {
     width: var(--half-button-height);
     height: var(--button-l-size);
     appearance: slider-vertical;
+}
+
+#auto-update-graphic-alert {
+    position: fixed;
+    left: 0;
+    top: 0.5vh;
+    padding-top: 0.5vh;
+    padding-bottom: 0.5vh;
+    width: 100%;
+    text-align: center;
+    z-index: 3;
+    font-size: 2vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    background-color: rgba(39, 43, 46, 80%);
+    pointer-events: none;
 }

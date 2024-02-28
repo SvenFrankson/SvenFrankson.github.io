@@ -526,10 +526,12 @@ var Nabu;
         indexOf(e) {
             return this._elements.indexOf(e);
         }
-        push(e) {
-            if (this._elements.indexOf(e) === -1) {
-                this._elements.push(e);
-            }
+        push(...elements) {
+            elements.forEach((e) => {
+                if (this._elements.indexOf(e) === -1) {
+                    this._elements.push(e);
+                }
+            });
         }
         remove(e) {
             let i = this._elements.indexOf(e);

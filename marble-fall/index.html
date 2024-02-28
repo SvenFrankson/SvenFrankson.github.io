@@ -110,6 +110,14 @@
 				</div>
 				<h3>Performances</h3>
 				<div class="line">
+					<span class="label">auto graphic quality</span>
+					<span class="value">
+						<span id="auto-graphic-q-minus" class="btn">-</span>		
+						<span id="auto-graphic-q-val" class="val"></span>
+						<span id="auto-graphic-q-plus" class="btn">+</span>	
+					</span>
+				</div>
+				<div class="line">
 					<span class="label">graphic quality</span>
 					<span class="value">
 						<span id="graphic-q-minus" class="btn">-</span>		
@@ -127,7 +135,7 @@
 				<a href="https://www.tiaratum.com" target="_blank"><img src="./datas/textures/logo-white.svg"/></a>
 				<h4>Marble Run Simulator Source Code <a href="https://github.com/SvenFrankson/marble-fall" target="_blank">&#10697</a></h4>
 				<a href="https://www.babylonjs.com/" target="_blank"><img src="./datas/textures/babylonjs_identity_color.svg"/></a>
-				<p>Wood material from TextureCan <a href="https://www.texturecan.com/details/146/" target="_blank">&#10697</a></p>
+				<p>Skybox "City Rooftop Night Skybox" by Luis Vidal <a href="https://sketchfab.com/3d-models/city-rooftop-night-skybox-cce0e8aaa10f45ccb234e1aa2a3d5753" target="_blank">&#10697</a></p>
 				<p style="text-align: right;">&copy; 2024 Sven Frankson</p>
 			</div>
 		</div>
@@ -421,6 +429,11 @@
 			<div id="machine-editor-item-container">
 			</div>
 		</div>
+
+		<div id="auto-update-graphic-alert" style="display: none;">
+			<div></div>
+		</div>
+
         <canvas id="background-canvas" class="full-screen"></canvas>
         <canvas id="render-canvas" class="full-screen"></canvas>
 		<div id="screenshot-frame" style="display: none;"></div>

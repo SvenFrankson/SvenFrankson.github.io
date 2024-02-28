@@ -466,6 +466,7 @@ var Mummu;
         constructor() {
             this.hit = false;
             this.depth = 0;
+            this.index = -1;
         }
     }
     Mummu.Intersection = Intersection;
@@ -643,19 +644,21 @@ var Mummu;
         return intersection;
     }
     Mummu.SphereCapsuleIntersection = SphereCapsuleIntersection;
-    function SphereWireIntersection(cSphere, rSphere, path, rWire, pathIsEvenlyDistributed) {
+    var SphereWireIntersectionTmpWireProj_0 = { point: BABYLON.Vector3.Zero(), index: -1 };
+    function SphereWireIntersection(cSphere, rSphere, path, rWire, pathIsEvenlyDistributed, nearBestIndex, nearBestSearchRange) {
         let intersection = new Intersection();
-        let proj = BABYLON.Vector3.Zero();
-        Mummu.ProjectPointOnPathToRef(cSphere, path, proj, pathIsEvenlyDistributed);
-        let dist = BABYLON.Vector3.Distance(cSphere, proj);
+        let proj = SphereWireIntersectionTmpWireProj_0;
+        Mummu.ProjectPointOnPathToRef(cSphere, path, proj, pathIsEvenlyDistributed, nearBestIndex, nearBestSearchRange);
+        let dist = BABYLON.Vector3.Distance(cSphere, proj.point);
         let depth = (rSphere + rWire) - dist;
         if (depth > 0) {
             intersection.hit = true;
             intersection.depth = depth;
-            let dir = cSphere.subtract(proj).normalize();
+            let dir = cSphere.subtract(proj.point).normalize();
             intersection.point = dir.scale(rWire);
-            intersection.point.addInPlace(proj);
+            intersection.point.addInPlace(proj.point);
             intersection.normal = dir;
+            intersection.index = proj.index;
         }
         return intersection;
     }
@@ -1411,12 +1414,22 @@ var Mummu;
         return PprojP.length();
     }
     Mummu.DistancePointSegment = DistancePointSegment;
-    function ProjectPointOnPathToRef(point, path, ref, pathIsEvenlyDistributed) {
+    function ProjectPointOnPathToRef(point, path, ref, pathIsEvenlyDistributed, nearBestIndex = -1, nearBestSearchRange = 32) {
         let proj = TmpVec3[3];
         if (pathIsEvenlyDistributed && path.length >= 4) {
             let bestIndex = -1;
             let bestSqrDist = Infinity;
-            for (let i = 0; i < path.length; i++) {
+            let start;
+            let end;
+            if (nearBestIndex >= 0) {
+                start = Nabu.MinMax(nearBestIndex - nearBestSearchRange, 0, path.length);
+                end = Nabu.MinMax(nearBestIndex + nearBestSearchRange, 0, path.length);
+            }
+            else {
+                start = 0;
+                end = path.length;
+            }
+            for (let i = start; i < end; i++) {
                 let sqrDist = BABYLON.Vector3.DistanceSquared(point, path[i]);
                 if (sqrDist < bestSqrDist) {
                     bestIndex = i;
@@ -1430,7 +1443,8 @@ var Mummu;
                 ProjectPointOnSegmentToRef(point, path[i], path[i + 1], proj);
                 let sqrDist = BABYLON.Vector3.DistanceSquared(point, proj);
                 if (sqrDist < bestSqrDist) {
-                    ref.copyFrom(proj);
+                    ref.point.copyFrom(proj);
+                    ref.index = i;
                     bestSqrDist = sqrDist;
                 }
             }
@@ -1441,7 +1455,8 @@ var Mummu;
                 ProjectPointOnSegmentToRef(point, path[i], path[i + 1], proj);
                 let sqrDist = BABYLON.Vector3.DistanceSquared(point, proj);
                 if (sqrDist < bestSqrDist) {
-                    ref.copyFrom(proj);
+                    ref.point.copyFrom(proj);
+                    ref.index = i;
                     bestSqrDist = sqrDist;
                 }
             }
