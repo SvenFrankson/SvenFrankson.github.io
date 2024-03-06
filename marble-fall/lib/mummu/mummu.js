@@ -66,7 +66,7 @@ var Mummu;
                 });
             };
         }
-        static CreateNumbers(owner, obj, properties, onUpdateCallback, isAngle) {
+        static CreateNumbers(owner, obj, properties, onUpdateCallback, isAngle, easing) {
             return (targets, duration) => {
                 return new Promise(resolve => {
                     let n = properties.length;
@@ -82,6 +82,9 @@ var Mummu;
                         t += 1 / 60;
                         let f = t / duration;
                         if (f < 1) {
+                            if (easing) {
+                                f = easing(f);
+                            }
                             for (let i = 0; i < n; i++) {
                                 if (isAngle && isAngle[i]) {
                                     obj[properties[i]] = Nabu.LerpAngle(origins[i], targets[i], f);
@@ -111,7 +114,7 @@ var Mummu;
                 });
             };
         }
-        static CreateVector3(owner, obj, property, onUpdateCallback) {
+        static CreateVector3(owner, obj, property, onUpdateCallback, easing) {
             return (target, duration) => {
                 return new Promise(resolve => {
                     let origin = obj[property].clone();
@@ -124,6 +127,9 @@ var Mummu;
                         t += 1 / 60;
                         let f = t / duration;
                         if (f < 1) {
+                            if (easing) {
+                                f = easing(f);
+                            }
                             tmpVector3.copyFrom(target).scaleInPlace(f);
                             obj[property].copyFrom(origin).scaleInPlace(1 - f).addInPlace(tmpVector3);
                             if (onUpdateCallback) {

@@ -12,47 +12,8 @@
 		<link rel="stylesheet" type="text/css" href="./styles/machine-editor.css">
 	</head>
 	<body>
-		<div id="main-menu" class="page" style="opacity: 0;">
-			<menu-panel class="panel create" w="4" h="2">
-				<span class="label">CREATE</span>
-				<span class="label-2">Make your own circuit !</span>
-			</menu-panel>
-			<menu-panel class="panel demo" w="2" h="2">
-				<span class="label">DEMO I</span>
-				<span class="label-2">Tiny track</span>
-			</menu-panel>
-			<menu-panel class="panel demo" w="2" h="2">
-				<span class="label">DEMO II</span>
-				<span class="label-2">Simple curves</span>
-			</menu-panel>
-			<menu-panel class="panel demo" w="2" h="2">
-				<span class="label">DEMO III</span>
-				<span class="label-2">Endless loops</span>
-			</menu-panel>
-			<menu-panel class="panel demo" w="2" h="2">
-				<span class="label">DEMO IV</span>
-				<span class="label-2">Multiple branches</span>
-			</menu-panel>
-			<menu-panel class="panel demo" w="2" h="2">
-				<span class="label">DEMO V</span>
-				<span class="label-2">Large tornado</span>
-			</menu-panel>
-			<menu-panel class="panel demo" w="2" h="2">
-				<span class="label">DEMO VI</span>
-				<span class="label-2">Newton's 4th Law</span>
-			</menu-panel>
-			<menu-panel class="panel demo" w="2" h="2">
-				<span class="label">DEMO VII</span>
-				<span class="label-2">Pavlita</span>
-			</menu-panel>
-			<menu-panel class="panel demo" w="2" h="2">
-				<span class="label">DEMO VIII</span>
-				<span class="label-2">Aerials</span>
-			</menu-panel>
-			<menu-panel class="panel option" w="2" h="1"><span class="label">OPTIONS</span></menu-panel>
-			<menu-panel class="panel credit" w="2" h="1"><span class="label">CREDITS</span></menu-panel>
-			<a href="https://www.tiaratum.com" target="_blank"><menu-panel class="panel studio" w="2" h="1"></menu-panel></a>
-		</div>
+		<panel-page id="challenge-menu" class="page" file="challenge-page.xhtml" anim-line-height="2"></panel-page>
+		<panel-page id="main-menu" class="page" file="home-page.xhtml" anim-line-height="2"></panel-page>
 		<div id="options" class="page" style="opacity: 0;">
 			<div id="options" class="background">
 				<h2 style="opacity: 0.5;">Options</h2>
@@ -259,12 +220,12 @@
 				</svg>
 			</button>
 
-			<button id="toolbar-back" class="btn s"  title="Back to main menu">
+			<a href="#home"><button id="toolbar-back" class="btn s"  title="Back to main menu">
 				<svg class="label" viewBox="0 0 100 100">
 					<path d="M5 45 L25 30 L25 60 Z" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"></path>
 					<path d="M10 45 L80 45 L80 75" fill="none" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"></path>
 				</svg>
-			</button>
+			</button></a>
 
 			<button id="toolbar-screenshot" class="btn s"  title="Take circuit screenshot" style="display: none">
 				<svg class="label" viewBox="0 0 100 100">
@@ -368,6 +329,23 @@
 					</svg>
 				</button>
 			</div>
+			<div id="machine-editor-part-menu-color" class="line">
+				<span class="label">color</span>
+				
+				<button class="btn xxs minus">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M20 50 L80 50" fill="none" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				</button>
+
+				<span class="value">1</span>
+				
+				<button class="btn xxs plus">
+					<svg class="label" viewBox="0 0 100 100">
+						<path d="M20 50 L80 50 M50 20 L50 80" fill="none" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				</button>
+			</div>
 			<div id="machine-editor-part-menu-mirrorX" class="line">
 				<span class="label">mirrorX</span>
 				
@@ -437,5 +415,11 @@
         <canvas id="background-canvas" class="full-screen"></canvas>
         <canvas id="render-canvas" class="full-screen"></canvas>
 		<div id="screenshot-frame" style="display: none;"></div>
+		<nabu-popup id="challenge-tuto" duration="3">
+			<div></div>
+		</nabu-popup>
+		<nabu-popup id="challenge-next">
+			<a href="#challenge-menu"><button>Next</button></a>
+		</nabu-popup>
 	</body>
 </html>

@@ -1,0 +1,31 @@
+{
+    "balls": [
+        { "x": -0.4539999737739563, "y": -0.031499985218048095, "z": 0.05999999865889549 },
+        { "x": -0.4539999737739563, "y": 0.12218142712116241, "z": 0.05999999865889549 },
+        { "x": -0.4539999737739563, "y": 0.27586283946037293, "z": 0.05999999865889549 }
+    ],
+    "parts": [
+        { "name": "ramp-3.1.1", "i": -2, "j": 0, "k": -1, "mirrorX": true, "mirrorZ": false, "color": 0 },
+        { "name": "uturn-0.2", "i": 1, "j": 0, "k": -1, "color": 0 },
+        { "name": "uturn-0.2", "i": -3, "j": 0, "k": 1, "mirrorX": true, "mirrorZ": true, "color": 0 },
+        { "name": "join", "i": 0, "j": -1, "k": 0, "mirrorX": false, "mirrorZ": false, "color": 0 },
+        { "name": "ramp-3.1.1", "i": -2, "j": -1, "k": 2, "mirrorX": true, "mirrorZ": false, "color": 0 },
+        { "name": "uturn-0.3", "i": 1, "j": -1, "k": 0, "color": 0 },
+        { "name": "join", "i": -1, "j": -2, "k": 0, "mirrorX": false, "mirrorZ": false, "color": 0 },
+        { "name": "uturn-1.2", "i": -2, "j": -3, "k": -1, "mirrorX": true, "mirrorZ": false, "color": 0 },
+        { "name": "loop-1.1.1", "i": -2, "j": -4, "k": 1, "color": 0 },
+        { "name": "ramp-1.4.1", "i": -1, "j": -4, "k": 1, "mirrorX": true, "mirrorZ": false, "color": 0 },
+        { "name": "ramp-2.1.1", "i": -1, "j": -4, "k": -1, "mirrorX": true, "mirrorZ": false, "color": 0 },
+        { "name": "uturn-0.3", "i": 1, "j": -4, "k": -1, "mirrorX": false, "mirrorZ": true, "color": 0 },
+        { "name": "ramp-2.3.1", "i": 0, "j": -5, "k": 0, "mirrorX": true, "mirrorZ": false, "color": 0 },
+        { "name": "uturn-0.2", "i": 2, "j": -5, "k": 0, "color": 0 },
+        { "name": "split", "i": 0, "j": -6, "k": 1, "mirrorX": false, "mirrorZ": false, "color": 0 },
+        { "name": "uturn-0.3", "i": -2, "j": -6, "k": -1, "mirrorX": true, "mirrorZ": false, "color": 0 },
+        { "name": "ramp-1.0.1", "i": -1, "j": -6, "k": 1, "mirrorX": false, "mirrorZ": false, "color": 0 },
+        { "name": "snake-1.2.3", "i": 1, "j": -7, "k": -1, "mirrorX": false, "mirrorZ": false, "color": 0 },
+        { "name": "ramp-1.1.1", "i": -1, "j": -7, "k": -1, "mirrorX": true, "mirrorZ": false, "color": 0 },
+        { "name": "split", "i": 0, "j": -9, "k": -1, "mirrorX": false, "mirrorZ": false, "color": 0 },
+        { "name": "ramp-2.1.1", "i": -2, "j": -10, "k": -1, "mirrorX": false, "mirrorZ": false, "color": 0 },
+        { "name": "elevator-12", "i": -3, "j": -11, "k": -1, "mirrorX": true, "mirrorZ": false, "color": 0 }
+    ]
+}
