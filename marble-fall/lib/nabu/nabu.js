@@ -1560,15 +1560,14 @@ var Nabu;
             let m = Math.min(tileW, tileH) / 15;
             for (let i = 0; i < this.panels.length; i++) {
                 let panel = this.panels[i];
-                panel.style.display = "block";
                 panel.style.width = (panel.w * tileW - 2 * m).toFixed(0) + "px";
                 panel.style.height = (panel.h * tileH - 2 * m).toFixed(0) + "px";
                 panel.style.position = "absolute";
                 panel.computedLeft = panel.x * tileW + m;
+                panel.computedTop = panel.y * tileH + m + emptyLinesBottom * 0.5 * tileH;
                 if (panel.style.display != "none") {
                     panel.style.left = panel.computedLeft.toFixed(0) + "px";
                 }
-                panel.computedTop = panel.y * tileH + m + emptyLinesBottom * 0.5 * tileH;
                 panel.style.top = panel.computedTop.toFixed(0) + "px";
                 let label = panel.querySelector(".label");
                 if (label) {
@@ -1600,6 +1599,8 @@ var Nabu;
             this._onHRefChange = async () => {
                 let split = this._currentHRef.split("/");
                 let page = split[split.length - 1];
+                let splitPage = page.split("#");
+                page = "#" + splitPage[splitPage.length - 1];
                 this.onHRefChange(page);
             };
         }
