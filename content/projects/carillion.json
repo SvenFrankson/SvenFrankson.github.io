@@ -1,0 +1,14 @@
+{
+    "name": "Carillion",
+    "imgs": [
+        {
+            "src": "./public/img/carillion-level-14.png"
+        }
+    ],
+    "links": [
+        {
+            "text": "Play",
+            "href": "https://carillion.tiaratum.com/"
+        }
+    ]
+}
